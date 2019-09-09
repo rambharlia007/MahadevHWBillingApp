@@ -1,0 +1,48 @@
+﻿
+@{
+    ViewBag.Title = "Items";
+}
+
+<h2>Items</h2>
+
+<table class="table" id="app">
+    <thead class="thead-light">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">First</th>
+            <th scope="col">Last</th>
+            <th scope="col">Handle</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr v-for="todo in todos">
+            <th scope="row">1</th>
+            <td>{{todo.Name}}</td>
+            <td>{{todo.Category}}</td>
+            <td>{{todo.Unit}}</td>
+            <td>{{todo.Price}}</td>
+        </tr>
+    </tbody>
+</table>
+
+<script>
+
+    $(document).ready(function () {
+        var obj = {
+            todos: []
+        }
+
+        new Vue({
+            el: '#app',
+            data: obj,
+            beforeMount() {
+                var self = this;
+                $.get("/item/GetData", function (data, status) {
+                    self.todos = data;
+                });
+            },
+        })
+    });
+
+    
+</script>
