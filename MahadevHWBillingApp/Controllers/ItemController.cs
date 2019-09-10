@@ -15,6 +15,12 @@ namespace MahadevHWBillingApp.Controllers
         {
             return View();
         }
+
+        public ActionResult New()
+        {
+            return View();
+        }
+
         public JsonResult GetData()
         {
             using (var context = new SQLiteConnection(@"Data Source=E:\SqlLiteDB\DB\GSTBilling.db"))
