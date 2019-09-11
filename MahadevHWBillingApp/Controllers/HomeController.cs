@@ -23,8 +23,33 @@ namespace MahadevHWBillingApp.Controllers
             //    return xx;
             //}
 
+            using (var x = new MahadevHWContext())
+            {
+                for (int i = 0; i < 100000; i++)
+                {
+                    x.Items.Add(new Item()
+                    {
+                        Amount = 1000,
+                        Category = "fkjslk",
+                        Name = "sjlkfs",
+                        Unit = "500 lts"
+                    });
+                }
+
+                //x.SaveChanges();
+            }
+
             return View();
 
+        }
+
+        public JsonResult CreateDb()
+        {
+            using (var x = new MahadevHWContext())
+            {
+                // create DB
+                return Json("Db created", JsonRequestBehavior.AllowGet);
+            }
         }
 
         public ActionResult About()

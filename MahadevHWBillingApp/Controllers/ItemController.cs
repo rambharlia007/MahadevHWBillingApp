@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using MahadevHWBillingApp.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
@@ -11,6 +12,13 @@ namespace MahadevHWBillingApp.Controllers
 {
     public class ItemController : Controller
     {
+        private MahadevHWContext _mahadevHwContext;
+
+        public ItemController()
+        {
+            _mahadevHwContext = new MahadevHWContext();
+        }
+
         public ActionResult Index()
         {
             return View();
@@ -23,7 +31,7 @@ namespace MahadevHWBillingApp.Controllers
 
         public JsonResult GetData()
         {
-            using (var context = new SQLiteConnection(@"Data Source=E:\SqlLiteDB\DB\GSTBilling.db"))
+            using (var context = new SQLiteConnection(@"Data Source=D:\GSTBilling.db"))
             {
                 var data = @"select  * from Items LIMIT 1000";
                 var x = context.Query<Item>(data);
@@ -31,6 +39,32 @@ namespace MahadevHWBillingApp.Controllers
                 xx.MaxJsonLength = int.MaxValue;
                 return xx;
             }
+        }
+
+        [HttpPost]
+        public JsonResult AddItem(Item item)
+        {
+            _mahadevHwContext.Items.Add(item);
+            _mahadevHwContext.SaveChanges();
+            return Json("Item created");
+        }
+
+        [HttpPost]
+        public JsonResult EditItem(Item item)
+        {
+            _mahadevHwContext.Entry(item).State = EntityState.Modified;
+            _mahadevHwContext.SaveChanges();
+            return Json("Item Edited");
+        }
+
+        public JsonResult RemoveItem(int id)
+        {
+            using (var context = new SQLiteConnection(@"Data Source=D:\GSTBilling.db"))
+            {
+                var query = $@"Delete from Items Where Id = {id}";
+                context.Execute(query);
+            }
+            return Json("Item deleted", JsonRequestBehavior.AllowGet);
         }
     }
 }

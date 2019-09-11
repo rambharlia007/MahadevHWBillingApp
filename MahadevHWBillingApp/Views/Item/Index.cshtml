@@ -13,31 +13,52 @@
     .pointer {
         cursor: pointer;
     }
+    .hide {
+        display: none;
+    }
+    [v-cloak] {
+        display: none;
+    }
 </style>
 
 <div id="app">
+    <div class="alert alert-success alert-dismissible fade show" role="alert" v-cloak v-bind:class="{hide:!isSuccess}" style="margin-top: 20px;">
+        {{alertMessage}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+   
+    <div v-cloak class="alert alert-success alert-dismissible fade show" role="alert" v-bind:class="{hide:!isFailure}" style="margin-top: 20px;">
+        {{alertMessage}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
     <div class="card" style="margin-top:15px;">
         <div class="card-body">
             <table class="table text-secondary" style="font-size:14px;">
                 <thead class="thead-light">
-                    <tr>
-                        <th scope="col">Name</th>
-                        <th scope="col">Category</th>
-                        <th scope="col">Unit</th>
-                        <th scope="col">Amount</th>
-                        <th scope="col">Edit</th>
-                        <th scope="col">Delete</th>
-                    </tr>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Unit</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Edit</th>
+                    <th scope="col">Delete</th>
+                </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="item in items">
-                        <td>{{item.Name}}</td>
-                        <td>{{item.Category}}</td>
-                        <td>{{item.Unit}}</td>
-                        <td>{{item.Amount}}</td>
-                        <td><i class="fa fa-edit pointer" v-on:click="editItem(item)"></i></td>
-                        <td><i class="fa fa-trash pointer" v-on:click="deleteItem(item.Id)"></i></td>
-                    </tr>
+                <tr v-for="item in items">
+                    <td>{{item.Name}}</td>
+                    <td>{{item.Category}}</td>
+                    <td>{{item.Unit}}</td>
+                    <td>{{item.Amount}}</td>
+                    <td><i class="fa fa-edit pointer" v-on:click="editItem(item)"></i></td>
+                    <td><i class="fa fa-trash pointer" v-on:click="deleteItem(item.Id)"></i>
+                        <i class="fa fa-spinner fa-spin" v-if="isSpinner"></i>
+                    </td>
+                </tr>
                 </tbody>
             </table>
         </div>
@@ -56,68 +77,101 @@
 
                 <!-- Modal body -->
                 <div class="modal-body">
-                            <form>
-                                <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">Name</label>
-                                    <div class="col-sm-10">
-                                        <input v-model="item.Name" type="text" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">Category</label>
-                                    <div class="col-sm-10">
-                                        <input v-model="item.Category" type="text" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">Unit</label>
-                                    <div class="col-sm-10">
-                                        <input v-model="item.Unit" type="text" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">Amount</label>
-                                    <div class="col-sm-10">
-                                        <input v-model="item.Amount" type="text" class="form-control">
-                                    </div>
-                                </div>
-                            </form>
-                    </div>
-
-                    <!-- Modal footer -->
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                    </div>
-
+                    <form>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">Name</label>
+                            <div class="col-sm-10">
+                                <input v-model="item.Name" type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">Category</label>
+                            <div class="col-sm-10">
+                                <input v-model="item.Category" type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">Unit</label>
+                            <div class="col-sm-10">
+                                <input v-model="item.Unit" type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">Amount</label>
+                            <div class="col-sm-10">
+                                <input v-model="item.Amount" type="text" class="form-control">
+                            </div>
+                        </div>
+                    </form>
                 </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" data-dismiss="modal" v-on:click="saveEditItem()">Submit</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 <script>
 
-    $(document).ready(function () {
+    $(document).ready(function() {
         var obj = {
             items: [],
-            item: {}
+            item: {},
+            isSuccess: false,
+            isFailure: false,
+            isSpinner: false,
+            alertMessage: ""
         }
 
         new Vue({
             el: '#app',
             data: obj,
             methods: {
-                editItem: function (item) {
+                editItem: function(item) {
                     $("#myModal").modal("show");
                     this.item = item;
                 },
                 deleteItem: function (id) {
-
+                    var self = this;
+                    self.isSpinner = true
+                    $.get("/item/RemoveItem?id=" + id,
+                        function(data) {
+                            self.isSpinner = false;
+                            self.alertMessage = "Item deleted succesfully";
+                            self.isSuccess = true;
+                            self.initialLoad();
+                        }).fail(function() {
+                            self.isSpinner = false;
+                            self.isFailure = true;
+                            self.alertMessage = "Internal server error";
+                    })
+                },
+                saveEditItem: function() {
+                    var self = this;
+                    if (self.item) {
+                        $.post("/item/EditItem", self.item, function( data ) {
+                            self.isSuccess = true;
+                            self.alertMessage = "Item Edited succesfully"
+                        }).fail(function() {
+                            alertMessage = "Internal server error"
+                        });;
+                    }
+                },
+                initialLoad: function() {
+                    var self = this;
+                    $.get("/item/GetData",
+                        function(data, status) {
+                            self.items = data;
+                        }).fail(function() {
+                        alertMessage = "Internal server error"
+                    });
                 }
             },
             beforeMount() {
-                var self = this;
-                $.get("/item/GetData", function (data, status) {
-                    self.items = data;
-                });
+                this.initialLoad();
             },
         })
     });
