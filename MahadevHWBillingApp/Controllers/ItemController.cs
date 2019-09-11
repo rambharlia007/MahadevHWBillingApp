@@ -31,7 +31,7 @@ namespace MahadevHWBillingApp.Controllers
 
         public JsonResult GetData()
         {
-            using (var context = new SQLiteConnection(@"Data Source=D:\GSTBilling.db"))
+            using (var context = new SQLiteConnection(@"Data Source=E:\SqlLiteDB\DB\GSTBilling.db"))
             {
                 var data = @"select  * from Items LIMIT 1000";
                 var x = context.Query<Item>(data);
@@ -42,9 +42,12 @@ namespace MahadevHWBillingApp.Controllers
         }
 
         [HttpPost]
-        public JsonResult AddItem(Item item)
+        public JsonResult AddItems(List<Item> items)
         {
-            _mahadevHwContext.Items.Add(item);
+            foreach (var item in items)
+            {
+                _mahadevHwContext.Items.Add(item);
+            }
             _mahadevHwContext.SaveChanges();
             return Json("Item created");
         }
@@ -59,7 +62,7 @@ namespace MahadevHWBillingApp.Controllers
 
         public JsonResult RemoveItem(int id)
         {
-            using (var context = new SQLiteConnection(@"Data Source=D:\GSTBilling.db"))
+            using (var context = new SQLiteConnection(@"Data Source=E:\SqlLiteDB\DB\GSTBilling.db"))
             {
                 var query = $@"Delete from Items Where Id = {id}";
                 context.Execute(query);

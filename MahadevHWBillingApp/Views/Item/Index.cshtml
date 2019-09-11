@@ -21,44 +21,48 @@
     }
 </style>
 
-<div id="app">
+<div id="app" style="margin-top:20px;">
     <div class="alert alert-success alert-dismissible fade show" role="alert" v-cloak v-bind:class="{hide:!isSuccess}" style="margin-top: 20px;">
         {{alertMessage}}
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
-   
+
     <div v-cloak class="alert alert-success alert-dismissible fade show" role="alert" v-bind:class="{hide:!isFailure}" style="margin-top: 20px;">
         {{alertMessage}}
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
-    <div class="card" style="margin-top:15px;">
+    <div style="padding-bottom:15px;">
+        <button type="button" class="btn btn-success" v-on:click="openModalForAddProduct()">Add Product</button>
+    </div>
+    <div class="card">
         <div class="card-body">
             <table class="table text-secondary" style="font-size:14px;">
                 <thead class="thead-light">
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Category</th>
-                    <th scope="col">Unit</th>
-                    <th scope="col">Amount</th>
-                    <th scope="col">Edit</th>
-                    <th scope="col">Delete</th>
-                </tr>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Unit</th>
+                        <th scope="col">Amount</th>
+                        <th scope="col">Edit</th>
+                        <th scope="col">Delete</th>
+                    </tr>
                 </thead>
                 <tbody>
-                <tr v-for="item in items">
-                    <td>{{item.Name}}</td>
-                    <td>{{item.Category}}</td>
-                    <td>{{item.Unit}}</td>
-                    <td>{{item.Amount}}</td>
-                    <td><i class="fa fa-edit pointer" v-on:click="editItem(item)"></i></td>
-                    <td><i class="fa fa-trash pointer" v-on:click="deleteItem(item.Id)"></i>
-                        <i class="fa fa-spinner fa-spin" v-if="isSpinner"></i>
-                    </td>
-                </tr>
+                    <tr v-for="item in items">
+                        <td>{{item.Name}}</td>
+                        <td>{{item.Category}}</td>
+                        <td>{{item.Unit}}</td>
+                        <td>{{item.Amount}}</td>
+                        <td><i class="fa fa-edit pointer" v-on:click="editItem(item)"></i></td>
+                        <td>
+                            <i class="fa fa-trash pointer" v-on:click="deleteItem(item.Id)"></i>
+                            <i class="fa fa-spinner fa-spin" v-if="isSpinner"></i>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -107,12 +111,58 @@
 
                 <!-- Modal footer -->
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-success" data-dismiss="modal" v-on:click="saveEditItem()">Submit</button>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="modal" id="add-product">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Modal Heading</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <form>
+                        <div class="form-row" v-for="item in newItems" style="padding-bottom:5px;">
+                            <div class="col-3">
+                                <input type="text" v-model="item.Name" class="form-control" placeholder="Name">
+                            </div>
+                            <div class="col">
+                                <input type="text" v-model="item.Category" class="form-control" placeholder="Category">
+                            </div>
+                            <div class="col">
+                                <input type="text" v-model="item.Unit" class="form-control" placeholder="Unit">
+                            </div>
+                            <div class="col">
+                                <input type="text" v-model="item.Amount" class="form-control" placeholder="Amount">
+                            </div>
+                            <div class="col">
+                                <input type="text" v-model="item.SGST" class="form-control" placeholder="SGST">
+                            </div>
+                            <div class="col">
+                                <input type="text" v-model="item.CGST" class="form-control" placeholder="CGST">
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-success btn-sm" v-on:click="addProduct()">Add Product</button>
+                    </form>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal" v-on:click="saveNewProduct()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 </div>
 <script>
 
@@ -123,7 +173,14 @@
             isSuccess: false,
             isFailure: false,
             isSpinner: false,
-            alertMessage: ""
+            alertMessage: "",
+            newItems: [{
+                Name: "",
+                Amount: "",
+                CGST: "",
+                SGST: "",
+                Category: ""
+            }]
         }
 
         new Vue({
@@ -149,6 +206,34 @@
                             self.alertMessage = "Internal server error";
                     })
                 },
+                openModalForAddProduct: function () {
+                    $("#add-product").modal("show");
+                },
+                addProduct: function () {
+                    this.newItems.push({
+                        Name: "",
+                        Amount: "",
+                        CGST: "",
+                        SGST: "",
+                        Category:""
+                    })
+                },
+                saveNewProduct: function () {
+                    var self = this;
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("AddItems", "Item")',
+                        data: JSON.stringify(self.newItems),
+                        dataType: 'json',
+                        contentType: 'application/json; charset=utf-8',
+                        success: function () {
+                            self.isSuccess = true;
+                            self.alertMessage = "Item Added succesfully"
+                            self.newItems = [];
+                            self.initialLoad()
+                        }
+                    });
+                },
                 saveEditItem: function() {
                     var self = this;
                     if (self.item) {
@@ -157,7 +242,7 @@
                             self.alertMessage = "Item Edited succesfully"
                         }).fail(function() {
                             alertMessage = "Internal server error"
-                        });;
+                        });
                     }
                 },
                 initialLoad: function() {

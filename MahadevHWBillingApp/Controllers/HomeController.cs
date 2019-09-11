@@ -16,16 +16,13 @@ namespace MahadevHWBillingApp.Controllers
         {
             //using (var context = new SQLiteConnection(@"Data Source=E:\SqlLiteDB\DB\GSTBilling.db"))
             //{
-            //    var data = @"select * from Items";
-            //    var x = context.Query<Item>(data);
-            //    var xx = Json(x, JsonRequestBehavior.AllowGet);
-            //    xx.MaxJsonLength = int.MaxValue;
-            //    return xx;
+            //    var data = @"delete from Items";
+            //    context.Execute(data);
             //}
 
             using (var x = new MahadevHWContext())
             {
-                for (int i = 0; i < 100000; i++)
+                for (int i = 0; i < 1000; i++)
                 {
                     x.Items.Add(new Item()
                     {
@@ -36,7 +33,7 @@ namespace MahadevHWBillingApp.Controllers
                     });
                 }
 
-                //x.SaveChanges();
+                x.SaveChanges();
             }
 
             return View();
