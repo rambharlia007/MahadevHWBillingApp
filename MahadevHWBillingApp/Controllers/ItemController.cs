@@ -1,12 +1,8 @@
-﻿using Dapper;
-using MahadevHWBillingApp.Models;
+﻿using MahadevHWBillingApp.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
+using MahadevHWBillingApp.Helper;
 
 namespace MahadevHWBillingApp.Controllers
 {
@@ -31,14 +27,10 @@ namespace MahadevHWBillingApp.Controllers
 
         public JsonResult GetData()
         {
-            using (var context = new SQLiteConnection(@"Data Source=E:\SqlLiteDB\DB\GSTBilling.db"))
-            {
-                var data = @"select  * from Items LIMIT 1000";
-                var x = context.Query<Item>(data);
-                var xx = Json(x, JsonRequestBehavior.AllowGet);
-                xx.MaxJsonLength = int.MaxValue;
-                return xx;
-            }
+            var items = Helper.Dapper.Get<Item>(Query.GetItem);
+            var response = Json(items, JsonRequestBehavior.AllowGet);
+            response.MaxJsonLength = int.MaxValue;
+            return response;
         }
 
         [HttpPost]
@@ -62,11 +54,7 @@ namespace MahadevHWBillingApp.Controllers
 
         public JsonResult RemoveItem(int id)
         {
-            using (var context = new SQLiteConnection(@"Data Source=E:\SqlLiteDB\DB\GSTBilling.db"))
-            {
-                var query = $@"Delete from Items Where Id = {id}";
-                context.Execute(query);
-            }
+            Helper.Dapper.Execute(Query.DeleteItem(new List<int> {id}));
             return Json("Item deleted", JsonRequestBehavior.AllowGet);
         }
     }
