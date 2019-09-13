@@ -20,7 +20,17 @@
         display: none;
     }
 </style>
-
+<div class="row" style="background-color: #f6f7f8 !important;">
+    <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb" style="padding-bottom: 0px; margin-bottom: 0px; background-color: #f6f7f8 !important;">
+                <li class="breadcrumb-item"><i class="fa fa-home">&nbsp;</i><a href="#">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Products</li>
+            </ol>
+        </nav>
+        <h4 style="padding-left: 15px;">Products</h4>
+    </div>
+</div>
 <div id="app" style="margin-top:20px;">
     <div class="alert alert-success alert-dismissible fade show" role="alert" v-cloak v-bind:class="{hide:!isSuccess}" style="margin-top: 20px;">
         {{alertMessage}}
@@ -35,36 +45,54 @@
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
-    <div style="padding-bottom:15px;">
-        <button type="button" class="btn btn-success" v-on:click="openModalForAddProduct()">Add Product</button>
-    </div>
+   
     <div class="card">
-        <div class="card-body" style="font-size:14px; overflow-y: scroll; height:1000px;">
-            <table class="table text-secondary" style="font-size:14px;">
+        <div class="card-body" style="font-size:14px;">
+            <div style="padding-bottom:15px;">
+                <button type="button" class="btn btn-success" v-on:click="openModalForAddProduct()">Add Product</button>
+            </div>
+            @*<table class="table text-secondary" style="font-size:14px;">
                 <thead class="thead-light">
-                    <tr>
-                        <th scope="col">Name</th>
-                        <th scope="col">Category</th>
-                        <th scope="col">Unit</th>
-                        <th scope="col">Amount</th>
-                        <th scope="col">Edit</th>
-                        <th scope="col">Delete</th>
-                    </tr>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Unit</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Edit</th>
+                    <th scope="col">Delete</th>
+                </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="item in items">
-                        <td>{{item.Name}}</td>
-                        <td>{{item.Category}}</td>
-                        <td>{{item.Unit}}</td>
-                        <td>{{item.Amount}}</td>
-                        <td><i class="fa fa-edit pointer" v-on:click="editItem(item)"></i></td>
-                        <td>
-                            <i class="fa fa-trash pointer" v-on:click="deleteItem(item.Id)"></i>
-                            <i class="fa fa-spinner fa-spin" v-if="isSpinner"></i>
-                        </td>
-                    </tr>
+                <tr v-for="item in items">
+                    <td>{{item.Name}}</td>
+                    <td>{{item.Category}}</td>
+                    <td>{{item.Unit}}</td>
+                    <td>{{item.Amount}}</td>
+                    <td><i class="fa fa-edit pointer" v-on:click="editItem(item)"></i></td>
+                    <td>
+                        <i class="fa fa-trash pointer" v-on:click="deleteItem(item.Id)"></i>
+                        <i class="fa fa-spinner fa-spin" v-if="isSpinner"></i>
+                    </td>
+                </tr>
                 </tbody>
+            </table>*@
+            
+            <table
+                id="product-table"
+                class="table text-secondary" style="font-size:14px;"
+            >
+                <thead class="thead-light">
+                <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Unit</th>
+                    <th>Amount</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+                </thead>
             </table>
+
         </div>
     </div>
 
@@ -164,6 +192,7 @@
 
 
 </div>
+
 <script>
 
     $(document).ready(function() {
@@ -180,7 +209,8 @@
                 CGST: "",
                 SGST: "",
                 Category: ""
-            }]
+            }],
+            tableRef:null
         }
 
         new Vue({
@@ -199,7 +229,7 @@
                             self.isSpinner = false;
                             self.alertMessage = "Item deleted succesfully";
                             self.isSuccess = true;
-                            self.initialLoad();
+                           // self.initialLoad();
                         }).fail(function() {
                             self.isSpinner = false;
                             self.isFailure = true;
@@ -230,7 +260,7 @@
                             self.isSuccess = true;
                             self.alertMessage = "Item Added succesfully"
                             self.newItems = [];
-                            self.initialLoad()
+                           // self.initialLoad()
                         }
                     });
                 },
@@ -253,10 +283,50 @@
                         }).fail(function() {
                         alertMessage = "Internal server error"
                     });
+                },
+                getTableData:function() {
+                    this.tableRef = $("#product-table").DataTable({
+                        ajax: {
+                            url: "/item/GetData",
+                            type: "GET",
+                            dataSrc: function (json) {
+                                return json;
+                            },
+                            error: function (xhr, error) {
+                                if (xhr.status == 401) alert("Unauthorised user");
+                            }
+                        },
+                        fixedHeader: {
+                            header: true,
+                            footer: true
+                        },
+                        columns: [
+                            { data: "Name" },
+                            { data: "Category" },
+                            { data: "Unit" },
+                            { data: "Amount" },
+                            {
+                                render: function (data, type, row, meta) {
+                                    return `<i class="fa fa-edit pointer" v-on:click="editItem(item)"></i>`;
+
+                                }
+                            },
+                            {
+                                render: function (data, type, row, meta) {
+                                    return `<i class="fa fa-trash pointer" v-on:click="deleteItem(item.Id)"></i>`;  
+                                }
+                            },
+                        ],
+                        lengthMenu: [[10, 20, 25, 30, 100], [10, 20, 25, 30, 100]],
+                        initComplete: function (settings, json) {
+                            $('[data-toggle="tooltip"]').tooltip();
+                        }
+                    });
                 }
             },
-            beforeMount() {
-                this.initialLoad();
+            mounted() {
+               // this.initialLoad();
+                this.getTableData();
             },
         })
     });
