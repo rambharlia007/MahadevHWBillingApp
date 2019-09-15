@@ -12,5 +12,7 @@ namespace MahadevHWBillingApp.Models
         public string Name { get; set; }
         public string Unit { get; set; }
         public string Category { get; set; }
+        public int SGST { get; set; }
+        public int CGST { get; set; }
     }
 }

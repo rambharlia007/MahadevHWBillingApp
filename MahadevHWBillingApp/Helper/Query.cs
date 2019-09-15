@@ -8,7 +8,15 @@ namespace MahadevHWBillingApp.Helper
 
         public static string DeleteItem(IList<int> ids)
         {
-            return $"Delete From Item Where Id in ({string.Join(",", ids)})";
-        } 
+            return $"Delete From Items Where Id in ({string.Join(",", ids)})";
+        }
+        public static string GetItemById(int id)
+        {
+            return $"Select * From Items Where Id in ({id})";
+        }
+        public static string GetItemBySearch(string filter)
+        {
+            return $"Select * From Items Where Name like '%{filter}%'";
+        }
     }
 }

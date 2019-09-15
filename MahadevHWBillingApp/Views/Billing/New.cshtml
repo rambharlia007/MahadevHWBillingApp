@@ -1,0 +1,363 @@
+﻿@{
+    ViewBag.Title = "New";
+}
+
+<style>
+    @@page {
+        size: auto;
+        margin: 0mm;
+    }
+    .pointer {
+        cursor: pointer;
+    }
+
+    .hide {
+        display: none;
+    }
+
+    [v-cloak] {
+        display: none;
+    }
+    .bg-grey{
+        background-color:#eee;
+    }
+
+    .table-body {
+        display: block;
+        max-height: 200px;
+        overflow-y: scroll;
+    }
+
+        .table-head, .table-body .table-row {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+
+</style>
+
+<div id="app" v-cloak>
+    <div class="row d-print-none" style="background-color: #f6f7f8 !important;">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" style="padding-bottom: 0px; margin-bottom: 0px; background-color: #f6f7f8 !important;">
+                    <li class="breadcrumb-item"><i class="fa fa-home">&nbsp;</i><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Billing</li>
+                </ol>
+            </nav>
+            <h4 style="padding-left: 15px;">Billing</h4>
+        </div>
+        <div class="col-md-4">
+                <button style="margin-top:25px; float:right;" type="button" class="btn btn-success btn-sm" v-if="!isPreview" v-on:click="showOrHidePreview(true)">Preview</button>
+                <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-if="isPreview" v-on:click="showOrHidePreview(false)">Hide Preview</button>
+                <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-if="isPreview" v-on:click="print()">Print</button>
+        </div>
+    </div>
+    <div style="margin-top:20px;">
+        <div class="alert alert-success alert-dismissible fade show" role="alert" v-cloak v-bind:class="{hide:!alertMessage}" style="margin-top: 20px;">
+            {{alertMessage}}
+            <button type="button" class="close" v-on:click="closeAlertMessage('alertMessage')" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <div v-cloak class="alert alert-danger alert-dismissible fade show" role="alert" v-bind:class="{hide:!alertFailureMessage}" style="margin-top: 20px;">
+            {{alertFailureMessage}}
+            <button type="button" class="close" v-on:click="closeAlertMessage('alertFailureMessage')" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <div class="card" v-if="!isPreview">
+            <div class="card-body" style="font-size:14px;">
+                <table class="table text-secondary" style="font-size:14px;">
+                    <thead class="thead-light table-head">
+                        <tr class="table-row">
+                            <th style="width:45px" scope="col">#</th>
+                            <th style="width:200px;" scope="col">Name</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">GST %</th>
+                            <th scope="col">CGST</th>
+                            <th scope="col">SGST</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Total</th>
+
+                        </tr>
+                    </thead>
+                    <tbody class="table-body">
+                        <tr v-for="(item,index) in items">
+                            <td style="width:45px">{{index+1}}</td>
+                            <td style="width:200px;" v-bind:["data-id"]="index">
+                                <select class="product-select-2 js-example-basic-single js-states form-control"></select>
+                            </td>
+                            <td> <input type="text" v-model="item.BasePrice" class="form-control form-control-sm bg-grey"></td>
+                            <td> <input type="text" readonly v-model="item.GST" class="form-control form-control-sm bg-grey"></td>
+                            <td> <input type="text" v-model="item.CGST" class="form-control form-control-sm bg-grey"></td>
+                            <td> <input type="text" v-model="item.SGST" class="form-control form-control-sm bg-grey"></td>
+                            <td> <input type="text" v-model="item.Quantity" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
+                            <td> <input type="text" v-model="item.Amount" class="form-control form-control-sm"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="row">
+                    <div class="col-lg-4 col-sm-5">
+
+                    </div>
+
+                    <div class="col-lg-4 col-sm-5 ml-auto">
+                        <table class="table table-sm table-clear">
+                            <tbody>
+                                <tr>
+                                    <td class="left">
+                                        <strong>Subtotal</strong>
+                                    </td>
+                                    <td class="right">{{subTotal}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="left">
+                                        <strong>TAX </strong>
+                                    </td>
+                                    <td class="right">{{tax}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="left">
+                                        <strong>Total</strong>
+                                    </td>
+                                    <td class="right">
+                                        <strong>{{total}}</strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="card" v-if="isPreview" id="print-bill">
+            <div class="card-header">
+                Invoice
+                <strong>12345</strong>
+                <span class="float-right"> <strong>GSTIN:</strong> 123453424242</span>
+
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-sm-6">
+                        <h6 class="mb-3">From:</h6>
+                        <div>
+                            <strong>Mahadev Hardware & Electricals</strong>
+                        </div>
+                        <div>TC Palya main road</div>
+                        <div>Bangalore 560036</div>
+                        <div>Email: surajbharlia007@gmail.com</div>
+                        <div>Phone: +91 9741480000</div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <h6 class="mb-3">To:</h6>
+                        <div>
+                            <strong>Pidilite India</strong>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="table-responsive-sm">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th style="width:45px" scope="col">#</th>
+                                <th style="width:200px;" scope="col">Name</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">CGST</th>
+                                <th scope="col">SGST</th>
+                                <th scope="col">Quantity</th>
+                                <th scope="col">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(item,index) in items" v-if="item.Name">
+                                <td class="center">{{index+1}}</td>
+                                <td class="left strong">{{item.Name}}</td>
+                                <td class="right">{{item.BasePrice}}</td>
+                                <td class="center">{{item.CGST}}</td>
+                                <td class="center">{{item.SGST}}</td>
+                                <td class="center">{{item.Quantity}}</td>
+                                <td class="center">{{item.Amount}}</td>
+                            </tr>
+                          
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-sm-5">
+
+                    </div>
+
+                    <div class="col-lg-4 col-sm-5 ml-auto">
+                        <table class="table table-sm table-clear">
+                            <tbody>
+                                <tr>
+                                    <td class="left">
+                                        <strong>Subtotal</strong>
+                                    </td>
+                                    <td class="right">{{subTotal}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="left">
+                                        <strong>TAX</strong>
+                                    </td>
+                                    <td class="right">{{tax}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="left">
+                                        <strong>Total</strong>
+                                    </td>
+                                    <td class="right">
+                                        <strong>{{total}}</strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        var items = [];
+
+        //for (i = 0; i < 25; i++) {
+        //    items.push({
+        //        Name: "",
+        //        Unit: "",
+        //        Quantity: "",
+        //        CGST: "",
+        //        SGST: "",
+        //        Amount: "",
+        //        BasePrice: "",
+        //        GST: ""
+        //    })
+        //}
+
+
+        for (i = 0; i < 25; i++) {
+            items.push({
+                Name: "xxw",
+                Unit: "100 ml",
+                Quantity: "5",
+                CGST: "25",
+                SGST: "35",
+                Amount: "1234",
+                BasePrice: "456",
+                GST: "18"
+            })
+        }
+
+        var obj = {
+            alertFailureMessage: "",
+            alertMessage: "",
+            items: items,
+            isPreview: false
+        }
+        new Vue({
+            el: '#app',
+            data: obj,
+            methods: {
+                calculatePerItemAmount: function (index) {
+                    var ref = this.items[index];
+                    ref.Amount = ref.BasePrice * ref.Quantity;
+                },
+                showOrHidePreview: function (value) {
+                    this.isPreview = value;
+                },
+                print: function () {
+                    window.print();
+                }
+            },
+            computed: {
+                subTotal: function () {
+                    var totalAmount = 0;
+                    this.items.forEach(function (item) {
+                        totalAmount += parseFloat(item.CGST || 0);
+                    })
+                    return totalAmount;
+                },
+                tax: function () {
+                    var totalTax = 0;
+                    this.items.forEach(function (item) {
+                        totalTax += Math.round((parseFloat(item.CGST || 0) + parseFloat(item.SGST || 0)) * 100) / 100; 
+                    })
+                    return totalTax;
+                },
+                total: function () {
+                    return Math.round((parseFloat(this.subTotal) + parseFloat(this.tax)) * 100) / 100;
+                },
+            },
+            mounted() {
+                var self = this;
+                $(".product-select-2").select2({
+                    ajax: {
+                        url: "/item/GetDataBySearch",
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            return {
+                                q: params.term, 
+                                page: params.page
+                            };
+                        },
+                        processResults: function (data, params) {
+                            var products = [];
+                            data.forEach((product) => {
+                                products.push({
+                                    id: product.Id,
+                                    text: product.Name,
+                                    BasePrice: product.Amount,
+                                    CGST: product.CGST,
+                                    SGST: product.SGST
+                                })
+                            });
+                            
+                            return {
+                                results: products
+                            };
+                        },
+                        cache: true
+                    },
+                    placeholder: 'Search for a Product',
+                    minimumInputLength: 1
+                   
+                });
+
+                $('.product-select-2').on('select2:select', function (e) {
+                    let index = parseInt($(this).parent().attr('data-id'));
+                    let data = e.params.data;
+
+                    self.items[index].Name = data.text;
+                    self.items[index].BasePrice = data.BasePrice;
+                    self.items[index].CGST = Math.round(data.BasePrice / data.CGST * 100) / 100;
+                    self.items[index].SGST = Math.round(data.BasePrice / data.SGST * 100) / 100;
+                    self.items[index].GST = data.CGST + data.SGST;
+                });
+
+            }
+        })
+    });
+ </script>
+
+

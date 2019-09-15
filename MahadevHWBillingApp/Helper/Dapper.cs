@@ -19,6 +19,14 @@ namespace MahadevHWBillingApp.Helper
             }
         }
 
+        public static T GetById<T>(string query) where T : class
+        {
+            using (var con = new SQLiteConnection(_connectionString))
+            {
+                return con.QueryFirst<T>(query);
+            }
+        }
+
         public static void Execute(string query)
         {
             using (var con = new SQLiteConnection(_connectionString))

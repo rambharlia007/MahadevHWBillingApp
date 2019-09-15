@@ -33,6 +33,20 @@ namespace MahadevHWBillingApp.Controllers
             return response;
         }
 
+        public JsonResult GetDataBySearch(string q)
+        {
+            var items = Helper.Dapper.Get<Item>(Query.GetItemBySearch(q));
+            var response = Json(items, JsonRequestBehavior.AllowGet);
+            response.MaxJsonLength = int.MaxValue;
+            return response;
+        }
+
+        public JsonResult GetDataById(int id)
+        {
+            var items = Helper.Dapper.GetById<Item>(Query.GetItemById(id));
+            var response = Json(items, JsonRequestBehavior.AllowGet);
+            return response;
+        }
         [HttpPost]
         public JsonResult AddItems(List<Item> items)
         {

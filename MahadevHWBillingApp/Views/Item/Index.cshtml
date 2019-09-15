@@ -3,12 +3,6 @@
     ViewBag.Title = "Items";
 }
 
-@*<div class="card" style="margin-top:15px;">
-        <div class="card-body" style="text-align:center">
-            <h5>Items</h5>
-        </div>
-    </div>*@
-
 <style>
     .pointer {
         cursor: pointer;
@@ -20,8 +14,10 @@
         display: none;
     }
 </style>
+
+<div id="app">
 <div class="row" style="background-color: #f6f7f8 !important;">
-    <div class="col-md-12">
+    <div class="col-md-8">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb" style="padding-bottom: 0px; margin-bottom: 0px; background-color: #f6f7f8 !important;">
                 <li class="breadcrumb-item"><i class="fa fa-home">&nbsp;</i><a href="#">Home</a></li>
@@ -30,66 +26,41 @@
         </nav>
         <h4 style="padding-left: 15px;">Products</h4>
     </div>
+    <div class="col-md-4">
+        <button style="margin-top:25px; float:right;" type="button" class="btn btn-success btn-sm" v-on:click="openModalForAddProduct()">Add New Category</button>
+        <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-on:click="openModalForAddProduct()">Add New Product</button>
+    </div>
 </div>
-<div id="app" style="margin-top:20px;">
-    <div class="alert alert-success alert-dismissible fade show" role="alert" v-cloak v-bind:class="{hide:!isSuccess}" style="margin-top: 20px;">
+<div  style="margin-top:20px;">
+    <div class="alert alert-success alert-dismissible fade show" role="alert" v-cloak v-bind:class="{hide:!alertMessage}" style="margin-top: 20px;">
         {{alertMessage}}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <button type="button" class="close" v-on:click="closeAlertMessage('alertMessage')" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
 
-    <div v-cloak class="alert alert-success alert-dismissible fade show" role="alert" v-bind:class="{hide:!isFailure}" style="margin-top: 20px;">
-        {{alertMessage}}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <div v-cloak class="alert alert-danger alert-dismissible fade show" role="alert" v-bind:class="{hide:!alertFailureMessage}" style="margin-top: 20px;">
+        {{alertFailureMessage}}
+        <button type="button" class="close" v-on:click="closeAlertMessage('alertFailureMessage')" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
-   
+
     <div class="card">
         <div class="card-body" style="font-size:14px;">
-            <div style="padding-bottom:15px;">
-                <button type="button" class="btn btn-success" v-on:click="openModalForAddProduct()">Add Product</button>
-            </div>
-            @*<table class="table text-secondary" style="font-size:14px;">
+            <table id="product-table"
+                   class="table text-secondary" style="font-size:14px;">
                 <thead class="thead-light">
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Category</th>
-                    <th scope="col">Unit</th>
-                    <th scope="col">Amount</th>
-                    <th scope="col">Edit</th>
-                    <th scope="col">Delete</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="item in items">
-                    <td>{{item.Name}}</td>
-                    <td>{{item.Category}}</td>
-                    <td>{{item.Unit}}</td>
-                    <td>{{item.Amount}}</td>
-                    <td><i class="fa fa-edit pointer" v-on:click="editItem(item)"></i></td>
-                    <td>
-                        <i class="fa fa-trash pointer" v-on:click="deleteItem(item.Id)"></i>
-                        <i class="fa fa-spinner fa-spin" v-if="isSpinner"></i>
-                    </td>
-                </tr>
-                </tbody>
-            </table>*@
-            
-            <table
-                id="product-table"
-                class="table text-secondary" style="font-size:14px;"
-            >
-                <thead class="thead-light">
-                <tr>
-                    <th>Name</th>
-                    <th>Category</th>
-                    <th>Unit</th>
-                    <th>Amount</th>
-                    <th>Edit</th>
-                    <th>Delete</th>
-                </tr>
+                    <tr>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Unit</th>
+                        <th>Amount</th>
+                        <th>SGST</th>
+                        <th>CGST</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
                 </thead>
             </table>
 
@@ -123,6 +94,18 @@
                             </div>
                         </div>
                         <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">CGST</label>
+                            <div class="col-sm-10">
+                                <input v-model="item.CGST" type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">SGST</label>
+                            <div class="col-sm-10">
+                                <input v-model="item.SGST" type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Unit</label>
                             <div class="col-sm-10">
                                 <input v-model="item.Unit" type="text" class="form-control">
@@ -139,7 +122,7 @@
 
                 <!-- Modal footer -->
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success" data-dismiss="modal" v-on:click="saveEditItem()">Submit</button>
+                    <button type="button" class="btn btn-success btn-sm" data-dismiss="modal" v-on:click="saveEditItem()">Save</button>
                 </div>
             </div>
         </div>
@@ -189,8 +172,7 @@
             </div>
         </div>
     </div>
-
-
+</div>
 </div>
 
 <script>
@@ -199,9 +181,7 @@
         var obj = {
             items: [],
             item: {},
-            isSuccess: false,
-            isFailure: false,
-            isSpinner: false,
+            alertFailureMessage:"",
             alertMessage: "",
             newItems: [{
                 Name: "",
@@ -217,23 +197,15 @@
             el: '#app',
             data: obj,
             methods: {
-                editItem: function(item) {
-                    $("#myModal").modal("show");
-                    this.item = item;
-                },
                 deleteItem: function (id) {
                     var self = this;
                     self.isSpinner = true
                     $.get("/item/RemoveItem?id=" + id,
-                        function(data) {
-                            self.isSpinner = false;
+                        function() {
                             self.alertMessage = "Item deleted succesfully";
-                            self.isSuccess = true;
                            // self.initialLoad();
                         }).fail(function() {
-                            self.isSpinner = false;
-                            self.isFailure = true;
-                            self.alertMessage = "Internal server error";
+                            self.alertFailureMessage = "Internal server error";
                     })
                 },
                 openModalForAddProduct: function () {
@@ -257,7 +229,6 @@
                         dataType: 'json',
                         contentType: 'application/json; charset=utf-8',
                         success: function () {
-                            self.isSuccess = true;
                             self.alertMessage = "Item Added succesfully"
                             self.newItems = [];
                            // self.initialLoad()
@@ -268,24 +239,42 @@
                     var self = this;
                     if (self.item) {
                         $.post("/item/EditItem", self.item, function( data ) {
-                            self.isSuccess = true;
                             self.alertMessage = "Item Edited succesfully"
                         }).fail(function() {
-                            alertMessage = "Internal server error"
+                            alertFailureMessage = "Internal server error"
                         });
                     }
                 },
-                initialLoad: function() {
+                getProductById: function(id) {
                     var self = this;
-                    $.get("/item/GetData",
+                    $.get(`/item/GetDataById/${id}`,
                         function(data, status) {
-                            self.items = data;
+                            self.item = data;
+                            $("#myModal").modal("show");
                         }).fail(function() {
-                        alertMessage = "Internal server error"
+                        alertFailureMessage = "Internal server error"
                     });
                 },
-                getTableData:function() {
-                    this.tableRef = $("#product-table").DataTable({
+                bindTableClickEvents: function () {
+                    var self = this;
+                    $(".edit-item").click(function (e) {
+                        var id = $(this).attr("data-id")
+                        self.getProductById(id);
+                    })
+
+                    $(".delete-item").click(function (e) {
+                        var id = $(this).attr("data-id")
+                        self.deleteItem(id);
+                    })
+
+                },
+                closeAlertMessage: function (property) {
+                    // set alert messahe to empty
+                    this[property] = "";
+                },
+                getTableData: function () {
+                    var self = this;
+                    self.tableRef = $("#product-table").DataTable({
                         ajax: {
                             url: "/item/GetData",
                             type: "GET",
@@ -305,27 +294,28 @@
                             { data: "Category" },
                             { data: "Unit" },
                             { data: "Amount" },
+                            { data: "CGST" },
+                            { data: "SGST" },
                             {
                                 render: function (data, type, row, meta) {
-                                    return `<i class="fa fa-edit pointer" v-on:click="editItem(item)"></i>`;
+                                    return `<i class="fa fa-edit pointer edit-item" data-id=${row.Id}></i>`;
 
                                 }
                             },
                             {
                                 render: function (data, type, row, meta) {
-                                    return `<i class="fa fa-trash pointer" v-on:click="deleteItem(item.Id)"></i>`;  
+                                    return `<i class="fa fa-trash pointer delete-item" data-id=${row.Id}></i>`;  
                                 }
                             },
                         ],
-                        lengthMenu: [[10, 20, 25, 30, 100], [10, 20, 25, 30, 100]],
+                        lengthMenu: [[5, 20, 25, 30, 100], [5, 20, 25, 30, 100]],
                         initComplete: function (settings, json) {
-                            $('[data-toggle="tooltip"]').tooltip();
+                            self.bindTableClickEvents()
                         }
                     });
                 }
             },
             mounted() {
-               // this.initialLoad();
                 this.getTableData();
             },
         })

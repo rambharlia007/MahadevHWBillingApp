@@ -22,18 +22,7 @@ namespace MahadevHWBillingApp.Controllers
 
             using (var x = new MahadevHWContext())
             {
-                for (int i = 0; i < 1000; i++)
-                {
-                    x.Items.Add(new Item()
-                    {
-                        Amount = 1000,
-                        Category = "fkjslk",
-                        Name = "sjlkfs",
-                        Unit = "500 lts"
-                    });
-                }
-
-                x.SaveChanges();
+                
             }
 
             return View();
