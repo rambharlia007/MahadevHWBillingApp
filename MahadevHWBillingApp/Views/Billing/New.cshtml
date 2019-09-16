@@ -22,17 +22,32 @@
         background-color:#eee;
     }
 
-    .table-body {
-        display: block;
-        max-height: 200px;
-        overflow-y: scroll;
-    }
-
         .table-head, .table-body .table-row {
             display: table;
             width: 100%;
             table-layout: fixed;
         }
+        @@media only screen and (min-width: 768px) {
+            .table-body {
+                display: block;
+                max-height: 250PX;
+                overflow-y: scroll;
+            }
+        }
+    @@media only screen and (min-width: 992px) {
+        .table-body {
+            display: block;
+            max-height: 350px;
+            overflow-y: scroll;
+        }
+    }
+       @@media only screen and (min-width: 1200px) {
+        .table-body {
+            display: block;
+            max-height: 500px;
+            overflow-y: scroll;
+        }
+}
 
 </style>
 
@@ -48,8 +63,8 @@
             <h4 style="padding-left: 15px;">Billing</h4>
         </div>
         <div class="col-md-4">
-                <button style="margin-top:25px; float:right;" type="button" class="btn btn-success btn-sm" v-if="!isPreview" v-on:click="showOrHidePreview(true)">Preview</button>
-                <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-if="isPreview" v-on:click="showOrHidePreview(false)">Hide Preview</button>
+                <button style="margin-top:25px; float:right;" type="button" class="btn btn-success btn-sm" v-if="!isPreview" v-on:click="showOrHidePreview(true)">Preview Print Bill</button>
+                <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-if="isPreview" v-on:click="showOrHidePreview(false)">Edit Bill</button>
                 <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-if="isPreview" v-on:click="print()">Print</button>
         </div>
     </div>
@@ -85,7 +100,7 @@
                         </tr>
                     </thead>
                     <tbody class="table-body">
-                        <tr v-for="(item,index) in items">
+                        <tr class="table-row" v-for="(item,index) in items">
                             <td style="width:45px">{{index+1}}</td>
                             <td style="width:200px;" v-bind:["data-id"]="index">
                                 <select class="product-select-2 js-example-basic-single js-states form-control"></select>
@@ -241,42 +256,50 @@
 
         var items = [];
 
-        //for (i = 0; i < 25; i++) {
-        //    items.push({
-        //        Name: "",
-        //        Unit: "",
-        //        Quantity: "",
-        //        CGST: "",
-        //        SGST: "",
-        //        Amount: "",
-        //        BasePrice: "",
-        //        GST: ""
-        //    })
-        //}
-
-
         for (i = 0; i < 25; i++) {
             items.push({
-                Name: "xxw",
-                Unit: "100 ml",
-                Quantity: "5",
-                CGST: "25",
-                SGST: "35",
-                Amount: "1234",
-                BasePrice: "456",
-                GST: "18"
+                Name: "",
+                Unit: "",
+                Quantity: "",
+                CGST: "",
+                SGST: "",
+                Amount: "",
+                BasePrice: "",
+                GST: ""
             })
         }
+
+
+        //for (i = 0; i < 25; i++) {
+        //    items.push({
+        //        Name: "xxw",
+        //        Unit: "100 ml",
+        //        Quantity: "5",
+        //        CGST: "25",
+        //        SGST: "35",
+        //        Amount: "1234",
+        //        BasePrice: "456",
+        //        GST: "18"
+        //    })
+       // }
 
         var obj = {
             alertFailureMessage: "",
             alertMessage: "",
             items: items,
-            isPreview: false
+            isPreview: false,
+            isSelect2Rendered:true
         }
         new Vue({
             el: '#app',
             data: obj,
+            updated: function () {
+                if (!this.isSelect2Rendered && !this.isPreview) {
+                    this.isSelect2Rendered = true;
+                    this.initSelect2();
+
+                }
+            },
             methods: {
                 calculatePerItemAmount: function (index) {
                     var ref = this.items[index];
@@ -284,16 +307,64 @@
                 },
                 showOrHidePreview: function (value) {
                     this.isPreview = value;
+                    if (value)
+                        this.isSelect2Rendered = false;
                 },
                 print: function () {
                     window.print();
+                },
+                initSelect2: function () {
+                    var self = this;
+                    $(".product-select-2").select2({
+                        ajax: {
+                            url: "/item/GetDataBySearch",
+                            dataType: 'json',
+                            delay: 250,
+                            data: function (params) {
+                                return {
+                                    q: params.term,
+                                    page: params.page
+                                };
+                            },
+                            processResults: function (data, params) {
+                                var products = [];
+                                data.forEach((product) => {
+                                    products.push({
+                                        id: product.Id,
+                                        text: product.Name,
+                                        BasePrice: product.Amount,
+                                        CGST: product.CGST,
+                                        SGST: product.SGST
+                                    })
+                                });
+
+                                return {
+                                    results: products
+                                };
+                            },
+                            cache: true
+                        },
+                        placeholder: 'Search for a Product',
+                        minimumInputLength: 1
+
+                    });
+                    $('.product-select-2').on('select2:select', function (e) {
+                        let index = parseInt($(this).parent().attr('data-id'));
+                        let data = e.params.data;
+
+                        self.items[index].Name = data.text;
+                        self.items[index].BasePrice = data.BasePrice;
+                        self.items[index].CGST = Math.round(data.BasePrice / data.CGST * 100) / 100;
+                        self.items[index].SGST = Math.round(data.BasePrice / data.SGST * 100) / 100;
+                        self.items[index].GST = data.CGST + data.SGST;
+                    });
                 }
             },
             computed: {
                 subTotal: function () {
                     var totalAmount = 0;
                     this.items.forEach(function (item) {
-                        totalAmount += parseFloat(item.CGST || 0);
+                        totalAmount += parseFloat(item.Amount || 0);
                     })
                     return totalAmount;
                 },
@@ -306,55 +377,13 @@
                 },
                 total: function () {
                     return Math.round((parseFloat(this.subTotal) + parseFloat(this.tax)) * 100) / 100;
-                },
+                }
             },
             mounted() {
+
                 var self = this;
-                $(".product-select-2").select2({
-                    ajax: {
-                        url: "/item/GetDataBySearch",
-                        dataType: 'json',
-                        delay: 250,
-                        data: function (params) {
-                            return {
-                                q: params.term, 
-                                page: params.page
-                            };
-                        },
-                        processResults: function (data, params) {
-                            var products = [];
-                            data.forEach((product) => {
-                                products.push({
-                                    id: product.Id,
-                                    text: product.Name,
-                                    BasePrice: product.Amount,
-                                    CGST: product.CGST,
-                                    SGST: product.SGST
-                                })
-                            });
-                            
-                            return {
-                                results: products
-                            };
-                        },
-                        cache: true
-                    },
-                    placeholder: 'Search for a Product',
-                    minimumInputLength: 1
-                   
-                });
-
-                $('.product-select-2').on('select2:select', function (e) {
-                    let index = parseInt($(this).parent().attr('data-id'));
-                    let data = e.params.data;
-
-                    self.items[index].Name = data.text;
-                    self.items[index].BasePrice = data.BasePrice;
-                    self.items[index].CGST = Math.round(data.BasePrice / data.CGST * 100) / 100;
-                    self.items[index].SGST = Math.round(data.BasePrice / data.SGST * 100) / 100;
-                    self.items[index].GST = data.CGST + data.SGST;
-                });
-
+                self.initSelect2();
+                
             }
         })
     });
