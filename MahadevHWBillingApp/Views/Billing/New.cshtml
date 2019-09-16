@@ -37,11 +37,11 @@
     @@media only screen and (min-width: 992px) {
         .table-body {
             display: block;
-            max-height: 350px;
+            max-height: 200px;
             overflow-y: scroll;
         }
     }
-       @@media only screen and (min-width: 1200px) {
+       @@media only screen and (min-width: 1500px) {
         .table-body {
             display: block;
             max-height: 500px;
@@ -83,7 +83,7 @@
             </button>
         </div>
 
-        <div class="card" v-if="!isPreview">
+        <div class="card" v-show="!isPreview">
             <div class="card-body" style="font-size:14px;">
                 <table class="table text-secondary" style="font-size:14px;">
                     <thead class="thead-light table-head">
@@ -91,10 +91,10 @@
                             <th style="width:45px" scope="col">#</th>
                             <th style="width:200px;" scope="col">Name</th>
                             <th scope="col">Price</th>
+                            <th scope="col">Quantity</th>
                             <th scope="col">GST %</th>
                             <th scope="col">CGST</th>
                             <th scope="col">SGST</th>
-                            <th scope="col">Quantity</th>
                             <th scope="col">Total</th>
 
                         </tr>
@@ -105,12 +105,12 @@
                             <td style="width:200px;" v-bind:["data-id"]="index">
                                 <select class="product-select-2 js-example-basic-single js-states form-control"></select>
                             </td>
-                            <td> <input type="text" v-model="item.BasePrice" class="form-control form-control-sm bg-grey"></td>
-                            <td> <input type="text" readonly v-model="item.GST" class="form-control form-control-sm bg-grey"></td>
-                            <td> <input type="text" v-model="item.CGST" class="form-control form-control-sm bg-grey"></td>
-                            <td> <input type="text" v-model="item.SGST" class="form-control form-control-sm bg-grey"></td>
+                            <td> <input type="text" v-model="item.BasePrice" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
                             <td> <input type="text" v-model="item.Quantity" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
-                            <td> <input type="text" v-model="item.Amount" class="form-control form-control-sm"></td>
+                            <td> <input type="text" v-model="item.GST" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
+                            <td> <input type="text" readonly v-model="item.CGST" class="form-control form-control-sm"></td>
+                            <td> <input type="text" readonly v-model="item.SGST" class="form-control form-control-sm"></td>
+                            <td> <input type="text" readonly v-model="item.Amount" class="form-control form-control-sm"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -127,20 +127,20 @@
                                     <td class="left">
                                         <strong>Subtotal</strong>
                                     </td>
-                                    <td class="right">{{subTotal}}</td>
+                                    <td class="right">{{Number(subTotal).toLocaleString()}}</td>
                                 </tr>
                                 <tr>
                                     <td class="left">
                                         <strong>TAX </strong>
                                     </td>
-                                    <td class="right">{{tax}}</td>
+                                    <td class="right">{{Number(tax).toLocaleString()}}</td>
                                 </tr>
                                 <tr>
                                     <td class="left">
                                         <strong>Total</strong>
                                     </td>
                                     <td class="right">
-                                        <strong>{{total}}</strong>
+                                        <strong>{{Number(total).toLocaleString()}}</strong>
                                     </td>
                                 </tr>
                             </tbody>
@@ -154,7 +154,7 @@
         </div>
 
 
-        <div class="card" v-if="isPreview" id="print-bill">
+        <div class="card" v-show="isPreview" id="print-bill">
             <div class="card-header">
                 Invoice
                 <strong>12345</strong>
@@ -200,11 +200,11 @@
                             <tr v-for="(item,index) in items" v-if="item.Name">
                                 <td class="center">{{index+1}}</td>
                                 <td class="left strong">{{item.Name}}</td>
-                                <td class="right">{{item.BasePrice}}</td>
-                                <td class="center">{{item.CGST}}</td>
-                                <td class="center">{{item.SGST}}</td>
-                                <td class="center">{{item.Quantity}}</td>
-                                <td class="center">{{item.Amount}}</td>
+                                <td class="right">{{Number(item.BasePrice).toLocaleString()}}</td>
+                                <td class="center">{{Number(item.CGST).toLocaleString()}}</td>
+                                <td class="center">{{Number(item.SGST).toLocaleString()}}</td>
+                                <td class="center">{{Number(item.Quantity).toLocaleString()}}</td>
+                                <td class="center">{{Number(item.Amount).toLocaleString()}}</td>
                             </tr>
                           
                         </tbody>
@@ -222,20 +222,20 @@
                                     <td class="left">
                                         <strong>Subtotal</strong>
                                     </td>
-                                    <td class="right">{{subTotal}}</td>
+                                    <td class="right">{{Number(subTotal).toLocaleString()}}</td>
                                 </tr>
                                 <tr>
                                     <td class="left">
                                         <strong>TAX</strong>
                                     </td>
-                                    <td class="right">{{tax}}</td>
+                                    <td class="right">{{Number(tax).toLocaleString()}}</td>
                                 </tr>
                                 <tr>
                                     <td class="left">
                                         <strong>Total</strong>
                                     </td>
                                     <td class="right">
-                                        <strong>{{total}}</strong>
+                                        <strong>{{Number(total).toLocaleString()}}</strong>
                                     </td>
                                 </tr>
                             </tbody>
@@ -293,25 +293,26 @@
         new Vue({
             el: '#app',
             data: obj,
-            updated: function () {
-                if (!this.isSelect2Rendered && !this.isPreview) {
-                    this.isSelect2Rendered = true;
-                    this.initSelect2();
-
-                }
-            },
             methods: {
                 calculatePerItemAmount: function (index) {
                     var ref = this.items[index];
+                    var taxInPercentage = ref.GST / 2;
                     ref.Amount = ref.BasePrice * ref.Quantity;
+                    var tax = Math.round(((ref.Amount * taxInPercentage) / 100) * 100) / 100;
+                    ref.CGST = tax;
+                    ref.SGST = tax;
                 },
                 showOrHidePreview: function (value) {
                     this.isPreview = value;
-                    if (value)
-                        this.isSelect2Rendered = false;
                 },
                 print: function () {
                     window.print();
+                },
+                beforePrint: function () {
+                    alert("BeforePrint");
+                },
+                afterPrint: function () {
+                    alert("Afetr Print");
                 },
                 initSelect2: function () {
                     var self = this;
@@ -354,9 +355,9 @@
 
                         self.items[index].Name = data.text;
                         self.items[index].BasePrice = data.BasePrice;
-                        self.items[index].CGST = Math.round(data.BasePrice / data.CGST * 100) / 100;
-                        self.items[index].SGST = Math.round(data.BasePrice / data.SGST * 100) / 100;
                         self.items[index].GST = data.CGST + data.SGST;
+                        self.items[index].Quantity = 1;
+                        self.calculatePerItemAmount(index);
                     });
                 }
             },
@@ -383,7 +384,8 @@
 
                 var self = this;
                 self.initSelect2();
-                
+                window.onbeforeprint = self.beforePrint;
+                window.onafterprint = self.afterPrint;
             }
         })
     });

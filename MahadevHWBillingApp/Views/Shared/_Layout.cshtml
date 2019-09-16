@@ -35,18 +35,27 @@
 
         <div class="collapse navbar-collapse" id="navbarColor01">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                <li class="nav-item">
+                    <a class="nav-link" href=@Url.Action("List","Sales")>Sales</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Products</a>
+                    <a class="nav-link" href=@Url.Action("List","Purchase")>Purchase</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href=@Url.Action("Index","Item")>Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href=@Url.Action("New","Billing")>New Bill</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href=@Url.Action("New","Profile")>Profile</a>
                 </li>
             </ul>
         </div>
     </nav>
     <div class="body-content">
         @RenderBody()
-        <hr />
+        <hr class="d-print-none"/>
         <footer class="d-print-none">
             <p>&copy; @DateTime.Now.Year - Ram Bharlia</p>
         </footer>

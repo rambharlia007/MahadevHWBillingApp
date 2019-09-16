@@ -266,6 +266,9 @@
     <Compile Include="Controllers\BillingController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ItemController.cs" />
+    <Compile Include="Controllers\ProfileController.cs" />
+    <Compile Include="Controllers\PurchaseController.cs" />
+    <Compile Include="Controllers\SalesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -365,6 +368,9 @@
     <Content Include="Scripts\popper-utils.js.map" />
     <Content Include="Views\Item\New.cshtml" />
     <Content Include="Views\Billing\New.cshtml" />
+    <Content Include="Views\Sales\List.cshtml" />
+    <Content Include="Views\Purchase\List.cshtml" />
+    <Content Include="Views\Profile\New.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
