@@ -34,7 +34,7 @@ namespace MahadevHWBillingApp.Controllers
         public JsonResult Get()
         {
             var result = _mahadevHwContext.Profiles.FirstOrDefault();
-            return Json(result, JsonRequestBehavior.AllowGet);
+            return Json(result ?? new Profile(), JsonRequestBehavior.AllowGet);
         }
     }
 }

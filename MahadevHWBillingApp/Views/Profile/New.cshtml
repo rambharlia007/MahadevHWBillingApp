@@ -113,11 +113,11 @@
                     }
                     $.post(endPoint,
                         formData,
-                        function(data) {
+                        function(res) {
                             self.Id = 1;
-                            self.alertMessage = data
-                        }).fail(function() {
-                        alertFailureMessage = data
+                            self.alertMessage = data;
+                        }).fail(function(res) {
+                        self.alertFailureMessage = res;
                     });
                 },
                 closeAlertMessage: function(property) {
@@ -142,7 +142,7 @@
                             self.Id = res.Id;
                         }
                     }).fail(function() {
-                    alertFailureMessage = "Internal server error"
+                    self.alertFailureMessage = "Internal server error";
                 });
             }
         })
