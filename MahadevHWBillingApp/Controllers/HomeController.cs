@@ -10,23 +10,11 @@ using System.Web.Mvc;
 
 namespace MahadevHWBillingApp.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         public ActionResult Index()
         {
-            //using (var context = new SQLiteConnection(@"Data Source=E:\SqlLiteDB\DB\GSTBilling.db"))
-            //{
-            //    var data = @"delete from Items";
-            //    context.Execute(data);
-            //}
-
-            using (var x = new MahadevHWContext())
-            {
-                
-            }
-
-            return View();
-
+            return View(_profile);
         }
 
         public JsonResult CreateDb()

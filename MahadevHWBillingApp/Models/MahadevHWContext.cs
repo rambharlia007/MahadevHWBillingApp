@@ -11,6 +11,7 @@ namespace MahadevHWBillingApp.Models
     {
         public static readonly string ConnectionString = ConfigurationManager.ConnectionStrings["GstContext"].ConnectionString;
         public DbSet<Item> Items { get; set; }
+        public DbSet<Profile> Profiles { get; set; }
         public MahadevHWContext()
         {
             Database.EnsureCreated();
@@ -22,6 +23,7 @@ namespace MahadevHWBillingApp.Models
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<Item>();
+            builder.Entity<Profile>();
             base.OnModelCreating(builder);
         }
     }

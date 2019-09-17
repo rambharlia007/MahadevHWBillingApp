@@ -6,12 +6,12 @@ using System.Web.Mvc;
 
 namespace MahadevHWBillingApp.Controllers
 {
-    public class BillingController : Controller
+    public class BillingController : BaseController
     {
         // GET: Billing
         public ActionResult New()
         {
-            return View();
+            return View(_profile);
         }
     }
 }

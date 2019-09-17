@@ -6,12 +6,11 @@ using System.Web.Mvc;
 
 namespace MahadevHWBillingApp.Controllers
 {
-    public class PurchaseController : Controller
+    public class PurchaseController : BaseController
     {
-        // GET: Purchase
         public ActionResult List()
         {
-            return View();
+            return View(_profile);
         }
     }
 }

@@ -6,18 +6,11 @@ using MahadevHWBillingApp.Helper;
 
 namespace MahadevHWBillingApp.Controllers
 {
-    public class ItemController : Controller
+    public class ItemController : BaseController
     {
-        private MahadevHWContext _mahadevHwContext;
-
-        public ItemController()
-        {
-            _mahadevHwContext = new MahadevHWContext();
-        }
-
         public ActionResult Index()
         {
-            return View();
+            return View(_profile);
         }
 
         public ActionResult New()
