@@ -15,6 +15,44 @@
     [v-cloak] {
         display: none;
     }
+    .modal-form-header {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        background-color: rgb(238, 238, 238);
+        margin-bottom: 10px;
+    }
+    .text-center {
+        text-align: center
+    }
+    .table-head, .table-body .table-row {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    @@media only screen and (min-width: 768px) {
+        .table-body {
+            display: block;
+            height: 250PX;
+            overflow-y: scroll;
+        }
+    }
+
+    @@media only screen and (min-width: 992px) {
+        .table-body {
+            display: block;
+            height: 200px;
+            overflow-y: scroll;
+        }
+    }
+
+    @@media only screen and (min-width: 1500px) {
+        .table-body {
+            display: block;
+            max-height: 500px;
+            overflow-y: scroll;
+        }
+    }
 </style>
 
 <div id="app">
@@ -84,37 +122,37 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Name</label>
                                 <div class="col-sm-10">
-                                    <input v-model="item.Name" type="text" class="form-control">
+                                    <input v-model="purchase.Name" type="text" class="form-control">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Category</label>
                                 <div class="col-sm-10">
-                                    <input v-model="item.Category" type="text" class="form-control">
+                                    <input v-model="purchase.Category" type="text" class="form-control">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">CGST</label>
                                 <div class="col-sm-10">
-                                    <input v-model="item.CGST" type="text" class="form-control">
+                                    <input v-model="purchase.CGST" type="text" class="form-control">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">SGST</label>
                                 <div class="col-sm-10">
-                                    <input v-model="item.SGST" type="text" class="form-control">
+                                    <input v-model="purchase.SGST" type="text" class="form-control">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Unit</label>
                                 <div class="col-sm-10">
-                                    <input v-model="item.Unit" type="text" class="form-control">
+                                    <input v-model="purchase.Unit" type="text" class="form-control">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Amount</label>
                                 <div class="col-sm-10">
-                                    <input v-model="item.Amount" type="text" class="form-control">
+                                    <input v-model="purchase.Amount" type="text" class="form-control">
                                 </div>
                             </div>
                         </form>
@@ -134,35 +172,40 @@
 
                     <!-- Modal Header -->
                     <div class="modal-header">
-                        <h4 class="modal-title">Modal Heading</h4>
+                        <h4 class="modal-title">Add Purchase</h4>
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                     </div>
 
                     <!-- Modal body -->
-                    <div class="modal-body">
-                        <form>
-                            <div class="form-row" v-for="item in newItems" style="padding-bottom:5px;">
-                                <div class="col-3">
-                                    <input type="text" v-model="item.Name" class="form-control" placeholder="Name">
-                                </div>
-                                <div class="col">
-                                    <input type="text" v-model="item.Date" class="form-control" placeholder="Date">
-                                </div>
-                                <div class="col">
-                                    <input type="text" v-model="item.Invoice" class="form-control" placeholder="Invoice">
-                                </div>
-                                <div class="col">
-                                    <input type="text" v-model="item.Amount" class="form-control" placeholder="Amount">
-                                </div>
-                                <div class="col">
-                                    <input type="text" v-model="item.SGST" class="form-control" placeholder="SGST">
-                                </div>
-                                <div class="col">
-                                    <input type="text" v-model="item.CGST" class="form-control" placeholder="CGST">
-                                </div>
-                            </div>
-                            <button type="button" class="btn btn-success btn-sm" v-on:click="addProduct()">Add Product</button>
-                        </form>
+                    <div class="modal-body" style="padding-top: 0px;">
+
+
+                        <table class="table text-secondary" style="font-size: 14px;">
+                            <thead class="thead-light table-head">
+                                <tr class="table-row">
+                                    <th style="width: 45px" scope="col">#</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Invoice</th>
+                                    <th style="width: 200px;">Name</th>
+                                    <th scope="col">CGST</th>
+                                    <th scope="col">SGST</th>
+                                    <th scope="col">Amount</th>
+
+                                </tr>
+                            </thead>
+                            <tbody class="table-body">
+                                <tr class="table-row" v-for="(purchase,index) in newPurchases">
+                                    <td style="width: 45px">{{index+1}}</td>
+                                  
+                                    <td> <input type="text" v-model="purchase.Date" class="form-control form-control-sm"></td>
+                                    <td> <input type="text" v-model="purchase.Invoice"  class="form-control form-control-sm"></td>
+                                    <td style="width: 200px;"> <input type="text" v-model="purchase.Name"  class="form-control form-control-sm"></td>
+                                    <td> <input type="text"  v-model="purchase.CGST" class="form-control form-control-sm"></td>
+                                    <td> <input type="text"  v-model="purchase.SGST" class="form-control form-control-sm"></td>
+                                    <td> <input type="text"  v-model="purchase.Amount" class="form-control form-control-sm"></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
                     <!-- Modal footer -->
@@ -177,20 +220,26 @@
 
 <script>
 
-    $(document).ready(function() {
-        var obj = {
-            items: [],
-            item: {},
-            alertFailureMessage:"",
-            alertMessage: "",
-            newItems: [{
+    $(document).ready(function () {
+
+        var tempPurchase = [];
+        for (var i = 0; i < 30; i++) {
+            tempPurchase.push({
                 Name: "",
                 Amount: "",
                 CGST: "",
                 SGST: "",
                 Date: "",
-                Invoice:""
-            }],
+                Invoice: ""
+            });
+        }
+
+        var obj = {
+            purchases: [],
+            purchase: {},
+            alertFailureMessage: "",
+            alertMessage: "",
+            newPurchases: tempPurchase,
             tableRef:null
         }
 
@@ -203,46 +252,37 @@
                     self.isSpinner = true
                     $.get("/purchase/Remove?id=" + id,
                         function() {
-                            self.alertMessage = "Item deleted succesfully";
-                           // self.initialLoad();
+                            self.alertMessage = "purchase deleted succesfully";
+                            // self.initialLoad();
                         }).fail(function() {
-                            self.alertFailureMessage = "Internal server error";
-                    })
+                        self.alertFailureMessage = "Internal server error";
+                    });
                 },
                 openModalForAddPurchase: function () {
-                    $("#add-product").modal("show");
-                },
-                addProduct: function () {
-                    this.newItems.push({
-                        Name: "",
-                        Amount: "",
-                        CGST: "",
-                        SGST: "",
-                        Category:""
-                    })
+                    $("#add-purchase").modal("show");
                 },
                 saveNewPurchase: function () {
                     var self = this;
                     $.ajax({
                         type: 'POST',
                         url: '@Url.Action("Add", "purchase")',
-                        data: JSON.stringify(self.newItems),
+                        data: JSON.stringify(self.newPurchases),
                         dataType: 'json',
                         contentType: 'application/json; charset=utf-8',
                         success: function () {
-                            self.alertMessage = "Item Added succesfully"
-                            self.newItems = [];
+                            self.alertMessage = "purchase Added succesfully";
+                            self.newPurchases = [];
                            // self.initialLoad()
                         }
                     });
                 },
                 saveEditPurchase: function() {
                     var self = this;
-                    if (self.item) {
-                        $.post("/purchase/Edit", self.item, function( data ) {
-                            self.alertMessage = "Item Edited succesfully"
+                    if (self.purchase) {
+                        $.post("/purchase/Edit", self.purchase, function( data ) {
+                            self.alertMessage = "purchase Edited succesfully";
                         }).fail(function() {
-                            alertFailureMessage = "Internal server error"
+                            self.alertFailureMessage = "Internal server error";
                         });
                     }
                 },
@@ -250,27 +290,27 @@
                     var self = this;
                     $.get(`/purchase/GetDataById/${id}`,
                         function(data, status) {
-                            self.item = data;
+                            self.purchase = data;
                             $("#myModal").modal("show");
                         }).fail(function() {
-                        alertFailureMessage = "Internal server error"
+                        self.alertFailureMessage = "Internal server error";
                     });
                 },
                 bindTableClickEvents: function () {
                     var self = this;
-                    $(".edit-purchase").click(function (e) {
+                    $(".edit-purchase").click(function(e) {
                         var id = $(this).attr("data-id")
                         self.getProductById(id);
-                    })
+                    });
 
-                    $(".delete-purchase").click(function (e) {
+                    $(".delete-purchase").click(function(e) {
                         var id = $(this).attr("data-id")
                         self.deleteItem(id);
-                    })
+                    });
 
                 },
                 closeAlertMessage: function (property) {
-                    // set alert messahe to empty
+                    // set alert message to empty
                     this[property] = "";
                 },
                 getTableData: function () {
@@ -283,7 +323,7 @@
                                 return json;
                             },
                             error: function (xhr, error) {
-                                if (xhr.status == 401) alert("Unauthorised user");
+                                if (xhr.status === 401) alert("Unauthorised user");
                             }
                         },
                         fixedHeader: {
@@ -293,25 +333,25 @@
                         columns: [
                             { data: "Date" },
                             { data: "Invoice" },
-                            { data: "Business" },
-                            { data: "CGST" },
+                            { data: "BusinessName" },
                             { data: "SGST" },
+                            { data: "CGST" },
                             { data: "Amount" },
                             {
                                 render: function (data, type, row, meta) {
-                                    return `<i class="fa fa-edit pointer edit-item" data-id=${row.Id}></i>`;
+                                    return `<i class="fa fa-edit pointer edit-purchase" data-id=${row.Id}></i>`;
 
                                 }
                             },
                             {
                                 render: function (data, type, row, meta) {
-                                    return `<i class="fa fa-trash pointer delete-item" data-id=${row.Id}></i>`;
+                                    return `<i class="fa fa-trash pointer delete-purchase" data-id=${row.Id}></i>`;
                                 }
                             },
                         ],
                         lengthMenu: [[5, 20, 25, 30, 100], [5, 20, 25, 30, 100]],
                         initComplete: function (settings, json) {
-                            self.bindTableClickEvents()
+                            self.bindTableClickEvents();
                         }
                     });
                 }

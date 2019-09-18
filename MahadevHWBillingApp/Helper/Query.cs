@@ -23,7 +23,7 @@ namespace MahadevHWBillingApp.Helper
 
         public static string GetPurchaseById(int id)
         {
-            return $"Select * From Items Where Id in ({id})";
+            return $"Select * From Purchase Where Id in ({id})";
         }
     }
 }
