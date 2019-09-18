@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace MahadevHWBillingApp.Helper
 {
     public static class Query
     {
         public static readonly string GetItem = "Select * From Items";
+        public static string GetPurchase = "Select * From Purchase";
 
         public static string DeleteItem(IList<int> ids)
         {
@@ -17,6 +19,11 @@ namespace MahadevHWBillingApp.Helper
         public static string GetItemBySearch(string filter)
         {
             return $"Select * From Items Where Name like '%{filter}%'";
+        }
+
+        public static string GetPurchaseById(int id)
+        {
+            return $"Select * From Items Where Id in ({id})";
         }
     }
 }

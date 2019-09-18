@@ -113,15 +113,16 @@
                     }
                     $.post(endPoint,
                         formData,
-                        function(res) {
-                            self.Id = 1;
-                            self.alertMessage = data;
+                        function (res) {
+                            self.Id = res.Id;
+                            self.alertMessage = res.Message;
+                            $(".navbar-brand").text(self.BusinessName);
                         }).fail(function(res) {
                         self.alertFailureMessage = res;
                     });
                 },
                 closeAlertMessage: function(property) {
-                    // set alert messahe to empty
+                    // set alert message to empty
                     this[property] = "";
                 },
             },

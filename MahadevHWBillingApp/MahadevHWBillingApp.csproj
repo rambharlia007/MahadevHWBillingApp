@@ -278,6 +278,8 @@
     <Compile Include="Models\Item.cs" />
     <Compile Include="Models\MahadevHWContext.cs" />
     <Compile Include="Models\Profile.cs" />
+    <Compile Include="Models\Purchase.cs" />
+    <Compile Include="Models\Sale.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -18,9 +18,9 @@ namespace MahadevHWBillingApp.Controllers
         [HttpPost]
         public JsonResult Save(Profile profile)
         {
-            _mahadevHwContext.Profiles.Add(profile);
+             _mahadevHwContext.Profiles.Add(profile);
             _mahadevHwContext.SaveChanges();
-            return Json("Profile added successfully");
+            return Json(new {Id = profile.Id, Message = "Profile added successfully"});
         }
 
         [HttpPost]
@@ -28,7 +28,8 @@ namespace MahadevHWBillingApp.Controllers
         {
             _mahadevHwContext.Entry(profile).State = EntityState.Modified;
             _mahadevHwContext.SaveChanges();
-            return Json("Profile edited successfully");
+            _profile = profile;
+            return Json(new {Id = profile.Id, Message = "Profile edited successfully"});
         }
 
         public JsonResult Get()

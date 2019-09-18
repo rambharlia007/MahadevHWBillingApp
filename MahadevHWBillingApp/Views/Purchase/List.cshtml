@@ -3,5 +3,324 @@
     ViewBag.Title = "List";
 }
 
-<h2>List</h2>
+<style>
+    .pointer {
+        cursor: pointer;
+    }
 
+    .hide {
+        display: none;
+    }
+
+    [v-cloak] {
+        display: none;
+    }
+</style>
+
+<div id="app">
+    <div class="row" style="background-color: #f6f7f8 !important;">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" style="padding-bottom: 0px; margin-bottom: 0px; background-color: #f6f7f8 !important;">
+                    <li class="breadcrumb-item"><i class="fa fa-home">&nbsp;</i><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Purchase</li>
+                </ol>
+            </nav>
+            <h4 style="padding-left: 15px;">Purchase</h4>
+        </div>
+        <div class="col-md-4">
+            <button style="margin-top:25px; float:right;" type="button" class="btn btn-success btn-sm" v-on:click="openModalForAddPurchase()">Add Purchase</button>
+        </div>
+    </div>
+    <div style="margin-top:20px;">
+        <div class="alert alert-success alert-dismissible fade show" role="alert" v-cloak v-bind:class="{hide:!alertMessage}" style="margin-top: 20px;">
+            {{alertMessage}}
+            <button type="button" class="close" v-on:click="closeAlertMessage('alertMessage')" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <div v-cloak class="alert alert-danger alert-dismissible fade show" role="alert" v-bind:class="{hide:!alertFailureMessage}" style="margin-top: 20px;">
+            {{alertFailureMessage}}
+            <button type="button" class="close" v-on:click="closeAlertMessage('alertFailureMessage')" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="card-body" style="font-size:14px;">
+                <table id="product-table"
+                       class="table text-secondary" style="font-size:14px;">
+                    <thead class="thead-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Invoice</th>
+                        <th>Business</th>
+                        <th>SGST</th>
+                        <th>CGST</th>
+                        <th>Amount</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+        <!-- The Modal -->
+        <div class="modal" id="edit-purchase">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">Modal Heading</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Name</label>
+                                <div class="col-sm-10">
+                                    <input v-model="item.Name" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Category</label>
+                                <div class="col-sm-10">
+                                    <input v-model="item.Category" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">CGST</label>
+                                <div class="col-sm-10">
+                                    <input v-model="item.CGST" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">SGST</label>
+                                <div class="col-sm-10">
+                                    <input v-model="item.SGST" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Unit</label>
+                                <div class="col-sm-10">
+                                    <input v-model="item.Unit" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Amount</label>
+                                <div class="col-sm-10">
+                                    <input v-model="item.Amount" type="text" class="form-control">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal" v-on:click="saveEditItem()">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="add-purchase">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">Modal Heading</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-row" v-for="item in newItems" style="padding-bottom:5px;">
+                                <div class="col-3">
+                                    <input type="text" v-model="item.Name" class="form-control" placeholder="Name">
+                                </div>
+                                <div class="col">
+                                    <input type="text" v-model="item.Date" class="form-control" placeholder="Date">
+                                </div>
+                                <div class="col">
+                                    <input type="text" v-model="item.Invoice" class="form-control" placeholder="Invoice">
+                                </div>
+                                <div class="col">
+                                    <input type="text" v-model="item.Amount" class="form-control" placeholder="Amount">
+                                </div>
+                                <div class="col">
+                                    <input type="text" v-model="item.SGST" class="form-control" placeholder="SGST">
+                                </div>
+                                <div class="col">
+                                    <input type="text" v-model="item.CGST" class="form-control" placeholder="CGST">
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-success btn-sm" v-on:click="addProduct()">Add Product</button>
+                        </form>
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" data-dismiss="modal" v-on:click="saveNewPurchase()">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function() {
+        var obj = {
+            items: [],
+            item: {},
+            alertFailureMessage:"",
+            alertMessage: "",
+            newItems: [{
+                Name: "",
+                Amount: "",
+                CGST: "",
+                SGST: "",
+                Date: "",
+                Invoice:""
+            }],
+            tableRef:null
+        }
+
+        new Vue({
+            el: '#app',
+            data: obj,
+            methods: {
+                deleteItem: function (id) {
+                    var self = this;
+                    self.isSpinner = true
+                    $.get("/purchase/Remove?id=" + id,
+                        function() {
+                            self.alertMessage = "Item deleted succesfully";
+                           // self.initialLoad();
+                        }).fail(function() {
+                            self.alertFailureMessage = "Internal server error";
+                    })
+                },
+                openModalForAddPurchase: function () {
+                    $("#add-product").modal("show");
+                },
+                addProduct: function () {
+                    this.newItems.push({
+                        Name: "",
+                        Amount: "",
+                        CGST: "",
+                        SGST: "",
+                        Category:""
+                    })
+                },
+                saveNewPurchase: function () {
+                    var self = this;
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("Add", "purchase")',
+                        data: JSON.stringify(self.newItems),
+                        dataType: 'json',
+                        contentType: 'application/json; charset=utf-8',
+                        success: function () {
+                            self.alertMessage = "Item Added succesfully"
+                            self.newItems = [];
+                           // self.initialLoad()
+                        }
+                    });
+                },
+                saveEditPurchase: function() {
+                    var self = this;
+                    if (self.item) {
+                        $.post("/purchase/Edit", self.item, function( data ) {
+                            self.alertMessage = "Item Edited succesfully"
+                        }).fail(function() {
+                            alertFailureMessage = "Internal server error"
+                        });
+                    }
+                },
+                getPurchaseById: function(id) {
+                    var self = this;
+                    $.get(`/purchase/GetDataById/${id}`,
+                        function(data, status) {
+                            self.item = data;
+                            $("#myModal").modal("show");
+                        }).fail(function() {
+                        alertFailureMessage = "Internal server error"
+                    });
+                },
+                bindTableClickEvents: function () {
+                    var self = this;
+                    $(".edit-purchase").click(function (e) {
+                        var id = $(this).attr("data-id")
+                        self.getProductById(id);
+                    })
+
+                    $(".delete-purchase").click(function (e) {
+                        var id = $(this).attr("data-id")
+                        self.deleteItem(id);
+                    })
+
+                },
+                closeAlertMessage: function (property) {
+                    // set alert messahe to empty
+                    this[property] = "";
+                },
+                getTableData: function () {
+                    var self = this;
+                    self.tableRef = $("#product-table").DataTable({
+                        ajax: {
+                            url: "/purchase/GetData",
+                            type: "GET",
+                            dataSrc: function (json) {
+                                return json;
+                            },
+                            error: function (xhr, error) {
+                                if (xhr.status == 401) alert("Unauthorised user");
+                            }
+                        },
+                        fixedHeader: {
+                            header: true,
+                            footer: true
+                        },
+                        columns: [
+                            { data: "Date" },
+                            { data: "Invoice" },
+                            { data: "Business" },
+                            { data: "CGST" },
+                            { data: "SGST" },
+                            { data: "Amount" },
+                            {
+                                render: function (data, type, row, meta) {
+                                    return `<i class="fa fa-edit pointer edit-item" data-id=${row.Id}></i>`;
+
+                                }
+                            },
+                            {
+                                render: function (data, type, row, meta) {
+                                    return `<i class="fa fa-trash pointer delete-item" data-id=${row.Id}></i>`;
+                                }
+                            },
+                        ],
+                        lengthMenu: [[5, 20, 25, 30, 100], [5, 20, 25, 30, 100]],
+                        initComplete: function (settings, json) {
+                            self.bindTableClickEvents()
+                        }
+                    });
+                }
+            },
+            mounted() {
+                this.getTableData();
+            },
+        })
+    });
+
+
+</script>

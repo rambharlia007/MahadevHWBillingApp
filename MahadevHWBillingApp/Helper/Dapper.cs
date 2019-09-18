@@ -19,6 +19,11 @@ namespace MahadevHWBillingApp.Helper
             }
         }
 
+        internal static object Get<T>(object getPurchase)
+        {
+            throw new NotImplementedException();
+        }
+
         public static T GetById<T>(string query) where T : class
         {
             using (var con = new SQLiteConnection(_connectionString))
