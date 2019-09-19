@@ -10,14 +10,6 @@ namespace MahadevHWBillingApp.Models
     {
         public ItemConfiguration()
         {
-            this.Property(s => s.Amount).IsRequired();
-            this.Property(s => s.CGST).IsRequired();
-            this.Property(s => s.SGST).IsRequired();
-            this.Property(s => s.Unit).IsRequired();
-            this.Property(s => s.Name).IsRequired();
-
-
-
 
         }
     }

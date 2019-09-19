@@ -112,12 +112,12 @@
                         <td style="width: 200px;" v-bind:["data-id"]="index">
                             <select class="product-select-2 js-example-basic-single js-states form-control"></select>
                         </td>
-                        <td> <input type="text" v-model="item.BasePrice" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
+                        <td> <input type="text" v-model="item.Price" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
                         <td> <input type="text" v-model="item.Quantity" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
                         <td> <input type="text" v-model="item.GST" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
-                        <td> <input type="text" readonly v-model="item.CGST" class="form-control form-control-sm"></td>
-                        <td> <input type="text" readonly v-model="item.SGST" class="form-control form-control-sm"></td>
-                        <td> <input type="text" readonly v-model="item.Amount" class="form-control form-control-sm"></td>
+                        <td> <input type="text" readonly v-model="item.TotalCGSTAmount" class="form-control form-control-sm"></td>
+                        <td> <input type="text" readonly v-model="item.TotalSGSTAmount" class="form-control form-control-sm"></td>
+                        <td> <input type="text" readonly v-model="item.TotalAmount" class="form-control form-control-sm"></td>
                     </tr>
                     </tbody>
                 </table>
@@ -204,11 +204,11 @@
                             <tr v-for="(item,index) in items" v-if="item.Name">
                                 <td class="center">{{index+1}}</td>
                                 <td class="left strong">{{item.Name}}</td>
-                                <td class="right">{{Number(item.BasePrice).toLocaleString()}}</td>
-                                <td class="center">{{Number(item.CGST).toLocaleString()}}</td>
-                                <td class="center">{{Number(item.SGST).toLocaleString()}}</td>
+                                <td class="right">{{Number(item.Price).toLocaleString()}}</td>
+                                <td class="center">{{Number(item.TotalCGSTAmount).toLocaleString()}}</td>
+                                <td class="center">{{Number(item.TotalSGSTAmount).toLocaleString()}}</td>
                                 <td class="center">{{Number(item.Quantity).toLocaleString()}}</td>
-                                <td class="center">{{Number(item.Amount).toLocaleString()}}</td>
+                                <td class="center">{{Number(item.TotalAmount).toLocaleString()}}</td>
                             </tr>
 
                         </tbody>
@@ -259,12 +259,12 @@
         for (i = 0; i < 25; i++) {
             items.push({
                 Name: "",
-                Unit: "",
+                MeasuringUnit: "",
                 Quantity: "",
-                CGST: "",
-                SGST: "",
-                Amount: "",
-                BasePrice: "",
+                TotalCGSTAmount: "",
+                TotalSGSTAmount: "",
+                TotalAmount: "",
+                Price: "",
                 GST: "",
                 ItemId: 0,
             })
@@ -284,10 +284,10 @@
                 calculatePerItemAmount: function (index) {
                     var ref = this.items[index];
                     var taxInPercentage = ref.GST / 2;
-                    ref.Amount = ref.BasePrice * ref.Quantity;
-                    var tax = Math.round(((ref.Amount * taxInPercentage) / 100) * 100) / 100;
-                    ref.CGST = tax;
-                    ref.SGST = tax;
+                    ref.TotalAmount = ref.Price * ref.Quantity;
+                    var tax = Math.round(((ref.Price * taxInPercentage) / 100) * 100) / 100;
+                    ref.TotalCGSTAmount = tax;
+                    ref.TotalSGSTAmount = tax;
                 },
                 showOrHidePreview: function (value) {
                     this.isPreview = value;
@@ -315,9 +315,9 @@
                                 BusinessName: "",
                                 CustomerName: "",
                                 CustomerGSTIN: "",
-                                CGST: self.tax / 2,
-                                SGST: self.tax / 2,
-                                Amount: self.total,
+                                TotalCGSTAmount: self.tax / 2,
+                                TotalSGSTAmount: self.tax / 2,
+                                TotalAmount: self.total,
                                 Invoice: "1234",
                                 Date:"25-12-2019"
                             },
@@ -358,7 +358,7 @@
                                     products.push({
                                         id: product.Id,
                                         text: product.Name,
-                                        BasePrice: product.Amount,
+                                        Price: product.Price,
                                         CGST: product.CGST,
                                         SGST: product.SGST
                                     })
@@ -380,7 +380,7 @@
 
                         self.items[index].ItemId = data.id;
                         self.items[index].Name = data.text;
-                        self.items[index].BasePrice = data.BasePrice;
+                        self.items[index].Price = data.Price;
                         self.items[index].GST = data.CGST + data.SGST;
                         self.items[index].Quantity = 1;
                         self.calculatePerItemAmount(index);

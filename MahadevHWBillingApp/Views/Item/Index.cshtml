@@ -54,10 +54,11 @@
                     <tr>
                         <th>Name</th>
                         <th>Category</th>
-                        <th>Unit</th>
-                        <th>Amount</th>
-                        <th>SGST</th>
-                        <th>CGST</th>
+                        <th>Measuring Unit</th>
+                        <th>Quantity Available</th>
+                        <th>SGST (%)</th>
+                        <th>CGST (%)</th>
+                        <th>Price</th>
                         <th>Edit</th>
                         <th>Delete</th>
                     </tr>
@@ -94,6 +95,18 @@
                             </div>
                         </div>
                         <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">Measuring Unit</label>
+                            <div class="col-sm-10">
+                                <input v-model="item.MeasuringUnit" type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">Quantity Available</label>
+                            <div class="col-sm-10">
+                                <input v-model="item.Quantity" type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group row">
                             <label class="col-sm-2 col-form-label">CGST</label>
                             <div class="col-sm-10">
                                 <input v-model="item.CGST" type="text" class="form-control">
@@ -105,16 +118,11 @@
                                 <input v-model="item.SGST" type="text" class="form-control">
                             </div>
                         </div>
+
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label">Unit</label>
+                            <label class="col-sm-2 col-form-label">Price</label>
                             <div class="col-sm-10">
-                                <input v-model="item.Unit" type="text" class="form-control">
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label class="col-sm-2 col-form-label">Amount</label>
-                            <div class="col-sm-10">
-                                <input v-model="item.Amount" type="text" class="form-control">
+                                <input v-model="item.Price" type="text" class="form-control">
                             </div>
                         </div>
                     </form>
@@ -149,16 +157,19 @@
                                 <input type="text" v-model="item.Category" class="form-control" placeholder="Category">
                             </div>
                             <div class="col">
-                                <input type="text" v-model="item.Unit" class="form-control" placeholder="Unit">
+                                <input type="text" v-model="item.MeasuringUnit" class="form-control" placeholder="Measuring Unit">
                             </div>
                             <div class="col">
-                                <input type="text" v-model="item.Amount" class="form-control" placeholder="Amount">
+                                <input type="text" v-model="item.Quantity" class="form-control" placeholder="Quantity Available">
                             </div>
                             <div class="col">
-                                <input type="text" v-model="item.SGST" class="form-control" placeholder="SGST">
+                                <input type="text" v-model="item.Price" class="form-control" placeholder="Price">
                             </div>
                             <div class="col">
-                                <input type="text" v-model="item.CGST" class="form-control" placeholder="CGST">
+                                <input type="text" v-model="item.SGST" class="form-control" placeholder="SGST %">
+                            </div>
+                            <div class="col">
+                                <input type="text" v-model="item.CGST" class="form-control" placeholder="CGST %">
                             </div>
                         </div>
                         <button type="button" class="btn btn-success btn-sm" v-on:click="addProduct()">Add Product</button>
@@ -185,10 +196,12 @@
             alertMessage: "",
             newItems: [{
                 Name: "",
-                Amount: "",
+                Price: "",
                 CGST: "",
                 SGST: "",
-                Category: ""
+                Category: "",
+                Quantity: "",
+                MeasuringUnit:""
             }],
             tableRef:null
         }
@@ -214,10 +227,12 @@
                 addProduct: function () {
                     this.newItems.push({
                         Name: "",
-                        Amount: "",
+                        Price: "",
                         CGST: "",
                         SGST: "",
-                        Category:""
+                        Category: "",
+                        Quantity: "",
+                        MeasuringUnit: ""
                     })
                 },
                 saveNewProduct: function () {
@@ -292,10 +307,11 @@
                         columns: [
                             { data: "Name" },
                             { data: "Category" },
-                            { data: "Unit" },
-                            { data: "Amount" },
-                            { data: "CGST" },
+                            { data: "MeasuringUnit" },
+                            { data: "Quantity" },
                             { data: "SGST" },
+                            { data: "CGST" },
+                            { data: "Price" },
                             {
                                 render: function (data, type, row, meta) {
                                     return `<i class="fa fa-edit pointer edit-item" data-id=${row.Id}></i>`;

@@ -105,9 +105,9 @@
                         <th>Date <small>(DD-MM-YYYY)</small></th>
                         <th>Invoice</th>
                         <th>Business</th>
-                        <th>SGST</th>
-                        <th>CGST</th>
-                        <th>Amount</th>
+                        <th>SGST Amount</th>
+                        <th>CGST Amount</th>
+                        <th>Total Amount</th>
                         <th>Edit</th>
                         <th>Delete</th>
                     </tr>
@@ -150,21 +150,21 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">SGST</label>
+                                <label class="col-sm-2 col-form-label">SGST Amount</label>
                                 <div class="col-sm-10">
-                                    <input v-model="purchase.SGST" type="number" class="form-control">
+                                    <input v-model="purchase.TotalSGSTAmount" type="number" class="form-control">
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">CGST</label>
+                                <label class="col-sm-2 col-form-label">CGST Amount</label>
                                 <div class="col-sm-10">
-                                    <input v-model="purchase.CGST" type="number" class="form-control">
+                                    <input v-model="purchase.TotalCGSTAmount" type="number" class="form-control">
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Amount</label>
+                                <label class="col-sm-2 col-form-label">Total Amount</label>
                                 <div class="col-sm-10">
-                                    <input v-model="purchase.Amount" type="number" class="form-control">
+                                    <input v-model="purchase.TotalAmount" type="number" class="form-control">
                                 </div>
                             </div>
                         </form>
@@ -199,9 +199,9 @@
                                     <th scope="col">Date</th>
                                     <th scope="col">Invoice</th>
                                     <th style="width: 200px;">Name</th>
-                                    <th scope="col">CGST</th>
-                                    <th scope="col">SGST</th>
-                                    <th scope="col">Amount</th>
+                                    <th scope="col">SGST Amount</th>
+                                    <th scope="col">CGST Amount</th>
+                                    <th scope="col">Total Amount</th>
 
                                 </tr>
                             </thead>
@@ -211,9 +211,9 @@
                                     <td  v-bind:["data-id"]="index"> <input type="text" v-model="purchase.Date" class="form-control form-control-sm purchase-date"></td>
                                     <td> <input type="text" v-model="purchase.Invoice"  class="form-control form-control-sm"></td>
                                     <td style="width: 200px;"> <input type="text" v-model="purchase.BusinessName"  class="form-control form-control-sm"></td>
-                                    <td> <input type="number"  v-model="purchase.CGST" class="form-control form-control-sm"></td>
-                                    <td> <input type="number"  v-model="purchase.SGST" class="form-control form-control-sm"></td>
-                                    <td> <input type="number"  v-model="purchase.Amount" class="form-control form-control-sm"></td>
+                                    <td> <input type="number"  v-model="purchase.TotalCGSTAmount" class="form-control form-control-sm"></td>
+                                    <td> <input type="number"  v-model="purchase.TotalSGSTAmount" class="form-control form-control-sm"></td>
+                                    <td> <input type="number"  v-model="purchase.TotalAmount" class="form-control form-control-sm"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -238,9 +238,9 @@
             for (var i = 0; i < 30; i++) {
                 tempPurchase.push({
                     BusinessName: "",
-                    Amount: "",
-                    CGST: "",
-                    SGST: "",
+                    TotalAmount: "",
+                    TotalCGSTAmount: "",
+                    TotalSGSTAmount: "",
                     Date: "",
                     Invoice: ""
                 });
@@ -279,7 +279,7 @@
                     var self = this;
                     var validData = [];
                     self.newPurchases.forEach((data) => {
-                        if (data.Date && data.Invoice && data.BusinessName && data.CGST && data.SGST && data.Amount) {
+                        if (data.Date && data.Invoice && data.BusinessName && data.TotalCGSTAmount && data.TotalSGSTAmount && data.TotalAmount) {
                             validData.push(data);
                         }
                     })
@@ -359,9 +359,9 @@
                             { data: "Date" },
                             { data: "Invoice" },
                             { data: "BusinessName" },
-                            { data: "SGST" },
-                            { data: "CGST" },
-                            { data: "Amount" },
+                            { data: "TotalSGSTAmount" },
+                            { data: "TotalCGSTAmount" },
+                            { data: "TotalAmount" },
                             {
                                 render: function (data, type, row, meta) {
                                     return `<i class="fa fa-edit pointer edit-purchase" data-id=${row.Id}></i>`;
