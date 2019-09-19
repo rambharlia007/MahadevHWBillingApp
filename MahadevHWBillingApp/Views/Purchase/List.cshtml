@@ -190,8 +190,6 @@
 
                     <!-- Modal body -->
                     <div class="modal-body" style="padding-top: 0px;">
-
-
                         <table class="table text-secondary" style="font-size: 14px;">
                             <thead class="thead-light table-head">
                                 <tr class="table-row">
@@ -202,7 +200,6 @@
                                     <th scope="col">SGST Amount</th>
                                     <th scope="col">CGST Amount</th>
                                     <th scope="col">Total Amount</th>
-
                                 </tr>
                             </thead>
                             <tbody class="table-body">
@@ -298,7 +295,7 @@
                         });
                     }
                     else {
-                        self.alertFailureMessage = `30 off 30 invalid Purchase record were found`;
+                        self.alertFailureMessage = "30 off 30 invalid Purchase record were found";
                     }
                 },
                 saveEditPurchase: function() {

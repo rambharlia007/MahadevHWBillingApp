@@ -13,6 +13,34 @@
     [v-cloak] {
         display: none;
     }
+    .table-head, .table-body .table-row {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+    }
+    @@media only screen and (min-width: 768px) {
+        .table-body {
+            display: block;
+            height: 250PX;
+            overflow-y: scroll;
+        }
+    }
+
+    @@media only screen and (min-width: 992px) {
+        .table-body {
+            display: block;
+            height: 200px;
+            overflow-y: scroll;
+        }
+    }
+
+    @@media only screen and (min-width: 1500px) {
+        .table-body {
+            display: block;
+            max-height: 500px;
+            overflow-y: scroll;
+        }
+    }
 </style>
 
 <div id="app">
@@ -137,43 +165,44 @@
     </div>
 
     <div class="modal" id="add-product">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
 
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <h4 class="modal-title">Modal Heading</h4>
+                    <h4 class="modal-title">Add Products</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
 
                 <!-- Modal body -->
                 <div class="modal-body">
-                    <form>
-                        <div class="form-row" v-for="item in newItems" style="padding-bottom:5px;">
-                            <div class="col-3">
-                                <input type="text" v-model="item.Name" class="form-control" placeholder="Name">
-                            </div>
-                            <div class="col">
-                                <input type="text" v-model="item.Category" class="form-control" placeholder="Category">
-                            </div>
-                            <div class="col">
-                                <input type="text" v-model="item.MeasuringUnit" class="form-control" placeholder="Measuring Unit">
-                            </div>
-                            <div class="col">
-                                <input type="text" v-model="item.Quantity" class="form-control" placeholder="Quantity Available">
-                            </div>
-                            <div class="col">
-                                <input type="text" v-model="item.Price" class="form-control" placeholder="Price">
-                            </div>
-                            <div class="col">
-                                <input type="text" v-model="item.SGST" class="form-control" placeholder="SGST %">
-                            </div>
-                            <div class="col">
-                                <input type="text" v-model="item.CGST" class="form-control" placeholder="CGST %">
-                            </div>
-                        </div>
-                        <button type="button" class="btn btn-success btn-sm" v-on:click="addProduct()">Add Product</button>
-                    </form>
+                    
+                    <table class="table text-secondary" style="font-size: 14px;">
+                        <thead class="thead-light table-head">
+                        <tr class="table-row">
+                            <th style="width: 45px" scope="col">#</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Category</th>
+                            <th style="width: 200px;">Measuring Unit</th>
+                            <th scope="col">Quantity Available</th>
+                            <th scope="col">SGST (%)</th>
+                            <th scope="col">CGST (%)</th>
+                            <th scope="col">Price</th>
+                        </tr>
+                        </thead>
+                        <tbody class="table-body">
+                        <tr class="table-row" v-for="(item,index) in newItems">
+                            <td style="width: 45px">{{index+1}}</td>
+                            <td> <input type="text" v-model="item.Name" class="form-control form-control-sm"></td>
+                            <td> <input type="text" v-model="item.Category"  class="form-control form-control-sm"></td>
+                            <td> <input type="text" v-model="item.MeasuringUnit"  class="form-control form-control-sm"></td>
+                            <td> <input type="number"  v-model="item.Quantity" class="form-control form-control-sm"></td>
+                            <td> <input type="number"  v-model="item.SGST" class="form-control form-control-sm"></td>
+                            <td> <input type="number"  v-model="item.CGST" class="form-control form-control-sm"></td>
+                            <td> <input type="number"  v-model="item.Price" class="form-control form-control-sm"></td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 <!-- Modal footer -->
@@ -188,21 +217,30 @@
 
 <script>
 
-    $(document).ready(function() {
+    $(document).ready(function () {
+
+        function addEmptyNewItems() {
+            var result = [];
+            for (var i = 0; i < 20; i++) {
+                result.push({
+                    Name: "",
+                    Price: "",
+                    CGST: "",
+                    SGST: "",
+                    Category: "",
+                    Quantity: "",
+                    MeasuringUnit:""
+                });
+            }
+            return result;
+        }
+
         var obj = {
             items: [],
             item: {},
             alertFailureMessage:"",
             alertMessage: "",
-            newItems: [{
-                Name: "",
-                Price: "",
-                CGST: "",
-                SGST: "",
-                Category: "",
-                Quantity: "",
-                MeasuringUnit:""
-            }],
+            newItems: addEmptyNewItems(),
             tableRef:null
         }
 
@@ -233,30 +271,41 @@
                         Category: "",
                         Quantity: "",
                         MeasuringUnit: ""
-                    })
+                    });
                 },
                 saveNewProduct: function () {
                     var self = this;
-                    $.ajax({
-                        type: 'POST',
-                        url: '@Url.Action("AddItems", "Item")',
-                        data: JSON.stringify(self.newItems),
-                        dataType: 'json',
-                        contentType: 'application/json; charset=utf-8',
-                        success: function () {
-                            self.alertMessage = "Item Added succesfully"
-                            self.newItems = [];
-                           // self.initialLoad()
-                        }
+                    var validData = [];
+                    self.newItems.forEach(function(data) {
+                        if (data.Name && data.Price && data.CGST && data.SGST && data.Quantity && data.MeasuringUnit)
+                            validData.push(data);
                     });
+
+                    if (validData.length) {
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("AddItems", "Item")',
+                            data: JSON.stringify(validData),
+                            dataType: 'json',
+                            contentType: 'application/json; charset=utf-8',
+                            success: function() {
+                                self.alertMessage = `${validData.length} Product Added succesfully. ${30 - validData.length} Product were left empty`;
+                                self.newItems = [];
+                                // self.initialLoad()
+                            }
+                        });
+                    } else {
+                        self.alertFailureMessage = "30 off 30 invalid Product record were found";
+                    }
+                    
                 },
                 saveEditItem: function() {
                     var self = this;
                     if (self.item) {
                         $.post("/item/EditItem", self.item, function( data ) {
-                            self.alertMessage = "Item Edited succesfully"
+                            self.alertMessage = "Item Edited succesfully";
                         }).fail(function() {
-                            alertFailureMessage = "Internal server error"
+                            self.alertFailureMessage = "Internal server error";
                         });
                     }
                 },
@@ -267,7 +316,7 @@
                             self.item = data;
                             $("#myModal").modal("show");
                         }).fail(function() {
-                        alertFailureMessage = "Internal server error"
+                        alertFailureMessage = "Internal server error";
                     });
                 },
                 bindTableClickEvents: function () {
