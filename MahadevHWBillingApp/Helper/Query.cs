@@ -12,6 +12,10 @@ namespace MahadevHWBillingApp.Helper
         {
             return $"Delete From Items Where Id in ({string.Join(",", ids)})";
         }
+        public static string DeletePurchase(IList<int> ids)
+        {
+            return $"Delete From Purchase Where Id in ({string.Join(",", ids)})";
+        }
         public static string GetItemById(int id)
         {
             return $"Select * From Items Where Id in ({id})";

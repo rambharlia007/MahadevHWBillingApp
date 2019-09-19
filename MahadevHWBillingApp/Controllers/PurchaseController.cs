@@ -25,7 +25,7 @@ namespace MahadevHWBillingApp.Controllers
 
         public JsonResult GetDataById(int id)
         {
-            var items = Helper.Dapper.GetById<Item>(Query.GetPurchaseById(id));
+            var items = Helper.Dapper.GetById<Purchase>(Query.GetPurchaseById(id));
             var response = Json(items, JsonRequestBehavior.AllowGet);
             return response;
         }
@@ -50,7 +50,7 @@ namespace MahadevHWBillingApp.Controllers
 
         public JsonResult Remove(int id)
         {
-            Helper.Dapper.Execute(Query.DeleteItem(new List<int> { id }));
+            Helper.Dapper.Execute(Query.DeletePurchase(new List<int> { id }));
             return Json("Item deleted", JsonRequestBehavior.AllowGet);
         }
     }

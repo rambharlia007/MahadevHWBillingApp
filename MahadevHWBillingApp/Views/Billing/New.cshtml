@@ -72,6 +72,7 @@
             <button style="margin-top:25px; float:right;" type="button" class="btn btn-success btn-sm" v-if="!isPreview" v-on:click="showOrHidePreview(true)">Preview Print Bill</button>
             <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-if="isPreview" v-on:click="showOrHidePreview(false)">Edit Bill</button>
             <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-if="isPreview" v-on:click="print()">Print</button>
+            <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-on:click="save()">Save</button>
         </div>
     </div>
     <div style="margin-top:20px;">
@@ -151,11 +152,8 @@
                             </tr>
                             </tbody>
                         </table>
-
                     </div>
-
                 </div>
-
             </div>
         </div>
 
@@ -246,14 +244,10 @@
                                 </tr>
                             </tbody>
                         </table>
-
                     </div>
-
                 </div>
-
             </div>
         </div>
-
     </div>
 </div>
 
@@ -271,7 +265,8 @@
                 SGST: "",
                 Amount: "",
                 BasePrice: "",
-                GST: ""
+                GST: "",
+                ItemId: 0,
             })
         }
 
@@ -305,6 +300,44 @@
                 },
                 afterPrint: function () {
                     alert("Afetr Print");
+                },
+                save: function () {
+                    var self = this;
+                    var validData = [];
+                    self.items.forEach((data) => {
+                        if (data.Name && data.Quantity) {
+                            validData.push(data);
+                        }
+                    })
+                    if (validData.length) {
+                        var finalData = {
+                            SaleDetail: {
+                                BusinessName: "",
+                                CustomerName: "",
+                                CustomerGSTIN: "",
+                                CGST: self.tax / 2,
+                                SGST: self.tax / 2,
+                                Amount: self.total,
+                                Invoice: "1234",
+                                Date:"25-12-2019"
+                            },
+                            SaleItems: validData
+                        }
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("Save", "Billing")',
+                            data: JSON.stringify(finalData),
+                            dataType: 'json',
+                            contentType: 'application/json; charset=utf-8',
+                            success: function () {
+                                self.alertMessage = `${validData.length} purchase Added succesfully. ${30 - validData.length} Purchase were left empty`;
+                                self.newPurchases = addEmptyPurchaseObject();
+                            }
+                        });
+                    }
+                    else {
+                        self.alertFailureMessage = `30 off 30 invalid Purchase record were found`;
+                    }
                 },
                 initSelect2: function () {
                     var self = this;
@@ -345,6 +378,7 @@
                         let index = parseInt($(this).parent().attr('data-id'));
                         let data = e.params.data;
 
+                        self.items[index].ItemId = data.id;
                         self.items[index].Name = data.text;
                         self.items[index].BasePrice = data.BasePrice;
                         self.items[index].GST = data.CGST + data.SGST;

@@ -16,6 +16,5 @@ namespace MahadevHWBillingApp.Models
         public decimal Amount { get; set; }
         public string Invoice { get; set; }
         public string Date { get; set; }
-        public virtual List<Item> Items { get; set; }
     }
 }

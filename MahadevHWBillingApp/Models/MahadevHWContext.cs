@@ -16,6 +16,7 @@ namespace MahadevHWBillingApp.Models
         public DbSet<Profile> Profiles { get; set; }
         public DbSet<Purchase> Purchase { get; set; }
         public DbSet<Sale> Sales { get; set; }
+        public DbSet<SaleItem> SaleItems { get; set; }
 
         public MahadevHWContext()
         {
@@ -33,6 +34,7 @@ namespace MahadevHWBillingApp.Models
             builder.Entity<Profile>();
             builder.Entity<Purchase>();
             builder.Entity<Sale>();
+            builder.Entity<SaleItem>();
             base.OnModelCreating(builder);
         }
     }

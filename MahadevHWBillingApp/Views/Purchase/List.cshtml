@@ -29,7 +29,18 @@
         width: 100%;
         table-layout: fixed;
     }
-
+    .jq-dte-day{
+        width:30px !important;
+    }
+    .jq-dte-month {
+        width: 30px !important;
+    }
+    .jq-dte-year {
+        width: 35px !important;
+    }
+    .jq-dte {
+        width: 125px;
+    }
     @@media only screen and (min-width: 768px) {
         .table-body {
             display: block;
@@ -91,7 +102,7 @@
                        class="table text-secondary" style="font-size:14px;">
                     <thead class="thead-light">
                     <tr>
-                        <th>Date</th>
+                        <th>Date <small>(DD-MM-YYYY)</small></th>
                         <th>Invoice</th>
                         <th>Business</th>
                         <th>SGST</th>
@@ -106,7 +117,7 @@
         </div>
 
         <!-- The Modal -->
-        <div class="modal" id="edit-purchase">
+        <div class="modal" id="edit-purchase-modal">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
 
@@ -120,39 +131,40 @@
                     <div class="modal-body">
                         <form>
                             <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Name</label>
+                                <label class="col-sm-2 col-form-label">Date</label>
                                 <div class="col-sm-10">
-                                    <input v-model="purchase.Name" type="text" class="form-control">
+                                        <input type="text" class="form-control purchase-edit-date">
+                                       <pre style="display:inline">{{purchase.Date}}</pre>
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Category</label>
+                                <label class="col-sm-2 col-form-label">Invoice</label>
                                 <div class="col-sm-10">
-                                    <input v-model="purchase.Category" type="text" class="form-control">
+                                    <input v-model="purchase.Invoice" type="text" class="form-control">
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">CGST</label>
+                                <label class="col-sm-2 col-form-label">Business</label>
                                 <div class="col-sm-10">
-                                    <input v-model="purchase.CGST" type="text" class="form-control">
+                                    <input v-model="purchase.BusinessName" type="text" class="form-control">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">SGST</label>
                                 <div class="col-sm-10">
-                                    <input v-model="purchase.SGST" type="text" class="form-control">
+                                    <input v-model="purchase.SGST" type="number" class="form-control">
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Unit</label>
+                                <label class="col-sm-2 col-form-label">CGST</label>
                                 <div class="col-sm-10">
-                                    <input v-model="purchase.Unit" type="text" class="form-control">
+                                    <input v-model="purchase.CGST" type="number" class="form-control">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Amount</label>
                                 <div class="col-sm-10">
-                                    <input v-model="purchase.Amount" type="text" class="form-control">
+                                    <input v-model="purchase.Amount" type="number" class="form-control">
                                 </div>
                             </div>
                         </form>
@@ -160,14 +172,14 @@
 
                     <!-- Modal footer -->
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal" v-on:click="saveEditItem()">Save</button>
+                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal" v-on:click="saveEditPurchase()">Save</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="modal" id="add-purchase">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-dialog modal-dialog-centered modal-xl">
                 <div class="modal-content">
 
                     <!-- Modal Header -->
@@ -196,13 +208,12 @@
                             <tbody class="table-body">
                                 <tr class="table-row" v-for="(purchase,index) in newPurchases">
                                     <td style="width: 45px">{{index+1}}</td>
-                                  
-                                    <td> <input type="text" v-model="purchase.Date" class="form-control form-control-sm"></td>
+                                    <td  v-bind:["data-id"]="index"> <input type="text" v-model="purchase.Date" class="form-control form-control-sm purchase-date"></td>
                                     <td> <input type="text" v-model="purchase.Invoice"  class="form-control form-control-sm"></td>
-                                    <td style="width: 200px;"> <input type="text" v-model="purchase.Name"  class="form-control form-control-sm"></td>
-                                    <td> <input type="text"  v-model="purchase.CGST" class="form-control form-control-sm"></td>
-                                    <td> <input type="text"  v-model="purchase.SGST" class="form-control form-control-sm"></td>
-                                    <td> <input type="text"  v-model="purchase.Amount" class="form-control form-control-sm"></td>
+                                    <td style="width: 200px;"> <input type="text" v-model="purchase.BusinessName"  class="form-control form-control-sm"></td>
+                                    <td> <input type="number"  v-model="purchase.CGST" class="form-control form-control-sm"></td>
+                                    <td> <input type="number"  v-model="purchase.SGST" class="form-control form-control-sm"></td>
+                                    <td> <input type="number"  v-model="purchase.Amount" class="form-control form-control-sm"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -222,16 +233,19 @@
 
     $(document).ready(function () {
 
-        var tempPurchase = [];
-        for (var i = 0; i < 30; i++) {
-            tempPurchase.push({
-                Name: "",
-                Amount: "",
-                CGST: "",
-                SGST: "",
-                Date: "",
-                Invoice: ""
-            });
+        function addEmptyPurchaseObject() {
+            var tempPurchase = [];
+            for (var i = 0; i < 30; i++) {
+                tempPurchase.push({
+                    BusinessName: "",
+                    Amount: "",
+                    CGST: "",
+                    SGST: "",
+                    Date: "",
+                    Invoice: ""
+                });
+            }
+            return tempPurchase;
         }
 
         var obj = {
@@ -239,7 +253,7 @@
             purchase: {},
             alertFailureMessage: "",
             alertMessage: "",
-            newPurchases: tempPurchase,
+            newPurchases: addEmptyPurchaseObject(),
             tableRef:null
         }
 
@@ -263,18 +277,29 @@
                 },
                 saveNewPurchase: function () {
                     var self = this;
-                    $.ajax({
-                        type: 'POST',
-                        url: '@Url.Action("Add", "purchase")',
-                        data: JSON.stringify(self.newPurchases),
-                        dataType: 'json',
-                        contentType: 'application/json; charset=utf-8',
-                        success: function () {
-                            self.alertMessage = "purchase Added succesfully";
-                            self.newPurchases = [];
-                           // self.initialLoad()
+                    var validData = [];
+                    self.newPurchases.forEach((data) => {
+                        if (data.Date && data.Invoice && data.BusinessName && data.CGST && data.SGST && data.Amount) {
+                            validData.push(data);
                         }
-                    });
+                    })
+
+                    if (validData.length) {
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("Add", "purchase")',
+                            data: JSON.stringify(validData),
+                            dataType: 'json',
+                            contentType: 'application/json; charset=utf-8',
+                            success: function () {
+                                self.alertMessage = `${validData.length} purchase Added succesfully. ${30 - validData.length} Purchase were left empty`;
+                                self.newPurchases = addEmptyPurchaseObject();
+                            }
+                        });
+                    }
+                    else {
+                        self.alertFailureMessage = `30 off 30 invalid Purchase record were found`;
+                    }
                 },
                 saveEditPurchase: function() {
                     var self = this;
@@ -291,7 +316,7 @@
                     $.get(`/purchase/GetDataById/${id}`,
                         function(data, status) {
                             self.purchase = data;
-                            $("#myModal").modal("show");
+                            $("#edit-purchase-modal").modal("show");
                         }).fail(function() {
                         self.alertFailureMessage = "Internal server error";
                     });
@@ -300,7 +325,7 @@
                     var self = this;
                     $(".edit-purchase").click(function(e) {
                         var id = $(this).attr("data-id")
-                        self.getProductById(id);
+                        self.getPurchaseById(id);
                     });
 
                     $(".delete-purchase").click(function(e) {
@@ -354,10 +379,32 @@
                             self.bindTableClickEvents();
                         }
                     });
+                },
+                getFormatedDate: function (value) {
+                    var tempDate = value.split("-");
+                    return `${tempDate[2]}-${tempDate[1]}-${tempDate[0]}`;   // DD-MM-YYYY
                 }
             },
             mounted() {
+                var self = this;
                 this.getTableData();
+                $('.purchase-edit-date').datetextentry({
+                    field_order: 'DMY',
+                    on_change: function (date_str) {
+                        if (date_str) {
+                            self.purchase.Date = self.getFormatedDate(date_str);
+                        }
+                    }
+                });
+                $('.purchase-date').datetextentry({
+                    field_order: 'DMY',
+                    on_change: function (date_str) {
+                        if (date_str) {
+                            var id = parseInt($(this)[0].$element.parent().parent().attr("data-id"));
+                            self.newPurchases[id].Date = self.getFormatedDate(date_str);;
+                        }
+                    }
+                });
             },
         })
     });
