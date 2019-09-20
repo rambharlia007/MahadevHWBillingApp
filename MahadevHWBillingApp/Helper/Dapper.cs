@@ -5,6 +5,7 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Web;
 using Dapper;
+using static Dapper.SqlMapper;
 
 namespace MahadevHWBillingApp.Helper
 {
@@ -19,9 +20,12 @@ namespace MahadevHWBillingApp.Helper
             }
         }
 
-        internal static object Get<T>(object getPurchase)
+        public static GridReader QueryMultiple(string query) 
         {
-            throw new NotImplementedException();
+            using (var con = new SQLiteConnection(_connectionString))
+            {
+               return con.QueryMultiple(query);
+            }
         }
 
         public static T GetById<T>(string query) where T : class

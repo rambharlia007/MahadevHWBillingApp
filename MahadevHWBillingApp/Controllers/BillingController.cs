@@ -10,7 +10,7 @@ namespace MahadevHWBillingApp.Controllers
     public class BillingController : BaseController
     {
         // GET: Billing
-        public ActionResult New()
+        public ActionResult New(int id = 0)
         {
             return View(_profile);
         }

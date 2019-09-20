@@ -1,0 +1,218 @@
+﻿
+@{
+    ViewBag.Title = "List";
+}
+
+<style>
+    .pointer {
+        cursor: pointer;
+    }
+
+    .hide {
+        display: none;
+    }
+
+    [v-cloak] {
+        display: none;
+    }
+
+    .modal-form-header {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        background-color: rgb(238, 238, 238);
+        margin-bottom: 10px;
+    }
+
+    .text-center {
+        text-align: center
+    }
+
+    .table-head, .table-body .table-row {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    .jq-dte-day {
+        width: 30px !important;
+    }
+
+    .jq-dte-month {
+        width: 30px !important;
+    }
+
+    .jq-dte-year {
+        width: 35px !important;
+    }
+
+    .jq-dte {
+        width: 125px;
+    }
+
+    @@media only screen and (min-width: 768px) {
+        .table-body {
+            display: block;
+            height: 250PX;
+            overflow-y: scroll;
+        }
+    }
+
+    @@media only screen and (min-width: 992px) {
+        .table-body {
+            display: block;
+            height: 200px;
+            overflow-y: scroll;
+        }
+    }
+
+    @@media only screen and (min-width: 1500px) {
+        .table-body {
+            display: block;
+            max-height: 500px;
+            overflow-y: scroll;
+        }
+    }
+</style>
+
+<div id="app">
+    <div class="row" style="background-color: #f6f7f8 !important;">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" style="padding-bottom: 0px; margin-bottom: 0px; background-color: #f6f7f8 !important;">
+                    <li class="breadcrumb-item"><i class="fa fa-home">&nbsp;</i><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Sales</li>
+                </ol>
+            </nav>
+            <h4 style="padding-left: 15px;">Sales</h4>
+        </div>
+        <div class="col-md-4">
+            <button style="margin-top:25px; float:right;" type="button" class="btn btn-success btn-sm" v-on:click="addNewBill()">Add New Bill</button>
+        </div>
+    </div>
+    <div style="margin-top:20px;">
+        <div class="alert alert-success alert-dismissible fade show" role="alert" v-cloak v-bind:class="{hide:!alertMessage}" style="margin-top: 20px;">
+            {{alertMessage}}
+            <button type="button" class="close" v-on:click="closeAlertMessage('alertMessage')" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <div v-cloak class="alert alert-danger alert-dismissible fade show" role="alert" v-bind:class="{hide:!alertFailureMessage}" style="margin-top: 20px;">
+            {{alertFailureMessage}}
+            <button type="button" class="close" v-on:click="closeAlertMessage('alertFailureMessage')" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="card-body" style="font-size:14px;">
+                <table id="sale-table" class="table text-secondary" style="font-size:14px;">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Date <small>(DD-MM-YYYY)</small></th>
+                            <th>Invoice</th>
+                            <th>Customer GSTIN</th>
+                            <th>SGST Amount</th>
+                            <th>CGST Amount</th>
+                            <th>Sub Total</th>
+                            <th>Total Amount</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+
+        var obj = {
+            alertFailureMessage: "",
+            alertMessage: "",
+            tableRef:null
+        }
+
+        new Vue({
+            el: '#app',
+            data: obj,
+            methods: {
+                deleteItem: function (id) {
+                    var self = this;
+                    $.get("/sale/Remove?id=" + id,
+                        function() {
+                            self.alertMessage = "sale record deleted succesfully";
+                            // self.initialLoad();
+                        }).fail(function() {
+                        self.alertFailureMessage = "Internal server error";
+                    });
+                },
+                bindTableClickEvents: function () {
+                    var self = this;
+                    $(".delete-sale").click(function(e) {
+                        var id = $(this).attr("data-id")
+                        self.deleteItem(id);
+                    });
+                },
+                closeAlertMessage: function (property) {
+                    // set alert message to empty
+                    this[property] = "";
+                },
+                addNewBill: function () {
+                    window.location.href = "@Url.Action("New", "Billing")";
+                },
+                getTableData: function () {
+                    var self = this;
+                    self.tableRef = $("#sale-table").DataTable({
+                        ajax: {
+                            url: "/sale/GetData",
+                            type: "GET",
+                            dataSrc: function (json) {
+                                return json;
+                            },
+                            error: function (xhr, error) {
+                                if (xhr.status === 401) alert("Unauthorised user");
+                            }
+                        },
+                        fixedHeader: {
+                            header: true,
+                            footer: true
+                        }, 
+                        columns: [
+                            { data: "Date" },
+                            { data: "Invoice" },
+                            { data: "CustomerGSTIN" },
+                            { data: "TotalSGSTAmount" },
+                            { data: "TotalCGSTAmount" },
+                            { data: "SubTotal" },
+                            { data: "TotalAmount" },
+                            {
+                                render: function (data, type, row, meta) {
+                                    return `<i class="fa fa-edit pointer" data-id=${row.Id}></i>`;
+                                }
+                            },
+                            {
+                                render: function (data, type, row, meta) {
+                                    return `<i class="fa fa-trash pointer " data-id=${row.Id}></i>`;
+                                }
+                            },
+                        ],
+                        lengthMenu: [[5, 20, 25, 30, 100], [5, 20, 25, 30, 100]],
+                        initComplete: function (settings, json) {
+                            self.bindTableClickEvents();
+                        }
+                    });
+                }
+            },
+            mounted() {
+                var self = this;
+                this.getTableData();
+            }
+        })
+    });
+
+
+</script>
