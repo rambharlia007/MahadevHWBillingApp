@@ -95,6 +95,7 @@
                     <thead class="thead-light table-head">
                     <tr class="table-row">
                         <th style="width: 45px" scope="col">#</th>
+                        <th class="text-center" v-if="Id" scope="col"></th>
                         <th class="text-center" style="width: 200px;" scope="col">Name</th>
                         <th class="text-center" scope="col">Price</th>
                         <th class="text-center" scope="col">Quantity</th>
@@ -108,8 +109,9 @@
                     <tbody class="table-body">
                     <tr class="table-row" v-for="(item,index) in items">
                         <td style="width: 45px">{{index+1}}</td>
-                        <td style="width: 200px;" v-bind:["data-id"]="index">
-                            <select class="product-select-2 js-example-basic-single js-states form-control"></select>
+                        <td v-if="Id"><input type="text" readonly v-model="item.Name" class="form-control form-control-sm" /></td>
+                        <td style="width: 200px;">
+                            <select v-bind:id="'product-sel-'+index" :data-id="index" class="product-select-2 js-example-basic-single js-states form-control"></select>
                         </td>
                         <td> <input type="text" v-model="item.Price" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
                         <td> <input type="text" v-model="item.Quantity" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
@@ -128,18 +130,43 @@
                                 <tr>
                                     <th class="text-center" scope="col">Customer Name</th>
                                     <th class="text-center" scope="col">Customer GSTIN</th>
+                                    <th class="text-center" scope="col">Address</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td> <input type="text"  v-model="CustomerName" class="form-control form-control-sm"></td>
-                                    <td> <input type="text"  v-model="CustomerGSTIN" class="form-control form-control-sm"></td>
+                                    <td> <input type="text" v-model="CustomerName" class="form-control form-control-sm"></td>
+                                    <td> <input type="text" v-model="CustomerGSTIN" class="form-control form-control-sm"></td>
+                                    <td> <textarea v-model="CustomerGSTIN" class="form-control form-control-sm"></textarea></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-
-                    <div class="col-lg-4 col-sm-5 ml-auto">
+                    <div class="col-lg-2 col-sm-2 ml-auto">
+                        <table class="table table-sm table-clear">
+                            <tbody>
+                            <tr v-for="(value, propertyName) in taxSlot">
+                                <td class="left">
+                                    <strong>SGST {{propertyName}}%</strong>
+                                </td>
+                                <td class="right">{{value}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg-2 col-sm-2 ml-auto">
+                        <table class="table table-sm table-clear">
+                            <tbody>
+                            <tr v-for="(value, propertyName) in taxSlot">
+                                <td class="left">
+                                    <strong>CGST {{propertyName}}%</strong>
+                                </td>
+                                <td class="right">{{value}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg-2 col-sm-2 ml-auto">
                         <table class="table table-sm table-clear">
                             <tbody>
                             <tr>
@@ -205,58 +232,82 @@
                 <div class="table-responsive-sm">
                     <table class="table table-sm">
                         <thead>
-                            <tr>
-                                <th style="width:45px" scope="col">#</th>
-                                <th style="width:200px;" scope="col">Name</th>
-                                <th scope="col">Price</th>
-                                <th scope="col">CGST</th>
-                                <th scope="col">SGST</th>
-                                <th scope="col">Quantity</th>
-                                <th scope="col">Total</th>
-                            </tr>
+                        <tr>
+                            <th style="width:45px" scope="col">#</th>
+                            <th style="width:200px;" scope="col">Name</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">GST %</th>
+                            <th scope="col">CGST Tax</th>
+                            <th scope="col">SGST Tax</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Total</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(item,index) in items" v-if="item.Name">
-                                <td class="center">{{index+1}}</td>
-                                <td class="left strong">{{item.Name}}</td>
-                                <td class="right">{{Number(item.Price).toLocaleString()}}</td>
-                                <td class="center">{{Number(item.TotalCGSTAmount).toLocaleString()}}</td>
-                                <td class="center">{{Number(item.TotalSGSTAmount).toLocaleString()}}</td>
-                                <td class="center">{{Number(item.Quantity).toLocaleString()}}</td>
-                                <td class="center">{{Number(item.TotalAmount).toLocaleString()}}</td>
-                            </tr>
-
+                        <tr v-for="(item,index) in items" v-if="item.Name">
+                            <td class="center">{{index+1}}</td>
+                            <td style="width:200px;" class="left strong">{{item.Name}}</td>
+                            <td class="right">{{Number(item.Price).toLocaleString()}}</td>
+                            <td class="right">{{Number(item.GST)}}</td>
+                            <td class="center">{{Number(item.TotalCGSTAmount).toLocaleString()}}</td>
+                            <td class="center">{{Number(item.TotalSGSTAmount).toLocaleString()}}</td>
+                            <td class="center">{{Number(item.Quantity).toLocaleString()}}</td>
+                            <td class="center">{{Number(item.TotalAmount).toLocaleString()}}</td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
+                <hr/>
                 <div class="row">
-                    <div class="col-lg-4 col-sm-5">
-
-                    </div>
-
-                    <div class="col-lg-4 col-sm-5 ml-auto">
+                    <div class="col-lg-3 col-sm-3 ml-auto"></div>
+                    <div class="col-lg-3 col-sm-3 ml-auto">
                         <table class="table table-sm table-clear">
                             <tbody>
-                                <tr>
-                                    <td class="left">
-                                        <strong>Subtotal</strong>
-                                    </td>
-                                    <td class="right">{{Number(subTotal).toLocaleString()}}</td>
-                                </tr>
-                                <tr>
-                                    <td class="left">
-                                        <strong>TAX</strong>
-                                    </td>
-                                    <td class="right">{{Number(tax).toLocaleString()}}</td>
-                                </tr>
-                                <tr>
-                                    <td class="left">
-                                        <strong>Total</strong>
-                                    </td>
-                                    <td class="right">
-                                        <strong>{{Number(total).toLocaleString()}}</strong>
-                                    </td>
-                                </tr>
+                            <tr v-for="(value, propertyName) in taxSlot">
+                                <td class="left">
+                                    <strong>SGST {{propertyName}}%</strong>
+                                </td>
+                                <td class="right">{{value.toLocaleString()}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg-3 col-sm-3 ml-auto">
+                        <table class="table table-sm table-clear">
+                            <tbody>
+                            <tr v-for="(value, propertyName) in taxSlot">
+                                <td class="left">
+                                    <strong>CGST {{propertyName}}%</strong>
+                                </td>
+                                <td class="right">{{value.toLocaleString()}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="col-lg-3 col-sm-3 ml-auto">
+                        <table class="table table-sm table-clear">
+                            <tbody>
+                            <tr>
+                                <td class="left">
+                                    <strong>Subtotal</strong>
+                                </td>
+                                <td class="right">{{Number(subTotal).toLocaleString()}}</td>
+                            </tr>
+                            <tr>
+                                <td class="left">
+                                    <strong>TAX</strong>
+                                </td>
+                                <td class="right">{{Number(tax).toLocaleString()}}</td>
+                            </tr>
+                            <tr>
+                                <td class="left">
+                                    <strong>Total</strong>
+                                </td>
+                                <td class="right">
+                                    <strong>{{Number(total).toLocaleString()}}</strong>
+                                </td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -271,7 +322,7 @@
 
         var items = [];
 
-        for (i = 0; i < 25; i++) {
+        for (var i = 0; i < 25; i++) {
             items.push({
                 Name: "",
                 MeasuringUnit: "",
@@ -282,9 +333,9 @@
                 Price: "",
                 GST: "",
                 CGST: "",
-                SGST:"",
-                ItemId: 0,
-            })
+                SGST: "",
+                ItemId: 0
+            });
         }
 
         function generateInvoiceNumber() {
@@ -308,13 +359,14 @@
             isSelect2Rendered: true,
             CustomerName: "",
             CustomerGSTIN: "",
+            Id:0,
             Invoice: generateInvoiceNumber()
         }
         new Vue({
             el: '#app',
             data: obj,
             methods: {
-                calculatePerItemAmount: function (index) {
+                calculatePerItemAmount: function(index) {
                     var ref = this.items[index];
                     var taxInPercentage = ref.GST / 2;
                     ref.TotalAmount = ref.Price * ref.Quantity;
@@ -322,27 +374,27 @@
                     ref.TotalCGSTAmount = tax;
                     ref.TotalSGSTAmount = tax;
                 },
-               
-                showOrHidePreview: function (value) {
+
+                showOrHidePreview: function(value) {
                     this.isPreview = value;
                 },
-                print: function () {
+                print: function() {
                     window.print();
                 },
-                beforePrint: function () {
+                beforePrint: function() {
                     alert("BeforePrint");
                 },
-                afterPrint: function () {
+                afterPrint: function() {
                     alert("Afetr Print");
                 },
-                save: function () {
+                save: function() {
                     var self = this;
                     var validData = [];
                     self.items.forEach((data) => {
                         if (data.Name && data.Quantity) {
                             validData.push(data);
                         }
-                    })
+                    });
                     if (validData.length) {
                         var date = new Date();
                         var finalData = {
@@ -355,7 +407,7 @@
                                 TotalAmount: self.total,
                                 Invoice: self.Invoice,
                                 SubTotal: self.subTotal,
-                                Date: `${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}`
+                                Date: `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
                             },
                             SaleItems: validData
                         }
@@ -365,79 +417,95 @@
                             data: JSON.stringify(finalData),
                             dataType: 'json',
                             contentType: 'application/json; charset=utf-8',
-                            success: function () {
-                                self.alertMessage = `${validData.length} purchase Added succesfully. ${30 - validData.length} Purchase were left empty`;
+                            success: function() {
+                                self.alertMessage =
+                                    `${validData.length} Items in the Bill Added succesfully.`;
                                 self.newPurchases = addEmptyPurchaseObject();
+                            },
+                            error: function (res) {
+                                self.alertFailureMessage = "Internal server error. Please try to save again";
                             }
                         });
                     }
                 },
-                initSelect2: function () {
+                initSelect2: function() {
                     var self = this;
-                    $(".product-select-2").select2({
-                        ajax: {
-                            url: "/item/GetDataBySearch",
-                            dataType: 'json',
-                            delay: 250,
-                            data: function (params) {
-                                return {
-                                    q: params.term,
-                                    page: params.page
-                                };
+
+                        $(".product-select-2").select2({
+                            ajax: {
+                                url: "/item/GetDataBySearch",
+                                dataType: 'json',
+                                delay: 250,
+                                data: function (params) {
+                                    return {
+                                        q: params.term,
+                                        page: params.page
+                                    };
+                                },
+                                processResults: function (data, params) {
+                                    var products = [];
+                                    data.forEach((product) => {
+                                        products.push({
+                                            id: product.Id,
+                                            text: product.Name,
+                                            Price: product.DiscountPrice,
+                                            CGST: product.CGST,
+                                            SGST: product.SGST
+                                        });
+                                    });
+
+                                    return {
+                                        results: products
+                                    };
+                                },
+                                cache: true
                             },
-                            processResults: function (data, params) {
-                                var products = [];
-                                data.forEach((product) => {
-                                    products.push({
-                                        id: product.Id,
-                                        text: product.Name,
-                                        Price: product.Price,
-                                        CGST: product.CGST,
-                                        SGST: product.SGST
-                                    })
-                                });
+                            placeholder: 'Search for a Product',
+                            minimumInputLength: 1
+                        });
 
-                                return {
-                                    results: products
-                                };
-                            },
-                            cache: true
-                        },
-                        placeholder: 'Search for a Product',
-                        minimumInputLength: 1
-
-                    });
-                    $('.product-select-2').on('select2:select', function (e) {
-                        let index = parseInt($(this).parent().attr('data-id'));
-                        let data = e.params.data;
-
-                        self.items[index].ItemId = data.id;
-                        self.items[index].Name = data.text;
-                        self.items[index].Price = data.Price;
-                        self.items[index].GST = data.CGST + data.SGST;
-                        self.items[index].CGST = data.CGST;
-                        self.items[index].SGST = data.SGST
-                        self.items[index].Quantity = 1;
-                        self.calculatePerItemAmount(index);
-                    });
+                        $('.product-select-2').on('select2:select',
+                            function (e) {
+                                var index = parseInt($(this).attr('data-id'));
+                                var data = e.params.data;
+                                self.items[index].ItemId = data.id;
+                                self.items[index].Name = data.text;
+                                self.items[index].Price = data.Price;
+                                self.items[index].GST = data.CGST + data.SGST;
+                                self.items[index].CGST = data.CGST;
+                                self.items[index].SGST = data.SGST;
+                                self.items[index].Quantity = 1;
+                                self.calculatePerItemAmount(index);
+                            });
                 }
             },
             computed: {
-                subTotal: function () {
+                taxSlot: function () {
+                    var slot = {};
+                    this.items.forEach(function(item) {
+                        if (item.CGST)
+                            slot[item.CGST] = (slot[item.CGST] || 0) + item.TotalCGSTAmount;
+                    });
+                    return slot;
+                },
+                subTotal: function() {
                     var totalAmount = 0;
-                    this.items.forEach(function (item) {
+                    this.items.forEach(function(item) {
                         totalAmount += parseFloat(item.TotalAmount || 0);
-                    })
+                    });
                     return totalAmount;
                 },
-                tax: function () {
+                tax: function() {
                     var totalTax = 0;
-                    this.items.forEach(function (item) {
-                        totalTax += Math.round((parseFloat(item.TotalCGSTAmount || 0) + parseFloat(item.TotalSGSTAmount || 0)) * 100) / 100;
-                    })
+                    this.items.forEach(function(item) {
+                        totalTax += Math.round((parseFloat(item.TotalCGSTAmount || 0) +
+                                    parseFloat(item.TotalSGSTAmount || 0)) *
+                                100) /
+                            100;
+                    });
                     return totalTax;
                 },
-                total: function () {
+                total: function() {
                     return Math.round((parseFloat(this.subTotal) + parseFloat(this.tax)) * 100) / 100;
                 }
             },
@@ -448,23 +516,46 @@
 
                 // Edit functionality
                 if (Number.isInteger(id)) {
-                    $.get(`/Sale/GetDataById/${id}`, function (data) {
-                        self.items = data.SaleItems;
-                        self.CustomerName = data.SaleDetail.CustomerName;
-                        self.CustomerGSTIN = data.SaleDetail.CustomerGSTIN;
-                        self.TotalCGSTAmount = self.tax / 2;
-                        self.TotalSGSTAmount = self.tax / 2;
-                        self.total = data.SaleDetail.TotalAmount;
-                        self.Invoice = data.SaleDetail.Invoice;
-                        self.SubTotal = data.SaleDetail.subTotal;
-                        self.Date = data.SaleDetail.Date;
-                    })
+                    $.get(`/Sale/GetDataById/${id}`,
+                        function(data) {
+                            self.CustomerName = data.SaleDetail.CustomerName;
+                            self.CustomerGSTIN = data.SaleDetail.CustomerGSTIN;
+                            self.TotalCGSTAmount = self.tax / 2;
+                            self.TotalSGSTAmount = self.tax / 2;
+                            self.total = data.SaleDetail.TotalAmount;
+                            self.Invoice = data.SaleDetail.Invoice;
+                            self.SubTotal = data.SaleDetail.subTotal;
+                            self.Date = data.SaleDetail.Date;
+                            self.Id = data.SaleDetail.Id;
+
+                            //var optionData = { id: 1, text: 'Barn owl' };
+                            //var newOption = new Option(optionData.text, optionData.id, false, true);
+                            //$(`#product-sel-${index}`).append(newOption).trigger('change');
+
+
+                            if (self.items.length) {
+                                data.SaleItems.forEach(function(data, index) {
+                                    self.items[index].Name = data.Name;
+                                    self.items[index].Quantity = data.Quantity;
+                                    self.items[index].TotalCGSTAmount = data.TotalCGSTAmount;
+                                    self.items[index].TotalSGSTAmount = data.TotalSGSTAmount;
+                                    self.items[index].TotalAmount = data.TotalAmount;
+                                    self.items[index].Price = data.Price;
+                                    self.items[index].CGST = data.CGST;
+                                    self.items[index].SGST = data.SGST;
+                                    self.items[index].ItemId = data.ItemId;
+                                    self.items[index].GST = data.CGST + data.SGST;
+                                });
+                            };
+                        });
                 }
+
                 self.initSelect2();
+
                 window.onbeforeprint = self.beforePrint;
                 window.onafterprint = self.afterPrint;
             }
-        })
+        });
     });
 </script>
 

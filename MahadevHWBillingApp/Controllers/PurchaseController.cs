@@ -15,12 +15,12 @@ namespace MahadevHWBillingApp.Controllers
         {
             return View(_profile);
         }
-        public JsonResult GetData()
+
+        public JsonResult GetData(string fromDate = null, string toDate = null)
         {
-            var items = Helper.Dapper.Get<Purchase>(Query.GetPurchase);
-            var response = Json(items, JsonRequestBehavior.AllowGet);
-            response.MaxJsonLength = int.MaxValue;
-            return response;
+            var items = Helper.Dapper.Get<Purchase>(Query.GetPurchase(fromDate, toDate));
+            var footerSum = new {CGST = 9000, SGST = 9000, TotalAmount = 15000};
+            return Json(new {data=items, footer = footerSum}, JsonRequestBehavior.AllowGet);
         }
 
         public JsonResult GetDataById(int id)

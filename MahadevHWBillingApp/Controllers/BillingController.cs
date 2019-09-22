@@ -1,7 +1,9 @@
 ﻿using MahadevHWBillingApp.Models;
 using System;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 
@@ -14,23 +16,34 @@ namespace MahadevHWBillingApp.Controllers
         {
             return View(_profile);
         }
+
         public JsonResult Save(Bill bill)
         {
-            try
+            using (var transaction = _mahadevHwContext.Database.BeginTransaction())
             {
-                _mahadevHwContext.Sales.Add(bill.SaleDetail);
-                _mahadevHwContext.SaveChanges();
-                foreach (var saleItem in bill.SaleItems)
+                try
                 {
-                    saleItem.SaleId = bill.SaleDetail.Id;
-                    _mahadevHwContext.SaleItems.Add(saleItem);
+                    _mahadevHwContext.Sales.Add(bill.SaleDetail);
+                    _mahadevHwContext.SaveChanges();
+
+                    foreach (var saleItem in bill.SaleItems)
+                    {
+                        saleItem.SaleId = bill.SaleDetail.Id;
+                        _mahadevHwContext.SaleItems.Add(saleItem);
+                    }
+
+                    _mahadevHwContext.SaveChanges();
+
+                    transaction.Commit();
+                    return Json(new {Message = "Save successfull"});
+
                 }
-                _mahadevHwContext.SaveChanges();
-                return Json(new { Message = "Save successfull" });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { Message = "Internal Server error" });
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    return Json(new {Message = "Internal Server error"});
+                }
             }
         }
     }

@@ -5,13 +5,14 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Web;
 using Dapper;
+using MahadevHWBillingApp.Models;
 using static Dapper.SqlMapper;
 
 namespace MahadevHWBillingApp.Helper
 {
     public static class Dapper
     {
-        private readonly static string _connectionString = ConfigurationManager.ConnectionStrings["GstContext"].ConnectionString;
+        private static readonly string _connectionString = ConfigurationManager.ConnectionStrings["GstContext"].ConnectionString;
         public static IEnumerable<T> Get<T>(string query) where T : class
         {
             using (var con = new SQLiteConnection(_connectionString))
@@ -20,11 +21,17 @@ namespace MahadevHWBillingApp.Helper
             }
         }
 
-        public static GridReader QueryMultiple(string query) 
+        public static Bill GetBillDetails(string query)
         {
             using (var con = new SQLiteConnection(_connectionString))
             {
-               return con.QueryMultiple(query);
+                var gridReader = con.QueryMultiple(query);
+                var result = new Bill
+                {
+                    SaleDetail = gridReader.ReadSingle<Sale>(),
+                    SaleItems = gridReader.Read<SaleItem>().ToList()
+                };
+                return result;
             }
         }
 

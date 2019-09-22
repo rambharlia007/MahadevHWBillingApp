@@ -86,7 +86,9 @@
                         <th>Quantity Available</th>
                         <th>SGST (%)</th>
                         <th>CGST (%)</th>
-                        <th>Price</th>
+                        <th>Discount %</th>
+                        <th>List Price</th>
+                        <th>Discount Price</th>
                         <th>Edit</th>
                         <th>Delete</th>
                     </tr>
@@ -103,7 +105,7 @@
 
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <h4 class="modal-title">Modal Heading</h4>
+                    <h4 class="modal-title">Edit Product</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
 
@@ -114,12 +116,6 @@
                             <label class="col-sm-2 col-form-label">Name</label>
                             <div class="col-sm-10">
                                 <input v-model="item.Name" type="text" class="form-control">
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label class="col-sm-2 col-form-label">Category</label>
-                            <div class="col-sm-10">
-                                <input v-model="item.Category" type="text" class="form-control">
                             </div>
                         </div>
                         <div class="form-group row">
@@ -146,11 +142,22 @@
                                 <input v-model="item.SGST" type="text" class="form-control">
                             </div>
                         </div>
-
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label">Price</label>
+                            <label class="col-sm-2 col-form-label">Discount %</label>
+                            <div class="col-sm-10">
+                                <input v-model="item.Discount" type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">List Price</label>
                             <div class="col-sm-10">
                                 <input v-model="item.Price" type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">Discount Price</label>
+                            <div class="col-sm-10">
+                                <input v-model="item.DiscountPrice" type="text" class="form-control">
                             </div>
                         </div>
                     </form>
@@ -179,28 +186,30 @@
                     
                     <table class="table text-secondary" style="font-size: 14px;">
                         <thead class="thead-light table-head">
-                        <tr class="table-row">
-                            <th style="width: 45px" scope="col">#</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Category</th>
-                            <th style="width: 200px;">Measuring Unit</th>
-                            <th scope="col">Quantity Available</th>
-                            <th scope="col">SGST (%)</th>
-                            <th scope="col">CGST (%)</th>
-                            <th scope="col">Price</th>
-                        </tr>
+                            <tr class="table-row">
+                                <th style="width: 45px" scope="col">#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Measuring Unit</th>
+                                <th scope="col">Quantity Available</th>
+                                <th scope="col">SGST (%)</th>
+                                <th scope="col">CGST (%)</th>
+                                <th scope="col">Discount %</th>
+                                <th scope="col">List Price</th>
+                                <th scope="col">Discount Price</th>
+                            </tr>
                         </thead>
                         <tbody class="table-body">
-                        <tr class="table-row" v-for="(item,index) in newItems">
-                            <td style="width: 45px">{{index+1}}</td>
-                            <td> <input type="text" v-model="item.Name" class="form-control form-control-sm"></td>
-                            <td> <input type="text" v-model="item.Category"  class="form-control form-control-sm"></td>
-                            <td> <input type="text" v-model="item.MeasuringUnit"  class="form-control form-control-sm"></td>
-                            <td> <input type="number"  v-model="item.Quantity" class="form-control form-control-sm"></td>
-                            <td> <input type="number"  v-model="item.SGST" class="form-control form-control-sm"></td>
-                            <td> <input type="number"  v-model="item.CGST" class="form-control form-control-sm"></td>
-                            <td> <input type="number"  v-model="item.Price" class="form-control form-control-sm"></td>
-                        </tr>
+                            <tr class="table-row" v-for="(item,index) in newItems">
+                                <td style="width: 45px">{{index+1}}</td>
+                                <td> <input type="text" v-model="item.Name" class="form-control form-control-sm"></td>
+                                <td> <input type="text" v-model="item.MeasuringUnit" class="form-control form-control-sm"></td>
+                                <td> <input type="number" v-model="item.Quantity" class="form-control form-control-sm"></td>
+                                <td> <input type="number" v-model="item.SGST" class="form-control form-control-sm"></td>
+                                <td> <input type="number" v-model="item.CGST" class="form-control form-control-sm"></td>
+                                <td> <input type="number" step=".01" v-model="item.Discount" v-on:keyup="calculatePerItemDiscount(index)" class="form-control form-control-sm"></td>
+                                <td> <input type="number" v-model="item.Price" v-on:keyup="calculatePerItemDiscount(index)" class="form-control form-control-sm"></td>
+                                <td> <input type="number" readonly v-model="item.DiscountPrice" class="form-control form-control-sm"></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -227,9 +236,10 @@
                     Price: "",
                     CGST: "",
                     SGST: "",
-                    Category: "",
+                    Discount: "",
                     Quantity: "",
-                    MeasuringUnit:""
+                    MeasuringUnit: "",
+                    DiscountPrice:""
                 });
             }
             return result;
@@ -248,16 +258,26 @@
             el: '#app',
             data: obj,
             methods: {
+                calculatePerItemDiscount: function (index) {
+                    var currentItem = this.newItems[index];
+                    if (currentItem.Discount) {
+                        
+                        currentItem.DiscountPrice =
+                            currentItem.Price - ((currentItem.Discount / 100) * currentItem.Price);
+                    } else {
+                        currentItem.DiscountPrice = currentItem.Price;
+                    }
+                },
                 deleteItem: function (id) {
                     var self = this;
                     self.isSpinner = true
                     $.get("/item/RemoveItem?id=" + id,
                         function() {
                             self.alertMessage = "Item deleted succesfully";
-                           // self.initialLoad();
+                            self.tableRef.ajax.reload(self.bindTableClickEvents);
                         }).fail(function() {
-                            self.alertFailureMessage = "Internal server error";
-                    })
+                        self.alertFailureMessage = "Internal server error";
+                    });
                 },
                 openModalForAddProduct: function () {
                     $("#add-product").modal("show");
@@ -290,8 +310,8 @@
                             contentType: 'application/json; charset=utf-8',
                             success: function() {
                                 self.alertMessage = `${validData.length} Product Added succesfully. ${30 - validData.length} Product were left empty`;
-                                self.newItems = [];
-                                // self.initialLoad()
+                                self.newItems = addEmptyNewItems();
+                                self.tableRef.ajax.reload(self.bindTableClickEvents);
                             }
                         });
                     } else {
@@ -304,6 +324,7 @@
                     if (self.item) {
                         $.post("/item/EditItem", self.item, function( data ) {
                             self.alertMessage = "Item Edited succesfully";
+                            self.tableRef.ajax.reload(self.bindTableClickEvents);
                         }).fail(function() {
                             self.alertFailureMessage = "Internal server error";
                         });
@@ -316,24 +337,24 @@
                             self.item = data;
                             $("#myModal").modal("show");
                         }).fail(function() {
-                        alertFailureMessage = "Internal server error";
+                        self.alertFailureMessage = "Internal server error";
                     });
                 },
                 bindTableClickEvents: function () {
                     var self = this;
-                    $(".edit-item").click(function (e) {
-                        var id = $(this).attr("data-id")
+                    $(".edit-item").click(function(e) {
+                        var id = $(this).attr("data-id");
                         self.getProductById(id);
-                    })
+                    });
 
-                    $(".delete-item").click(function (e) {
-                        var id = $(this).attr("data-id")
+                    $(".delete-item").click(function(e) {
+                        var id = $(this).attr("data-id");
                         self.deleteItem(id);
-                    })
+                    });
 
                 },
                 closeAlertMessage: function (property) {
-                    // set alert messahe to empty
+                    // set alert message to empty
                     this[property] = "";
                 },
                 getTableData: function () {
@@ -346,7 +367,7 @@
                                 return json;
                             },
                             error: function (xhr, error) {
-                                if (xhr.status == 401) alert("Unauthorised user");
+                                if (xhr.status === 401) alert("Unauthorised user");
                             }
                         },
                         fixedHeader: {
@@ -360,7 +381,9 @@
                             { data: "Quantity" },
                             { data: "SGST" },
                             { data: "CGST" },
+                            { data: "Discount" },
                             { data: "Price" },
+                            { data: "DiscountPrice" },
                             {
                                 render: function (data, type, row, meta) {
                                     return `<i class="fa fa-edit pointer edit-item" data-id=${row.Id}></i>`;
@@ -371,11 +394,11 @@
                                 render: function (data, type, row, meta) {
                                     return `<i class="fa fa-trash pointer delete-item" data-id=${row.Id}></i>`;  
                                 }
-                            },
+                            }
                         ],
                         lengthMenu: [[5, 20, 25, 30, 100], [5, 20, 25, 30, 100]],
                         initComplete: function (settings, json) {
-                            self.bindTableClickEvents()
+                            self.bindTableClickEvents();
                         }
                     });
                 }

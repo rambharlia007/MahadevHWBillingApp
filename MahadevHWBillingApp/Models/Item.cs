@@ -15,5 +15,7 @@ namespace MahadevHWBillingApp.Models
         public int SGST { get; set; }
         public int CGST { get; set; }
         public int Quantity { get; set; }
+        public int Discount { get; set; }
+        public decimal DiscountPrice { get; set; }
     }
 }

@@ -23,12 +23,7 @@ namespace MahadevHWBillingApp.Controllers
         }
         public JsonResult GetDataById(int id)
         {
-            var gridReader = Helper.Dapper.QueryMultiple(Query.GetSaleAndProducts(id));
-            var result = new Bill
-            {
-                SaleDetail = gridReader.ReadSingle<Sale>(),
-                SaleItems = gridReader.Read<SaleItem>().ToList()
-            };
+            var result = Helper.Dapper.GetBillDetails(Query.GetSaleAndProducts(id));
             var response = Json(result, JsonRequestBehavior.AllowGet);
             response.MaxJsonLength = int.MaxValue;
             return response;

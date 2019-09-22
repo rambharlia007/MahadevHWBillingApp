@@ -121,6 +121,7 @@
                             self.Id = res.Id;
                             self.alertMessage = res.Message;
                             $(".navbar-brand").text(self.BusinessName);
+                            $(".user-name").text(self.Owner);
                         }).fail(function(res) {
                         self.alertFailureMessage = res;
                     });

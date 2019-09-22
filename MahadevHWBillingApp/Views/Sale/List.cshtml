@@ -140,7 +140,7 @@
             el: '#app',
             data: obj,
             methods: {
-                deleteItem: function (id) {
+                deleteItem: function(id) {
                     var self = this;
                     $.get("/sale/Remove?id=" + id,
                         function() {
@@ -150,37 +150,41 @@
                         self.alertFailureMessage = "Internal server error";
                     });
                 },
-                bindTableClickEvents: function () {
+                bindTableClickEvents: function() {
                     var self = this;
                     $(".delete-sale").click(function(e) {
-                        var id = $(this).attr("data-id")
+                        var id = $(this).attr("data-id");
                         self.deleteItem(id);
                     });
+                    $(".edit-sale").click(function(e) {
+                        var id = $(this).attr("data-id");
+                        window.location.href = `/Billing/New/${id}`;
+                    });
                 },
-                closeAlertMessage: function (property) {
+                closeAlertMessage: function(property) {
                     // set alert message to empty
                     this[property] = "";
                 },
-                addNewBill: function () {
+                addNewBill: function() {
                     window.location.href = "@Url.Action("New", "Billing")";
                 },
-                getTableData: function () {
+                getTableData: function() {
                     var self = this;
                     self.tableRef = $("#sale-table").DataTable({
                         ajax: {
                             url: "/sale/GetData",
                             type: "GET",
-                            dataSrc: function (json) {
+                            dataSrc: function(json) {
                                 return json;
                             },
-                            error: function (xhr, error) {
+                            error: function(xhr, error) {
                                 if (xhr.status === 401) alert("Unauthorised user");
                             }
                         },
                         fixedHeader: {
                             header: true,
                             footer: true
-                        }, 
+                        },
                         columns: [
                             { data: "Date" },
                             { data: "Invoice" },
@@ -190,18 +194,18 @@
                             { data: "SubTotal" },
                             { data: "TotalAmount" },
                             {
-                                render: function (data, type, row, meta) {
-                                    return `<i class="fa fa-edit pointer" data-id=${row.Id}></i>`;
+                                render: function(data, type, row, meta) {
+                                    return `<i class="fa fa-edit pointer edit-sale" data-id=${row.Id}></i>`;
                                 }
                             },
                             {
-                                render: function (data, type, row, meta) {
-                                    return `<i class="fa fa-trash pointer " data-id=${row.Id}></i>`;
+                                render: function(data, type, row, meta) {
+                                    return `<i class="fa fa-trash pointer delete-sale" data-id=${row.Id}></i>`;
                                 }
-                            },
+                            }
                         ],
                         lengthMenu: [[5, 20, 25, 30, 100], [5, 20, 25, 30, 100]],
-                        initComplete: function (settings, json) {
+                        initComplete: function(settings, json) {
                             self.bindTableClickEvents();
                         }
                     });
@@ -211,7 +215,7 @@
                 var self = this;
                 this.getTableData();
             }
-        })
+        });
     });
 
 

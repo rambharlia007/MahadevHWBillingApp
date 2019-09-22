@@ -1,13 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace MahadevHWBillingApp.Helper
 {
     public static class Query
     {
         public static readonly string GetItem = "Select * From Items";
-        public static readonly string GetPurchase = "Select * From Purchase";
         public static readonly string GetSale = "select * From Sales";
+
+        public static string GetPurchase(string fromDate, string toDate)
+        {
+            if (fromDate == null && toDate == null)
+            {
+                var currentDate = DateTime.Now.Date;
+                var to = currentDate.ToString("yyyy-MM-dd HH:mm:ss");
+                var from = currentDate.AddDays(-90).Date.ToString("yyyy-MM-dd HH:mm:ss");
+                return $"Select * From Purchase Where Date >= '{from}' and Date <= '{to}'";
+            }
+            else
+            {
+                var from = DateTime.ParseExact(fromDate, "dd-MM-yyyy", CultureInfo.InvariantCulture)
+                    .ToString("yyyy-MM-dd HH:mm:ss");
+                var to = DateTime.ParseExact(toDate, "dd-MM-yyyy", CultureInfo.InvariantCulture)
+                    .ToString("yyyy-MM-dd HH:mm:ss");
+                return $"Select * From Purchase Where Date >= '{from}' and Date <= '{to}'";
+            }
+        }
 
         public static string DeleteItem(IList<int> ids)
         {
@@ -24,7 +43,8 @@ namespace MahadevHWBillingApp.Helper
 
         internal static string GetSaleAndProducts(int id)
         {
-           return $"Select * from Sales Where Id = {id}; Select * From SaleItems Where SaleId = {id}";
+            return
+                $"Select * from Sales Where Id = {id}; Select SI.*, I.Name From SaleItems SI inner join Items I on SI.ItemId = I.Id Where SaleId = {id}";
         }
 
         public static string GetItemBySearch(string filter)

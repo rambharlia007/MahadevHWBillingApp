@@ -16,10 +16,10 @@
         display: none;
     }
     .modal-form-header {
-        padding-top: 10px;
-        padding-bottom: 10px;
-        background-color: rgb(238, 238, 238);
-        margin-bottom: 10px;
+        padding-top: 10px !important;
+        padding-bottom: 10px !important;
+        background-color: rgb(238, 238, 238) !important;
+        margin-bottom: 10px !important;
     }
     .text-center {
         text-align: center
@@ -38,8 +38,17 @@
     .jq-dte-year {
         width: 35px !important;
     }
-    .jq-dte {
+    span.jq-dte {
         width: 125px;
+        border: 1px solid #ced4da;
+        padding: 0px;
+        margin: 0px;
+    }
+    .go-btn {
+        color: black;
+        background-color: #fff;
+        margin-left: 50px;
+        border: 1px solid #ced4da;
     }
     @@media only screen and (min-width: 768px) {
         .table-body {
@@ -68,7 +77,7 @@
 
 <div id="app">
     <div class="row" style="background-color: #f6f7f8 !important;">
-        <div class="col-md-8">
+        <div class="col-md-6">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb" style="padding-bottom: 0px; margin-bottom: 0px; background-color: #f6f7f8 !important;">
                     <li class="breadcrumb-item"><i class="fa fa-home">&nbsp;</i><a href="#">Home</a></li>
@@ -77,11 +86,11 @@
             </nav>
             <h4 style="padding-left: 15px;">Purchase</h4>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
             <button style="margin-top:25px; float:right;" type="button" class="btn btn-success btn-sm" v-on:click="openModalForAddPurchase()">Add Purchase</button>
         </div>
     </div>
-    <div style="margin-top:20px;">
+    <div>
         <div class="alert alert-success alert-dismissible fade show" role="alert" v-cloak v-bind:class="{hide:!alertMessage}" style="margin-top: 20px;">
             {{alertMessage}}
             <button type="button" class="close" v-on:click="closeAlertMessage('alertMessage')" aria-label="Close">
@@ -95,6 +104,14 @@
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
+        
+        
+        <div class="col-md-6" style="margin-top: 10px; margin-bottom: 10px;" v-cloak>
+            <span>From &nbsp;</span>
+            <input type="text" v-model="purchase.Date" id="from-date" class="form-control form-control-sm date-range">
+            <span style="padding-left: 50px;">To &nbsp;</span>
+            <input  type="text" v-model="purchase.Date" id="to-date" class="form-control form-control-sm date-range">
+        </div>  
 
         <div class="card">
             <div class="card-body" style="font-size:14px;">
@@ -112,6 +129,18 @@
                         <th>Delete</th>
                     </tr>
                     </thead>
+                    <tfoot>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th>Total</th>
+                            <th>500</th>
+                            <th>500</th>
+                            <th>2000</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
@@ -134,7 +163,7 @@
                                 <label class="col-sm-2 col-form-label">Date</label>
                                 <div class="col-sm-10">
                                         <input type="text" class="form-control purchase-edit-date">
-                                       <pre style="display:inline">{{purchase.Date}}</pre>
+                                        <pre style="display:inline">{{purchase.FormatDate}}</pre>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -251,14 +280,17 @@
             alertFailureMessage: "",
             alertMessage: "",
             newPurchases: addEmptyPurchaseObject(),
-            tableRef:null
+            tableRef: null,
+            fromDate: "",
+            toDate: "",
+            footerTotal: {}
         }
 
         new Vue({
             el: '#app',
             data: obj,
             methods: {
-                deleteItem: function (id) {
+                deleteItem: function(id) {
                     var self = this;
                     self.isSpinner = true
                     $.get("/purchase/Remove?id=" + id,
@@ -269,17 +301,22 @@
                         self.alertFailureMessage = "Internal server error";
                     });
                 },
-                openModalForAddPurchase: function () {
+                openModalForAddPurchase: function() {
                     $("#add-purchase").modal("show");
                 },
-                saveNewPurchase: function () {
+                saveNewPurchase: function() {
                     var self = this;
                     var validData = [];
                     self.newPurchases.forEach((data) => {
-                        if (data.Date && data.Invoice && data.BusinessName && data.TotalCGSTAmount && data.TotalSGSTAmount && data.TotalAmount) {
+                        if (data.Date &&
+                            data.Invoice &&
+                            data.BusinessName &&
+                            data.TotalCGSTAmount &&
+                            data.TotalSGSTAmount &&
+                            data.TotalAmount) {
                             validData.push(data);
                         }
-                    })
+                    });
 
                     if (validData.length) {
                         $.ajax({
@@ -288,22 +325,26 @@
                             data: JSON.stringify(validData),
                             dataType: 'json',
                             contentType: 'application/json; charset=utf-8',
-                            success: function () {
-                                self.alertMessage = `${validData.length} purchase Added succesfully. ${30 - validData.length} Purchase were left empty`;
+                            success: function() {
+                                self.alertMessage =
+                                    `${validData.length} purchase Added succesfully. ${30 - validData.length
+                                    } Purchase were left empty`;
                                 self.newPurchases = addEmptyPurchaseObject();
                             }
                         });
-                    }
-                    else {
+                    } else {
                         self.alertFailureMessage = "30 off 30 invalid Purchase record were found";
                     }
                 },
                 saveEditPurchase: function() {
                     var self = this;
                     if (self.purchase) {
-                        $.post("/purchase/Edit", self.purchase, function( data ) {
-                            self.alertMessage = "purchase Edited succesfully";
-                        }).fail(function() {
+                        $.post("/purchase/Edit",
+                            self.purchase,
+                            function (data) {
+                                self.tableRef.ajax.url("/Purchase/GetData").load(self.bindTableClickEvents);
+                                self.alertMessage = "purchase Edited succesfully";
+                            }).fail(function() {
                             self.alertFailureMessage = "Internal server error";
                         });
                     }
@@ -318,7 +359,7 @@
                         self.alertFailureMessage = "Internal server error";
                     });
                 },
-                bindTableClickEvents: function () {
+                bindTableClickEvents: function() {
                     var self = this;
                     $(".edit-purchase").click(function(e) {
                         var id = $(this).attr("data-id")
@@ -331,20 +372,21 @@
                     });
 
                 },
-                closeAlertMessage: function (property) {
+                closeAlertMessage: function(property) {
                     // set alert message to empty
                     this[property] = "";
                 },
-                getTableData: function () {
+                getTableData: function() {
                     var self = this;
                     self.tableRef = $("#product-table").DataTable({
                         ajax: {
                             url: "/purchase/GetData",
                             type: "GET",
                             dataSrc: function (json) {
-                                return json;
+                                self.footerTotal = json.footer;
+                                return json.data;
                             },
-                            error: function (xhr, error) {
+                            error: function(xhr, error) {
                                 if (xhr.status === 401) alert("Unauthorised user");
                             }
                         },
@@ -353,33 +395,45 @@
                             footer: true
                         },
                         columns: [
-                            { data: "Date" },
+                            { data: "FormatDate" },
                             { data: "Invoice" },
                             { data: "BusinessName" },
                             { data: "TotalSGSTAmount" },
                             { data: "TotalCGSTAmount" },
                             { data: "TotalAmount" },
                             {
-                                render: function (data, type, row, meta) {
+                                render: function(data, type, row, meta) {
                                     return `<i class="fa fa-edit pointer edit-purchase" data-id=${row.Id}></i>`;
 
                                 }
                             },
                             {
-                                render: function (data, type, row, meta) {
+                                render: function(data, type, row, meta) {
                                     return `<i class="fa fa-trash pointer delete-purchase" data-id=${row.Id}></i>`;
                                 }
                             },
                         ],
                         lengthMenu: [[5, 20, 25, 30, 100], [5, 20, 25, 30, 100]],
-                        initComplete: function (settings, json) {
+                        initComplete: function(settings, json) {
                             self.bindTableClickEvents();
+                        },
+                        footerCallback: function() {
+                            var api = this.api();
+                            $( api.column(3).footer() ).html(
+                                self.footerTotal.CGST
+                            );
+                            $( api.column(4).footer() ).html(
+                                self.footerTotal.CGST
+                            );
+                            $( api.column(5).footer() ).html(
+                                self.footerTotal.TotalAmount
+                            );
                         }
                     });
                 },
-                getFormatedDate: function (value) {
+                getFormatedDate: function(value) {
                     var tempDate = value.split("-");
-                    return `${tempDate[2]}-${tempDate[1]}-${tempDate[0]}`;   // DD-MM-YYYY
+                    return `${tempDate[2]}-${tempDate[1]}-${tempDate[0]}`; // DD-MM-YYYY
                 }
             },
             mounted() {
@@ -387,7 +441,7 @@
                 this.getTableData();
                 $('.purchase-edit-date').datetextentry({
                     field_order: 'DMY',
-                    on_change: function (date_str) {
+                    on_change: function(date_str) {
                         if (date_str) {
                             self.purchase.Date = self.getFormatedDate(date_str);
                         }
@@ -395,15 +449,29 @@
                 });
                 $('.purchase-date').datetextentry({
                     field_order: 'DMY',
-                    on_change: function (date_str) {
+                    on_change: function(date_str) {
                         if (date_str) {
                             var id = parseInt($(this)[0].$element.parent().parent().attr("data-id"));
                             self.newPurchases[id].Date = self.getFormatedDate(date_str);;
                         }
                     }
                 });
-            },
-        })
+                $('.date-range').datetextentry({
+                    field_order: 'DMY',
+                    on_change: function(date_str) {
+                        if (date_str) {
+                            var value = $(this)[0].$element.attr("id");
+                            if (value === "to-date") {
+                                self.toDate = self.getFormatedDate(date_str);
+                                self.tableRef.ajax.url(`/Purchase/GetData?fromDate=${self.fromDate}&toDate=${self.toDate}`).load();
+                            } else {
+                                self.fromDate = self.getFormatedDate(date_str);
+                            }   
+                        }
+                    }
+                });
+            }
+        });
     });
 
 
