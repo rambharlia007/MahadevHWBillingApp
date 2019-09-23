@@ -19,7 +19,7 @@ namespace MahadevHWBillingApp.Controllers
         public JsonResult GetData(string fromDate = null, string toDate = null)
         {
             var items = Helper.Dapper.Get<Purchase>(Query.GetPurchase(fromDate, toDate));
-            var footerSum = new {CGST = 9000, SGST = 9000, TotalAmount = 15000};
+            var footerSum = items.GetTotalForPurchase();
             return Json(new {data=items, footer = footerSum}, JsonRequestBehavior.AllowGet);
         }
 
