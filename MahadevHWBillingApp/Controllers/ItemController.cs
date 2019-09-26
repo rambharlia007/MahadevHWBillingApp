@@ -15,7 +15,7 @@ namespace MahadevHWBillingApp.Controllers
 
         public ActionResult New()
         {
-            return View();
+            return View(_profile);
         }
 
         public JsonResult GetData()

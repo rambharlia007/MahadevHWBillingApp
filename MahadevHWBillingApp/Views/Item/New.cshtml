@@ -1,11 +1,12 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "New";
 }
-
 <style type="text/css">
-	@@page { size: auto;  margin: 0mm; }
-    </style>
+    @@page {
+        size: auto;
+        margin: 0mm;
+    }
+</style>
 <div class="row" style="background-color: #f6f7f8 !important;">
     <div class="col-md-12">
         <nav aria-label="breadcrumb">
@@ -17,123 +18,241 @@
         <h4 style="padding-left: 15px;">New Bill</h4>
     </div>
 </div>
-  
-
 <div class="container" style="padding-top: 20px;">
-    <div class="card">
-        <div class="card-header">
-            Invoice
-            <strong>12345</strong>
-            <span class="float-right"> <strong>GSTIN:</strong> 123453424242</span>
-
+<div id="print-bill" class="card" style="font-size: 0.85em;color: #6c757d !important;">
+        <div class="card-header text-center">
+            <strong class="text-center">Tax Invoice</strong> 
         </div>
         <div class="card-body">
             <div class="row mb-4">
-                <div class="col-sm-6">
-                    <h6 class="mb-3">From:</h6>
-                    <div>
-                        <strong>Mahadev Hardware & Electricals</strong>
-                    </div>
-                    <div>TC Palya main road</div>
-                    <div>Bangalore 560036</div>
-                    <div>Email: surajbharlia007@gmail.com</div>
-                    <div>Phone: +91 9741480000</div>
+                <div class="col-sm-4">
+                    <table style="width:100%" class="table-bordered">
+                        <tr>
+                            <th colspan=2>Demo Business</th>
+                        </tr>
+                        <tr>
+                            <td colspan=2>101A Kr puram, Bangalore 560036</td>
+                        </tr>
+                        <tr>
+                            <td>GSTIN/UIN:</td>
+                            <td>2552552325</td>
+                        </tr>
+                        <tr>
+                            <td>Email:</td>
+                            <td>test@gmail.com</td>
+                        </tr>
+                        <tr>
+                            <td>Phone:</td>
+                            <td>4242553252</td>
+                        </tr>
+                    </table>
                 </div>
-
-                <div class="col-sm-6">
-                    <h6 class="mb-3">To:</h6>
-                    <div>
-                        <strong>Pidilite India</strong>
-                    </div>
+                <div class="col-sm-4">
+                    <table style="width: 100%" class="table-bordered">
+                        <tr>
+                            <td colspan=2>Buyer</td>
+                        </tr>
+                        <tr>
+                            <th colspan=2>Demo Business</th>
+                        </tr>
+                        <tr>
+                            <td colspan=2>101A Kr puram, Bangalore 560036</td>
+                        </tr>
+                        <tr>
+                            <td>GSTIN/UIN:</td>
+                            <td>2552552325</td>
+                        </tr>
+                        <tr>
+                            <td>Phone:</td>
+                            <td>4242553252</td>
+                        </tr>
+                    </table>
                 </div>
-
-
-
+                <div class="col-sm-4">
+                    <table style="width:100%" class="table-bordered">
+                        <tr>
+                            <th>Date:</th>
+                            <td>25-12-2019</td>
+                        </tr>
+                        <tr>
+                            <th>Invoice:</th>
+                            <td>2552552325</td>
+                        </tr>
+                    </table>
+                </div>
             </div>
-
             <div class="table-responsive-sm">
-                <table class="table table-sm">
+                <table class="table table-sm" style="color: #6c757d !important;">
                     <thead>
-                    <tr>
-                        <th class="center">#</th>
-                        <th>Item</th>
-                        <th class="right">Unit Cost</th>
-                        <th class="center">Qty</th>
-                        <th class="right">Total</th>
-                    </tr>
+                        <tr>
+                            <th scope="col" style="width: 45px;">#</th>
+                            <th scope="col" style="width: 200px;">Name</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">GST %</th>
+                            <th scope="col">CGST Tax</th>
+                            <th scope="col">SGST Tax</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Total</th>
+                        </tr>
                     </thead>
                     <tbody>
+                        <tr>
+                            <td class="center">1</td>
+                            <td class="left strong" style="width: 200px;">Xuluqu1341</td>
+                            <td class="right">3,236.8</td>
+                            <td class="right">18</td>
+                            <td class="center">291.31</td>
+                            <td class="center">291.31</td>
+                            <td class="center">1</td>
+                            <td class="center">3,236.8</td>
+                        </tr>
+                        <tr>
+                            <td class="center">2</td>
+                            <td class="left strong" style="width: 200px;">Xuluqubo1332</td>
+                            <td class="right">2,258.1</td>
+                            <td class="right">10</td>
+                            <td class="center">112.91</td>
+                            <td class="center">112.91</td>
+                            <td class="center">1</td>
+                            <td class="center">2,258.1</td>
+                        </tr>
+                        <tr>
+                            <td class="center">3</td>
+                            <td class="left strong" style="width: 200px;">Xuluqu1341</td>
+                            <td class="right">3,236.8</td>
+                            <td class="right">18</td>
+                            <td class="center">291.31</td>
+                            <td class="center">291.31</td>
+                            <td class="center">1</td>
+                            <td class="center">3,236.8</td>
+                        </tr>
+                        <tr>
+                            <td class="center">4</td>
+                            <td class="left strong" style="width: 200px;">Xuluqubozhu1334</td>
+                            <td class="right">83.84</td>
+                            <td class="right">10</td>
+                            <td class="center">4.19</td>
+                            <td class="center">4.19</td>
+                            <td class="center">1</td>
+                            <td class="center">83.84</td>
+                        </tr>
+                        <tr>
+                            <td class="center">5</td>
+                            <td class="left strong" style="width: 200px;">Xuluqubo1500</td>
+                            <td class="right">1,830.02</td>
+                            <td class="right">36</td>
+                            <td class="center">329.4</td>
+                            <td class="center">329.4</td>
+                            <td class="center">1</td>
+                            <td class="center">1,830.02</td>
+                        </tr>
+                        <tr>
+                            <td class="center">6</td>
+                            <td class="left strong" style="width: 200px;">Xuluqubo1502</td>
+                            <td class="right">4,069.49</td>
+                            <td class="right">18</td>
+                            <td class="center">366.25</td>
+                            <td class="center">366.25</td>
+                            <td class="center">1</td>
+                            <td class="center">4,069.49</td>
+                        </tr>
+                        <tr>
+                            <td class="center">7</td>
+                            <td class="left strong" style="width: 200px;">Xuluqubo1700</td>
+                            <td class="right">240</td>
+                            <td class="right">10</td>
+                            <td class="center">12</td>
+                            <td class="center">12</td>
+                            <td class="center">1</td>
+                            <td class="center">240</td>
+                        </tr>
+                        <tr>
+                            <td class="center">8</td>
+                            <td class="left strong" style="width: 200px;">Xuluqubo1345</td>
+                            <td class="right">1,316.38</td>
+                            <td class="right">18</td>
+                            <td class="center">118.47</td>
+                            <td class="center">118.47</td>
+                            <td class="center">1</td>
+                            <td class="center">1,316.38</td>
+                        </tr>
+                        <tr>
+                            <td class="center">9</td>
+                            <td class="left strong" style="width: 200px;">Xuluqubo1365</td>
+                            <td class="right">3,243.24</td>
+                            <td class="right">36</td>
+                            <td class="center">583.78</td>
+                            <td class="center">583.78</td>
+                            <td class="center">1</td>
+                            <td class="center">3,243.24</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <hr>
+        <div class="row">
+            <div class="col-lg-3 col-sm-3 ml-auto"></div>
+            <div class="col-lg-3 col-sm-3 ml-auto">
+                <table class="table table-sm table-clear" style="color: #6c757d !important;">
+                    <tbody>
                     <tr>
-                        <td class="center">1</td>
-                        <td class="left strong">Origin License</td>
-
-                        <td class="right">$999,00</td>
-                        <td class="center">1</td>
-                        <td class="right">$999,00</td>
+                        <td class="left"><strong>SGST 5%</strong></td>
+                        <td class="right">129.1</td>
                     </tr>
                     <tr>
-                        <td class="center">2</td>
-                        <td class="left">Custom Services</td>
-
-                        <td class="right">$150,00</td>
-                        <td class="center">20</td>
-                        <td class="right">$3.000,00</td>
+                        <td class="left"><strong>SGST 9%</strong></td>
+                        <td class="right">1,067.34</td>
                     </tr>
                     <tr>
-                        <td class="center">3</td>
-                        <td class="left">Hosting</td>
-
-                        <td class="right">$499,00</td>
-                        <td class="center">1</td>
-                        <td class="right">$499,00</td>
-                    </tr>
-                    <tr>
-                        <td class="center">4</td>
-                        <td class="left">Platinum Support</td>
-
-                        <td class="right">$3.999,00</td>
-                        <td class="center">1</td>
-                        <td class="right">$3.999,00</td>
+                        <td class="left"><strong>SGST 18%</strong></td>
+                        <td class="right">913.18</td>
                     </tr>
                     </tbody>
                 </table>
             </div>
-            <div class="row">
-                <div class="col-lg-4 col-sm-5">
-
-                </div>
-
-                <div class="col-lg-4 col-sm-5 ml-auto">
-                    <table class="table table-sm table-clear">
-                        <tbody>
-                        <tr>
-                            <td class="left">
-                                <strong>Subtotal</strong>
-                            </td>
-                            <td class="right">$8.497,00</td>
-                        </tr>
-                        <tr>
-                            <td class="left">
-                                <strong>VAT (10%)</strong>
-                            </td>
-                            <td class="right">$679,76</td>
-                        </tr>
-                        <tr>
-                            <td class="left">
-                                <strong>Total</strong>
-                            </td>
-                            <td class="right">
-                                <strong>$7.477,36</strong>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-
-                </div>
-
+            <div class="col-lg-3 col-sm-3 ml-auto" style="color: #6c757d !important;">
+                <table class="table table-sm table-clear" style="color: #6c757d !important;">
+                    <tbody>
+                    <tr>
+                        <td class="left"><strong>CGST 5%</strong></td>
+                        <td class="right">129.1</td>
+                    </tr>
+                    <tr>
+                        <td class="left"><strong>CGST 9%</strong></td>
+                        <td class="right">1,067.34</td>
+                    </tr>
+                    <tr>
+                        <td class="left"><strong>CGST 18%</strong></td>
+                        <td class="right">913.18</td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
-
+            <div class="col-lg-3 col-sm-3 ml-auto">
+                <table class="table table-sm table-clear" style="color: #6c757d !important;">
+                    <tbody>
+                    <tr>
+                        <td class="left"><strong>Subtotal</strong></td>
+                        <td class="right">19,514.67</td>
+                    </tr>
+                    <tr>
+                        <td class="left"><strong>TAX</strong></td>
+                        <td class="right">4,219.24</td>
+                    </tr>
+                    <tr>
+                        <td class="left"><strong>Total</strong></td>
+                        <td class="right"><strong>23,733.91</strong></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 offset-3">
+                <div>Amount Chargeable (in words)</div>
+                <div><strong>Thirty Thousand Only</strong></div>
+            </div>
+        </div>
         </div>
     </div>
 </div>
-
