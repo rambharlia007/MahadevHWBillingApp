@@ -46,5 +46,29 @@ namespace MahadevHWBillingApp.Controllers
                 }
             }
         }
+        public JsonResult Edit(Bill bill)
+        {
+            using (var transaction = _mahadevHwContext.Database.BeginTransaction())
+            {
+                try
+                {
+                    _mahadevHwContext.Entry(bill.SaleDetail).State = EntityState.Modified;
+                    foreach (var saleItem in bill.SaleItems)
+                    {
+                        _mahadevHwContext.Entry(saleItem).State = EntityState.Modified;
+                    }
+
+                    _mahadevHwContext.SaveChanges();
+                    transaction.Commit();
+                    return Json(new { Message = "Save successfull" });
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    return Json(new { Message = "Internal Server error" });
+                }
+            }
+        }
     }
 }

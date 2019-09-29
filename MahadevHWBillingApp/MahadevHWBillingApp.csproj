@@ -290,6 +290,9 @@
     <Compile Include="Helper\Extension.cs" />
     <Compile Include="Helper\Query.cs" />
     <Compile Include="Models\Bill.cs" />
+    <Compile Include="Models\ExcelAttribute.cs" />
+    <Compile Include="Models\Excel\PurchaseExcel.cs" />
+    <Compile Include="Models\Excel\SaleExcel.cs" />
     <Compile Include="Models\Item.cs" />
     <Compile Include="Models\ItemConfiguration.cs" />
     <Compile Include="Models\MahadevHWContext.cs" />
@@ -343,6 +346,7 @@
     <Content Include="fonts\fontawesome-webfont.woff" />
     <Content Include="fonts\fontawesome-webfont.ttf" />
     <Content Include="fonts\fontawesome-webfont.eot" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />

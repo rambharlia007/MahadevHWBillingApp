@@ -7,25 +7,86 @@ namespace MahadevHWBillingApp.Helper
     public static class Query
     {
         public static readonly string GetItem = "Select * From Items";
-        public static readonly string GetSale = "select * From Sales";
 
         public static string GetPurchase(string fromDate, string toDate)
         {
-            if (fromDate == null && toDate == null)
-            {
-                var currentDate = DateTime.Now.Date;
-                var to = currentDate.ToString("yyyy-MM-dd HH:mm:ss");
-                var from = currentDate.AddDays(-90).Date.ToString("yyyy-MM-dd HH:mm:ss");
-                return $"Select * From Purchase Where Date >= '{from}' and Date <= '{to}'";
-            }
-            else
-            {
-                var from = DateTime.ParseExact(fromDate, "dd-MM-yyyy", CultureInfo.InvariantCulture)
-                    .ToString("yyyy-MM-dd HH:mm:ss");
-                var to = DateTime.ParseExact(toDate, "dd-MM-yyyy", CultureInfo.InvariantCulture)
-                    .ToString("yyyy-MM-dd HH:mm:ss");
-                return $"Select * From Purchase Where Date >= '{from}' and Date <= '{to}'";
-            }
+            var from = fromDate.ToCustomFormat();
+            var to = toDate.ToCustomFormat();
+            return $"Select * From Purchase Where Date >= '{from}' and Date <= '{to}' Order By Date";
+        }
+
+        public static string GetSale(string fromDate, string toDate)
+        {
+            var from = fromDate.ToCustomFormat();
+            var to = toDate.ToCustomFormat();
+            return $"Select * From Sales Where Date >= '{from}' and Date <= '{to}' Order By Date";
+        }
+
+        public static string GetSaleExcelDownloadQuery(string fromDate, string toDate)
+        {
+            var from = fromDate.ToCustomFormat();
+            var to = toDate.ToCustomFormat();
+            return $@"
+                        SELECT DATE
+	                        ,Invoice
+	                        ,BusinessName
+	                        ,CustomerGSTIN
+	                        ,CustomerName
+	                        ,SubTotal
+	                        ,SUM(CASE 
+			                        WHEN SGST = 5.0
+				                        THEN T2
+			                        END) AS [Tax1]
+	                        ,SUM(CASE 
+			                        WHEN SGST = 9.0
+				                        THEN T2
+			                        END) AS [Tax2]
+                            ,SUM(CASE 
+			                        WHEN SGST = 15.0
+				                        THEN T2
+			                        END) AS [Tax3]
+	                        ,SUM(CASE 
+			                        WHEN SGST = 18.0
+				                        THEN T2
+			                        END) AS [Tax4]
+                        FROM (
+	                        SELECT S.BusinessName
+		                        ,S.CustomerName
+		                        ,S.CustomerGSTIN
+		                        ,S.Invoice
+		                        ,S.DATE
+		                        ,S.SubTotal
+		                        ,SUM(SI.TotalCGSTAmount) T2
+		                        ,SUM(SI.TotalSGSTAmount) T3
+		                        ,SI.SGST
+		                        ,SI.CGST
+	                        FROM Sales S
+	                        INNER JOIN SaleItems SI ON S.Id = SI.SaleId
+                        Where S.Date >= '{from}' and S.Date <= '{to}'
+	                        GROUP BY SI.SGST
+		                        ,SI.CGST
+		                        ,S.BusinessName
+		                        ,S.CustomerName
+		                        ,S.CustomerGSTIN
+		                        ,S.Invoice
+		                        ,S.DATE
+	                        ) sourceData
+                        GROUP BY sourceData.Invoice
+	                        ,sourceData.BusinessName
+	                        ,sourceData.CustomerName
+	                        ,sourceData.CustomerGSTIN
+	                        ,sourceData.Invoice
+	                        ,sourceData.Date
+                        ORDER BY SourceData.Date";
+        }
+
+        public static string GetPurchaseExcelDownload(string fromDate, string toDate)
+        {
+
+            var from = fromDate.ToCustomFormat();
+            var to = toDate.ToCustomFormat();
+            return
+                $"Select BusinessName Name,TotalCGSTAmount CGST, TotalSGSTAmount SGST, Date, TotalAmount Amount, Invoice From Purchase Where Date >= '{from}' and Date <= '{to}' Order By Date";
         }
 
         public static string DeleteItem(IList<int> ids)

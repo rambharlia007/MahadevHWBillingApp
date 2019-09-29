@@ -68,10 +68,10 @@
             <h4 style="padding-left: 15px;">Billing</h4>
         </div>
         <div class="col-md-4">
-            <button style="margin-top:25px; float:right;" type="button" class="btn btn-success btn-sm" v-if="!isPreview" v-on:click="showOrHidePreview(true)">Preview Print Bill</button>
-            <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-if="isPreview" v-on:click="showOrHidePreview(false)">Edit Bill</button>
+            <button style="margin-top:25px; float:right;" type="button" class="btn btn-success btn-sm" v-if="!isPreview" v-on:click="showOrHidePreview(true)">Print Preview</button>
+            <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-if="isPreview && !isPrintOnly" v-on:click="showOrHidePreview(false)">Edit Bill</button>
             <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-if="isPreview" v-on:click="print()">Print</button>
-            <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-on:click="save()">Save</button>
+            <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-if="!isPrintOnly" v-on:click="save()">Save</button>
         </div>
     </div>
     <div style="margin-top:20px;">
@@ -89,228 +89,358 @@
             </button>
         </div>
 
-        <div class="card" v-show="!isPreview">
-            <div class="card-body" style="font-size: 14px;">
-                <table class="table text-secondary" style="font-size: 14px;">
+        <div class="card" v-show="!isPreview" style="font-size: 0.85em; color: #6c757d !important;" >
+            <div class="card-body">
+                <table class="table text-secondary" style="font-size: 0.85em; color: #6c757d !important;" >
                     <thead class="thead-light table-head">
-                    <tr class="table-row">
-                        <th style="width: 45px" scope="col">#</th>
-                        <th class="text-center" v-if="Id" scope="col"></th>
-                        <th class="text-center" style="width: 200px;" scope="col">Name</th>
-                        <th class="text-center" scope="col">Price</th>
-                        <th class="text-center" scope="col">Quantity</th>
-                        <th class="text-center" scope="col">GST %</th>
-                        <th class="text-center" scope="col">CGST</th>
-                        <th class="text-center" scope="col">SGST</th>
-                        <th class="text-center" scope="col">Total</th>
+                        <tr class="table-row">
+                            <th style="width: 45px" scope="col">#</th>
+                            <th class="text-center" v-if="Id" scope="col"></th>
+                            <th class="text-center" style="width: 200px;" scope="col">Name</th>
+                            <th class="text-center" scope="col">Price</th>
+                            <th class="text-center" scope="col">Quantity</th>
+                            <th class="text-center" scope="col">GST %</th>
+                            <th class="text-center" scope="col">CGST</th>
+                            <th class="text-center" scope="col">SGST</th>
+                            <th class="text-center" scope="col">Total</th>
 
-                    </tr>
+                        </tr>
                     </thead>
                     <tbody class="table-body">
-                    <tr class="table-row" v-for="(item,index) in items">
-                        <td style="width: 45px">{{index+1}}</td>
-                        <td v-if="Id"><input type="text" readonly v-model="item.Name" class="form-control form-control-sm" /></td>
-                        <td style="width: 200px;">
-                            <select v-bind:id="'product-sel-'+index" :data-id="index" class="product-select-2 js-example-basic-single js-states form-control"></select>
-                        </td>
-                        <td> <input type="text" v-model="item.Price" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
-                        <td> <input type="text" v-model="item.Quantity" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
-                        <td> <input type="text" v-model="item.GST" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
-                        <td> <input type="text" readonly v-model="item.TotalCGSTAmount" class="form-control form-control-sm"></td>
-                        <td> <input type="text" readonly v-model="item.TotalSGSTAmount" class="form-control form-control-sm"></td>
-                        <td> <input type="text" readonly v-model="item.TotalAmount" class="form-control form-control-sm"></td>
-                    </tr>
+                        <tr class="table-row" v-for="(item,index) in items">
+                            <td style="width: 45px">{{index+1}}</td>
+                            <td v-if="Id"><input type="text" readonly v-model="item.Name" class="form-control form-control-sm" /></td>
+                            <td style="width: 200px;">
+                                <select v-bind:id="'product-sel-'+index" :data-id="index" class="product-select-2 js-example-basic-single js-states form-control"></select>
+                            </td>
+                            <td> <input type="text" v-model="item.Price" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
+                            <td> <input type="text" v-model="item.Quantity" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
+                            <td> <input type="text" v-model="item.GST" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
+                            <td> <input type="text" readonly v-model="item.TotalCGSTAmount" class="form-control form-control-sm"></td>
+                            <td> <input type="text" readonly v-model="item.TotalSGSTAmount" class="form-control form-control-sm"></td>
+                            <td> <input type="text" readonly v-model="item.TotalAmount" class="form-control form-control-sm"></td>
+                        </tr>
                     </tbody>
                 </table>
-                <hr/>
+                <hr />
                 <div class="row">
-                    <div class="col-lg-6 col-sm-6">
-                        <table class="table text-secondary" style="font-size: 14px;">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th class="text-center" scope="col">Customer Name</th>
-                                    <th class="text-center" scope="col">Customer GSTIN</th>
-                                    <th class="text-center" scope="col">Address</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td> <input type="text" v-model="CustomerName" class="form-control form-control-sm"></td>
-                                    <td> <input type="text" v-model="CustomerGSTIN" class="form-control form-control-sm"></td>
-                                    <td> <textarea v-model="CustomerGSTIN" class="form-control form-control-sm"></textarea></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-lg-2 col-sm-2 ml-auto">
-                        <table class="table table-sm table-clear">
-                            <tbody>
-                            <tr v-for="(value, propertyName) in taxSlot">
-                                <td class="left">
-                                    <strong>SGST {{propertyName}}%</strong>
-                                </td>
-                                <td class="right">{{value}}</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-lg-2 col-sm-2 ml-auto">
-                        <table class="table table-sm table-clear">
-                            <tbody>
-                            <tr v-for="(value, propertyName) in taxSlot">
-                                <td class="left">
-                                    <strong>CGST {{propertyName}}%</strong>
-                                </td>
-                                <td class="right">{{value}}</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-lg-2 col-sm-2 ml-auto">
-                        <table class="table table-sm table-clear">
-                            <tbody>
+                    <div class="col-lg-4 col-sm-4">
+                        <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
                             <tr>
-                                <td class="left">
-                                    <strong>Subtotal</strong>
-                                </td>
-                                <td class="right">{{Number(subTotal).toLocaleString()}}</td>
+                                <th class="text-center" colspan="2">Customer Information</th>
                             </tr>
                             <tr>
-                                <td class="left">
-                                    <strong>TAX </strong>
-                                </td>
-                                <td class="right">{{Number(tax).toLocaleString()}}</td>
+                                <th>Name:</th>
+                                <td><input type="text" v-model="CustomerName" class="form-control form-control-sm"></td>
                             </tr>
                             <tr>
-                                <td class="left">
-                                    <strong>Total</strong>
-                                </td>
-                                <td class="right">
-                                    <strong>{{Number(total).toLocaleString()}}</strong>
+                                <th>GSTIN:</th>
+                                <td><input type="text" v-model="CustomerGSTIN" class="form-control form-control-sm"></td>
+                            </tr>
+                            <tr>
+                                <th>Phone Number:</th>
+                                <td><input type="text" v-model="CustomerGSTIN" class="form-control form-control-sm"></td>
+                            </tr>
+                            <tr>
+                                <th>Address:</th>
+                                <td>
+                                    <textarea v-model="CustomerAddress" class="form-control form-control-sm"></textarea>
                                 </td>
                             </tr>
-                            </tbody>
                         </table>
+                    </div>
+                    <div class="col-lg-8 col-sm-8">
+                        <div class="row">
+                            <div class="col-lg-4 col-sm-4 ml-auto pl-0">
+                                <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
+                                    <tr>
+                                        <th class="text-center" colspan="2">State Tax</th>
+                                    </tr>
+                                    <tr v-for="(value, propertyName) in taxSlot">
+                                        <th class="text-center">
+                                            {{propertyName}}%
+                                        </th>
+                                        <td>{{Number(value).toLocaleString()}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-center">
+                                            Total
+                                        </th>
+                                        <th>{{Number(tax/2).toLocaleString()}}</th>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-lg-4 col-sm-4 ml-auto pl-0">
+                                <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
+                                    <tr>
+                                        <th class="text-center" colspan="2">Central Tax</th>
+                                    </tr>
+                                    <tr v-for="(value, propertyName) in taxSlot">
+                                        <th class="text-center">
+                                            {{propertyName}}%
+                                        </th>
+                                        <td>{{Number(value).toLocaleString()}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-center">
+                                            Total
+                                        </th>
+                                        <th>{{Number(tax/2).toLocaleString()}}</th>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-lg-3 col-sm-3 ml-auto pl-0">
+                                <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
+                                    <tr>
+                                        <th>
+                                            Sub Total
+                                        </th>
+                                        <td>{{Number(subTotal).toLocaleString()}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            Tax
+                                        </th>
+                                        <td>{{Number(tax).toLocaleString()}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            Round Off
+                                        </th>
+                                        <td>{{RoundOff}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            Total
+                                        </th>
+                                        <th>{{Number(total).toLocaleString()}}</th>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-12" style="font-size: 0.85em; color: #6c757d !important;" v-if="TotalInWords">
+                                <span>
+                                    Amount (in words) : &nbsp;
+                                    <strong>
+                                        <i class="fa fa-inr"></i>  {{TotalInWords}} Only
+                                    </strong>
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        
+    
+    
+    @*Modal for success on save bill*@
+    <div class="modal" id="success-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Bill saved successfully.</h5>
+                </div>
+                <div class="modal-body">
+                    <p>You can Print, Edit and Delete the bill from the Sales grid.</p>
+                    <p>Please <a href="/Sale/List">click here</a> to go the sales grid</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 
 
-        <div class="card" v-show="isPreview" id="print-bill">
-            <div class="card-header">
-                Invoice
-                <strong>{{Invoice}}</strong>
-                <span class="float-right"> <strong>GSTIN:</strong> @Model.GSTIN</span>
-
+    <div id="print-bill" class="card" v-show="isPreview" style="font-size: 0.85em;color: #6c757d !important;">
+            <div class="card-header text-center">
+                <strong class="text-center">Tax Invoice</strong>
             </div>
             <div class="card-body">
                 <div class="row mb-4">
-                    <div class="col-sm-6">
-                        <h6 class="mb-3">From:</h6>
-                        <div>
-                            <strong>@Model.BusinessName</strong>
-                        </div>
-                        <div>@Model.Address</div>
-                        <div>Bangalore 560036</div>
-                        <div>Email: @Model.Email</div>
-                        <div>Phone: @Model.MobileNumber</div>
+                    <div class="col-sm-4">
+                        <table style="width:100%" class="table-bordered">
+                            <tr>
+                                <th colspan=2>@Model.BusinessName</th>
+                            </tr>
+                            <tr>
+                                <td colspan=2>@Model.Address</td>
+                            </tr>
+                            <tr>
+                                <td>GSTIN/UIN:</td>
+                                <td>@Model.GSTIN</td>
+                            </tr>
+                            <tr>
+                                <td>Email:</td>
+                                <td>@Model.Email</td>
+                            </tr>
+                            <tr>
+                                <td>Phone:</td>
+                                <td>@Model.MobileNumber</td>
+                            </tr>
+                        </table>
                     </div>
-
-                    <div class="col-sm-6">
-                        <h6 class="mb-3">To:</h6>
-                        <div>
-                            <strong>{{CustomerName}}</strong>
-                            </div>
-                        <div>
-                            <span>GSTIN</span>
-                            <strong>{{CustomerGSTIN}}</strong>
-                        </div>
+                    <div class="col-sm-4">
+                        <table style="width: 100%" class="table-bordered">
+                            <tr>
+                                <td colspan=2>Buyer</td>
+                            </tr>
+                            <tr>
+                                <th colspan=2>{{CustomerName}}</th>
+                            </tr>
+                            <tr>
+                                <td colspan=2>{{CustomerAddress}}</td>
+                            </tr>
+                            <tr>
+                                <td>GSTIN/UIN:</td>
+                                <td>{{CustomerGSTIN}}</td>
+                            </tr>
+                            <tr>
+                                <td>Phone:</td>
+                                <td>4242553252</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-sm-4">
+                        <table style="width:100%" class="table-bordered">
+                            <tr>
+                                <th>Date:</th>
+                                <td>{{Date}}</td>
+                            </tr>
+                            <tr>
+                                <th>Invoice:</th>
+                                <td>{{Invoice}}</td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
-
                 <div class="table-responsive-sm">
-                    <table class="table table-sm">
+                    <table class="table table-sm" style="color: #6c757d !important;">
                         <thead>
-                        <tr>
-                            <th style="width:45px" scope="col">#</th>
-                            <th style="width:200px;" scope="col">Name</th>
-                            <th scope="col">Price</th>
-                            <th scope="col">GST %</th>
-                            <th scope="col">CGST Tax</th>
-                            <th scope="col">SGST Tax</th>
-                            <th scope="col">Quantity</th>
-                            <th scope="col">Total</th>
-                        </tr>
+                            <tr>
+                                <th scope="col" style="width: 45px;">#</th>
+                                <th scope="col" style="width: 200px;">Product</th>
+                                <th scope="col">GST Rate</th>
+                                <th scope="col">SGST Tax</th>
+                                <th scope="col">CGST Tax</th>
+                                <th scope="col">Quantity</th>
+                                <th scope="col">Rate</th>
+                                <th scope="col">Amount</th>
+                            </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="(item,index) in items" v-if="item.Name">
-                            <td class="center">{{index+1}}</td>
-                            <td style="width:200px;" class="left strong">{{item.Name}}</td>
-                            <td class="right">{{Number(item.Price).toLocaleString()}}</td>
-                            <td class="right">{{Number(item.GST)}}</td>
-                            <td class="center">{{Number(item.TotalCGSTAmount).toLocaleString()}}</td>
-                            <td class="center">{{Number(item.TotalSGSTAmount).toLocaleString()}}</td>
-                            <td class="center">{{Number(item.Quantity).toLocaleString()}}</td>
-                            <td class="center">{{Number(item.TotalAmount).toLocaleString()}}</td>
-                        </tr>
+                            <tr v-for="(item,index) in items" v-if="item.Name">
+                                <td class="center">{{index+1}}</td>
+                                <td class="left strong" style="width: 200px;">{{item.Name}}</td>
+                                <td class="right">{{Number(item.GST)}}%</td>
+                                <td class="center">{{Number(item.TotalSGSTAmount).toLocaleString()}}</td>
+                                <td class="center">{{Number(item.TotalCGSTAmount).toLocaleString()}}</td>
+                                <td class="center">{{Number(item.Quantity).toLocaleString()}}</td>
+                                <td class="right">{{Number(item.Price).toLocaleString()}}</td>
+                                <td class="center">{{Number(item.TotalAmount).toLocaleString()}}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
-                <hr/>
+                <hr>
                 <div class="row">
-                    <div class="col-lg-3 col-sm-3 ml-auto"></div>
-                    <div class="col-lg-3 col-sm-3 ml-auto">
-                        <table class="table table-sm table-clear">
-                            <tbody>
+                    <div class="col-lg-4 col-sm-4 ml-auto">
+                        <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
+                            <tr>
+                                <th class="text-center" colspan="2">State Tax</th>
+                            </tr>
                             <tr v-for="(value, propertyName) in taxSlot">
-                                <td class="left">
-                                    <strong>SGST {{propertyName}}%</strong>
-                                </td>
-                                <td class="right">{{value.toLocaleString()}}</td>
+                                <th class="text-center">
+                                    {{propertyName}}%
+                                </th>
+                                <td>{{Number(value).toLocaleString()}}</td>
                             </tr>
-                            </tbody>
+                            <tr>
+                                <th class="text-center">
+                                   Total
+                                </th>
+                                <th>{{Number(tax/2).toLocaleString()}}</th>
+                            </tr>
                         </table>
                     </div>
-                    <div class="col-lg-3 col-sm-3 ml-auto">
-                        <table class="table table-sm table-clear">
-                            <tbody>
+                    <div class="col-lg-4 col-sm-4 ml-auto" style="color: #6c757d !important;">
+                        <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
+                            <tr>
+                                <th class="text-center" colspan="2">Central Tax</th>
+                            </tr>
                             <tr v-for="(value, propertyName) in taxSlot">
-                                <td class="left">
-                                    <strong>CGST {{propertyName}}%</strong>
-                                </td>
-                                <td class="right">{{value.toLocaleString()}}</td>
+                                <th class="text-center">
+                                    {{propertyName}}%
+                                </th>
+                                <td>{{Number(value).toLocaleString()}}</td>
                             </tr>
-                            </tbody>
+                            <tr>
+                                <th class="text-center">
+                                    Total
+                                </th>
+                                <th>{{Number(tax/2).toLocaleString()}}</th>
+                            </tr>
                         </table>
                     </div>
-
-                    <div class="col-lg-3 col-sm-3 ml-auto">
-                        <table class="table table-sm table-clear">
-                            <tbody>
+                    <div class="col-lg-4 col-sm-4 ml-auto">
+                        <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
                             <tr>
-                                <td class="left">
-                                    <strong>Subtotal</strong>
-                                </td>
-                                <td class="right">{{Number(subTotal).toLocaleString()}}</td>
+                                <th>
+                                    Sub Total
+                                </th>
+                                <td>{{Number(subTotal).toLocaleString()}}</td>
                             </tr>
                             <tr>
-                                <td class="left">
-                                    <strong>TAX</strong>
-                                </td>
-                                <td class="right">{{Number(tax).toLocaleString()}}</td>
+                                <th>
+                                    Tax
+                                </th>
+                                <td>{{Number(tax).toLocaleString()}}</td>
                             </tr>
                             <tr>
-                                <td class="left">
-                                    <strong>Total</strong>
-                                </td>
-                                <td class="right">
-                                    <strong>{{Number(total).toLocaleString()}}</strong>
-                                </td>
+                                <th>
+                                    Round Off
+                                </th>
+                                <td>{{RoundOff}}</td>
                             </tr>
-                            </tbody>
+                            <tr>
+                                <th>
+                                    Total
+                                </th>
+                                <th>{{Number(total).toLocaleString()}}</th>
+                            </tr>
                         </table>
                     </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <span>
+                            Amount (in words) &nbsp;
+                            <strong>
+                                <i class="fa fa-inr"></i>
+                                {{TotalInWords}} Only
+                            </strong>
+                        </span>
+                    </div>
+                </div>
+                <hr class="mb-0" />
+                <div class="row">
+                    <div class="col-md-6 col-sm-6">
+                        <div><strong>Declaration</strong></div>
+                        <div>
+                            We declare that this Invoice shows the actual price of the goods
+                            described and that all particulars are true and correct
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6">
+                        <div><strong class="pull-right">for @Model.BusinessName</strong></div>
+                        <div style="padding-top: 35px;">
+                            <span class="pull-right">
+                                Authorised Signatory
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <hr class="mt-0 mb-0" />
+                <div class="col-md-6 offset-4">
+                    This is a Computer Generated Invoice.
                 </div>
             </div>
         </div>
@@ -334,8 +464,15 @@
                 GST: "",
                 CGST: "",
                 SGST: "",
-                ItemId: 0
+                ItemId: 0,
+                SaleId: 0,
+                Id: 0
             });
+        }
+
+        function getDate() {
+            var date = new Date();
+           return  `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
         }
 
         function generateInvoiceNumber() {
@@ -360,9 +497,13 @@
             isSelect2Rendered: true,
             CustomerName: "",
             CustomerGSTIN: "",
+            CustomerAddress:"",
             Id: 0,
             Invoice: generateInvoiceNumber(),
-            TotalInWords: ""
+            TotalInWords: "",
+            Date: getDate(),
+            RoundOff: "",
+            isPrintOnly:false // This property is set to true only if print is given from sales grid
         }
         new Vue({
             el: '#app',
@@ -380,14 +521,12 @@
                     this.isPreview = value;
                     this.TotalInWords = convertNumberToWords(this.total);
                 },
-                print: function() {
+                print: function () {
+                    this.isPreview = true;
                     window.print();
                 },
-                beforePrint: function() {
-                    alert("BeforePrint");
-                },
                 afterPrint: function() {
-                    alert("Afetr Print");
+                    this.save();
                 },
                 save: function() {
                     var self = this;
@@ -398,7 +537,6 @@
                         }
                     });
                     if (validData.length) {
-                        var date = new Date();
                         var finalData = {
                             SaleDetail: {
                                 BusinessName: "@Model.BusinessName",
@@ -409,20 +547,25 @@
                                 TotalAmount: self.total,
                                 Invoice: self.Invoice,
                                 SubTotal: self.subTotal,
-                                Date: `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
+                                Date: self.Date,
+                                Id:self.Id
                             },
                             SaleItems: validData
                         }
+
+                        var apiEndPoint = "/Billing/Save";
+                        if (self.Id)
+                            apiEndPoint = "/Billing/Edit";
+
+
                         $.ajax({
                             type: 'POST',
-                            url: '@Url.Action("Save", "Billing")',
+                            url: apiEndPoint,
                             data: JSON.stringify(finalData),
                             dataType: 'json',
                             contentType: 'application/json; charset=utf-8',
                             success: function() {
-                                self.alertMessage =
-                                    `${validData.length} Items in the Bill Added succesfully.`;
-                                self.newPurchases = addEmptyPurchaseObject();
+                                $("#success-modal").modal({ backdrop: 'static', keyboard: false, show: true });
                             },
                             error: function (res) {
                                 self.alertFailureMessage = "Internal server error. Please try to save again";
@@ -483,10 +626,13 @@
             },
             computed: {
                 taxSlot: function () {
+                    var self = this;
                     var slot = {};
                     this.items.forEach(function(item) {
-                        if (item.CGST)
-                            slot[item.CGST] = (slot[item.CGST] || 0) + item.TotalCGSTAmount;
+                        if (item.CGST) {
+                            var property = item.CGST;
+                            slot[property] = (slot[property] || 0) + item.TotalCGSTAmount;
+                        }
                     });
                     return slot;
                 },
@@ -508,14 +654,21 @@
                     return totalTax;
                 },
                 total: function() {
-                    return Math.round((parseFloat(this.subTotal) + parseFloat(this.tax)) * 100) / 100;
+                    var total = Math.round((parseFloat(this.subTotal) + parseFloat(this.tax)) * 100) / 100;
+                    var roundOffTotal = Math.ceil(total);
+                    this.RoundOff = (roundOffTotal - total).toFixed(2);
+                    this.TotalInWords = convertNumberToWords(roundOffTotal);
+                    return roundOffTotal;
                 }
             },
             mounted() {
                 var self = this;
                 var url = window.location.href;
+                var isPrint = url.includes("pid");
                 var id = parseInt(url.substring(url.lastIndexOf('/') + 1));
 
+                self.isPreview = isPrint;
+                self.isPrintOnly = isPrint;
                 // Edit functionality
                 if (Number.isInteger(id)) {
                     $.get(`/Sale/GetDataById/${id}`,
@@ -527,13 +680,8 @@
                             self.total = data.SaleDetail.TotalAmount;
                             self.Invoice = data.SaleDetail.Invoice;
                             self.SubTotal = data.SaleDetail.subTotal;
-                            self.Date = data.SaleDetail.Date;
+                            self.Date = data.SaleDetail.FormatDate;
                             self.Id = data.SaleDetail.Id;
-
-                            //var optionData = { id: 1, text: 'Barn owl' };
-                            //var newOption = new Option(optionData.text, optionData.id, false, true);
-                            //$(`#product-sel-${index}`).append(newOption).trigger('change');
-
 
                             if (self.items.length) {
                                 data.SaleItems.forEach(function(data, index) {
@@ -547,14 +695,14 @@
                                     self.items[index].SGST = data.SGST;
                                     self.items[index].ItemId = data.ItemId;
                                     self.items[index].GST = data.CGST + data.SGST;
+                                    self.items[index].Id = data.Id;
+                                    self.items[index].SaleId = data.SaleId;
                                 });
                             };
                         });
                 }
 
                 self.initSelect2();
-
-                window.onbeforeprint = self.beforePrint;
                 window.onafterprint = self.afterPrint;
             }
         });

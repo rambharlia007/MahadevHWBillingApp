@@ -55,7 +55,6 @@
         <h4 style="padding-left: 15px;">Products</h4>
     </div>
     <div class="col-md-4">
-        <button style="margin-top:25px; float:right;" type="button" class="btn btn-success btn-sm" v-on:click="openModalForAddProduct()">Add New Category</button>
         <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-on:click="openModalForAddProduct()">Add New Product</button>
     </div>
 </div>
@@ -81,7 +80,6 @@
                 <thead class="thead-light">
                     <tr>
                         <th>Name</th>
-                        <th>Category</th>
                         <th>Measuring Unit</th>
                         <th>Quantity Available</th>
                         <th>SGST (%)</th>
@@ -376,7 +374,6 @@
                         },
                         columns: [
                             { data: "Name" },
-                            { data: "Category" },
                             { data: "MeasuringUnit" },
                             { data: "Quantity" },
                             { data: "SGST" },

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace MahadevHWBillingApp.Models
 {
@@ -16,6 +13,7 @@ namespace MahadevHWBillingApp.Models
         public decimal SubTotal { get; set; }
         public decimal TotalAmount { get; set; }
         public string Invoice { get; set; }
-        public string Date { get; set; }
+        public DateTime Date { get; set; }
+        public string FormatDate => Date.ToString("dd-MM-yyyy");
     }
 }

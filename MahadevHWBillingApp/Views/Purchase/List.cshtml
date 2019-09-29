@@ -87,7 +87,8 @@
             <h4 style="padding-left: 15px;">Purchase</h4>
         </div>
         <div class="col-md-6">
-            <button style="margin-top:25px; float:right;" type="button" class="btn btn-success btn-sm" v-on:click="openModalForAddPurchase()">Add Purchase</button>
+            <button style="margin-top: 25px; margin-left: 10px; float: right;" type="button" class="btn btn-success btn-sm" v-on:click="openModalForAddPurchase()">Add Purchase</button>
+            <button style="margin-top: 25px; float: right;" type="button" class="btn btn-success btn-sm" v-on:click="downloadReport()">Download Report</button>
         </div>
     </div>
     <div>
@@ -114,34 +115,36 @@
         </div>  
 
         <div class="card">
-            <div class="card-body" style="font-size:14px;">
-                <table id="product-table"
-                       class="table text-secondary" style="font-size:14px;">
-                    <thead class="thead-light">
-                    <tr>
-                        <th>Date <small>(DD-MM-YYYY)</small></th>
-                        <th>Invoice</th>
-                        <th>Business</th>
-                        <th>SGST Amount</th>
-                        <th>CGST Amount</th>
-                        <th>Total Amount</th>
-                        <th>Edit</th>
-                        <th>Delete</th>
-                    </tr>
-                    </thead>
-                    <tfoot>
+            <div class="card-body" style="font-size: 14px;">
+                <div class="table-responsive-sm">
+                    <table id="product-table"
+                           class="table text-secondary" style="font-size: 14px;">
+                        <thead class="thead-light">
+                        <tr>
+                            <th>Date <small>(DD-MM-YYYY)</small></th>
+                            <th>Invoice</th>
+                            <th>Business</th>
+                            <th>SGST Amount</th>
+                            <th>CGST Amount</th>
+                            <th>Total Amount</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                        </thead>
+                        <tfoot>
                         <tr>
                             <th></th>
                             <th></th>
                             <th>Total</th>
-                            <th>500</th>
-                            <th>500</th>
-                            <th>2000</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
                             <th></th>
                             <th></th>
                         </tr>
-                    </tfoot>
-                </table>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -152,7 +155,7 @@
 
                     <!-- Modal Header -->
                     <div class="modal-header">
-                        <h4 class="modal-title">Modal Heading</h4>
+                        <h4 class="modal-title">Edit Purchase</h4>
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                     </div>
 
@@ -162,8 +165,7 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Date</label>
                                 <div class="col-sm-10">
-                                        <input type="text" class="form-control purchase-edit-date">
-                                        <pre style="display:inline">{{purchase.FormatDate}}</pre>
+                                        <input type="text" id="purchase-edit-date-in" class="form-control purchase-edit-date">
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -222,24 +224,24 @@
                         <table class="table text-secondary" style="font-size: 14px;">
                             <thead class="thead-light table-head">
                                 <tr class="table-row">
-                                    <th style="width: 45px" scope="col">#</th>
-                                    <th scope="col">Date</th>
-                                    <th scope="col">Invoice</th>
-                                    <th style="width: 200px;">Name</th>
-                                    <th scope="col">SGST Amount</th>
-                                    <th scope="col">CGST Amount</th>
-                                    <th scope="col">Total Amount</th>
+                                    <th class="text-center pr-0" style="width: 35px" scope="col">#</th>
+                                    <th class="text-center pr-0" style="width: 140px" scope="col">Date</th>
+                                    <th class="text-center pr-0" style="width: 150px;" scope="col">Invoice</th>
+                                    <th class="text-center pr-0" style="width: 150px;">Name</th>
+                                    <th class="text-center pr-0" scope="col">SGST Amount</th>
+                                    <th class="text-center pr-0" scope="col">CGST Amount</th>
+                                    <th class="text-center pr-0" scope="col">Total Amount</th>
                                 </tr>
                             </thead>
                             <tbody class="table-body">
                                 <tr class="table-row" v-for="(purchase,index) in newPurchases">
-                                    <td style="width: 45px">{{index+1}}</td>
-                                    <td  v-bind:["data-id"]="index"> <input type="text" v-model="purchase.Date" class="form-control form-control-sm purchase-date"></td>
-                                    <td> <input type="text" v-model="purchase.Invoice"  class="form-control form-control-sm"></td>
-                                    <td style="width: 200px;"> <input type="text" v-model="purchase.BusinessName"  class="form-control form-control-sm"></td>
-                                    <td> <input type="number"  v-model="purchase.TotalCGSTAmount" class="form-control form-control-sm"></td>
-                                    <td> <input type="number"  v-model="purchase.TotalSGSTAmount" class="form-control form-control-sm"></td>
-                                    <td> <input type="number"  v-model="purchase.TotalAmount" class="form-control form-control-sm"></td>
+                                    <td class="pr-0" style="width: 35px">{{index+1}}</td>
+                                    <td class="pr-0" style="width: 140px" v-bind:["data-id"]="index"> <input type="text" v-model="purchase.Date" class="form-control form-control-sm purchase-date"></td>
+                                    <td class="pr-0" style="width: 150px;"> <input type="text" v-model="purchase.Invoice"  class="form-control form-control-sm"></td>
+                                    <td class="pr-0" style="width: 150px;"> <input type="text" v-model="purchase.BusinessName"  class="form-control form-control-sm"></td>
+                                    <td class="pr-0"> <input type="number"  v-model="purchase.TotalCGSTAmount" class="form-control form-control-sm"></tdclass="pr-0">
+                                    <td class="pr-0"> <input type="number"  v-model="purchase.TotalSGSTAmount" class="form-control form-control-sm"></td>
+                                    <td class="pr-0"> <input type="number"  v-model="purchase.TotalAmount" class="form-control form-control-sm"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -257,7 +259,7 @@
 
 <script>
 
-    $(document).ready(function () {
+    $(document).ready(function() {
 
         function addEmptyPurchaseObject() {
             var tempPurchase = [];
@@ -274,6 +276,15 @@
             return tempPurchase;
         }
 
+        function GetDateRange() {
+            var date = new Date();
+            var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+            var month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
+            var startDate = `01-${month}-${date.getFullYear()}`;
+            var endDate = `${day}-${month}-${date.getFullYear()}`;
+            return { startDate: startDate, endDate: endDate };
+        }
+
         var obj = {
             purchases: [],
             purchase: {},
@@ -281,8 +292,8 @@
             alertMessage: "",
             newPurchases: addEmptyPurchaseObject(),
             tableRef: null,
-            fromDate: "",
-            toDate: "",
+            fromDate: GetDateRange().startDate,
+            toDate: GetDateRange().endDate,
             footerTotal: {}
         }
 
@@ -296,7 +307,7 @@
                     $.get("/purchase/Remove?id=" + id,
                         function() {
                             self.alertMessage = "purchase deleted succesfully";
-                            // self.initialLoad();
+                            self.tableReload();
                         }).fail(function() {
                         self.alertFailureMessage = "Internal server error";
                     });
@@ -341,13 +352,23 @@
                     if (self.purchase) {
                         $.post("/purchase/Edit",
                             self.purchase,
-                            function (data) {
-                                self.tableRef.ajax.url("/Purchase/GetData").load(self.bindTableClickEvents);
+                            function(data) {
+                                self.tableReload();
                                 self.alertMessage = "purchase Edited succesfully";
                             }).fail(function() {
                             self.alertFailureMessage = "Internal server error";
                         });
                     }
+                },
+                downloadReport: function() {
+                    var self = this;
+                    var endPoint = `/Report/Purchase?fromDate=${self.fromDate}&toDate=${self.toDate}`;
+                    $.get(endPoint,
+                        function(data, status) {
+                            window.location = endPoint;
+                        }).fail(function() {
+                        self.alertFailureMessage = "Internal server error";
+                    });
                 },
                 getPurchaseById: function(id) {
                     var self = this;
@@ -355,6 +376,8 @@
                         function(data, status) {
                             self.purchase = data;
                             $("#edit-purchase-modal").modal("show");
+                            self.purchase.Date = data.FormatDate;
+                            self.setInitialDateComponent(".purchase-edit-date", data.FormatDate);
                         }).fail(function() {
                         self.alertFailureMessage = "Internal server error";
                     });
@@ -362,12 +385,12 @@
                 bindTableClickEvents: function() {
                     var self = this;
                     $(".edit-purchase").click(function(e) {
-                        var id = $(this).attr("data-id")
+                        var id = $(this).attr("data-id");
                         self.getPurchaseById(id);
                     });
 
                     $(".delete-purchase").click(function(e) {
-                        var id = $(this).attr("data-id")
+                        var id = $(this).attr("data-id");
                         self.deleteItem(id);
                     });
 
@@ -380,9 +403,9 @@
                     var self = this;
                     self.tableRef = $("#product-table").DataTable({
                         ajax: {
-                            url: "/purchase/GetData",
+                            url: `/Purchase/GetData?fromDate=${self.fromDate}&toDate=${self.toDate}`,
                             type: "GET",
-                            dataSrc: function (json) {
+                            dataSrc: function(json) {
                                 self.footerTotal = json.footer;
                                 return json.data;
                             },
@@ -398,9 +421,24 @@
                             { data: "FormatDate" },
                             { data: "Invoice" },
                             { data: "BusinessName" },
-                            { data: "TotalSGSTAmount" },
-                            { data: "TotalCGSTAmount" },
-                            { data: "TotalAmount" },
+                            {
+                                data: "TotalSGSTAmount",
+                                render: function (data, type, row, meta) {
+                                    return Number(data).toLocaleString();
+                                }
+                            },
+                            {
+                                data: "TotalCGSTAmount",
+                                render: function (data, type, row, meta) {
+                                    return Number(data).toLocaleString();
+                                }
+                            },
+                            {
+                                data:"TotalAmount",
+                                render: function(data, type, row, meta) {
+                                    return Number(data).toLocaleString();
+                                }
+                            },
                             {
                                 render: function(data, type, row, meta) {
                                     return `<i class="fa fa-edit pointer edit-purchase" data-id=${row.Id}></i>`;
@@ -418,22 +456,39 @@
                             self.bindTableClickEvents();
                         },
                         footerCallback: function() {
-                            var api = this.api();
-                            $( api.column(3).footer() ).html(
-                                self.footerTotal.CGST
-                            );
-                            $( api.column(4).footer() ).html(
-                                self.footerTotal.CGST
-                            );
-                            $( api.column(5).footer() ).html(
-                                self.footerTotal.Amount
-                            );
+                            if (Object.entries(self.footerTotal).length) {
+                                var inrSymbol = "<i class='fa fa-inr' aria-hidden='true'></i>";
+                                var api = this.api();
+                                $(api.column(3).footer()).html(
+                                    inrSymbol + Number(self.footerTotal.SGST).toLocaleString()
+                                );
+                                $(api.column(4).footer()).html(
+                                    inrSymbol + Number(self.footerTotal.CGST).toLocaleString()
+                                );
+                                $(api.column(5).footer()).html(
+                                    inrSymbol + Number(self.footerTotal.Amount).toLocaleString()
+                                );
+                            }
                         }
                     });
                 },
                 getFormatedDate: function(value) {
                     var tempDate = value.split("-");
                     return `${tempDate[2]}-${tempDate[1]}-${tempDate[0]}`; // DD-MM-YYYY
+                },
+                setInitialDateComponent: function(id, date) {
+                    var formatDate = date.split("-");
+                    $(id).siblings().children(".jq-dte-day").val(formatDate[0]);
+                    $(id).siblings().children(".jq-dte-month").val(formatDate[1]);
+                    $(id).siblings().children(".jq-dte-year").val(formatDate[2]);
+                    $(id).siblings().children(".jq-dte-day").removeClass("hint");
+                    $(id).siblings().children(".jq-dte-month").removeClass("hint");
+                    $(id).siblings().children(".jq-dte-year").removeClass("hint");
+                },
+                tableReload: function() {
+                    var self = this;
+                    self.tableRef.ajax.url(`/Purchase/GetData?fromDate=${self.fromDate}&toDate=${self.toDate}`)
+                        .load(self.bindTableClickEvents);
                 }
             },
             mounted() {
@@ -463,13 +518,23 @@
                             var value = $(this)[0].$element.attr("id");
                             if (value === "to-date") {
                                 self.toDate = self.getFormatedDate(date_str);
-                                self.tableRef.ajax.url(`/Purchase/GetData?fromDate=${self.fromDate}&toDate=${self.toDate}`).load();
+                                self.tableReload();
                             } else {
                                 self.fromDate = self.getFormatedDate(date_str);
-                            }   
+                                if (self.toDate)
+                                    self.tableReload();
+                            }
                         }
                     }
                 });
+
+                $('#product-table').on('draw.dt',
+                    function() {
+                        self.bindTableClickEvents();
+                    });
+
+                self.setInitialDateComponent("#from-date", self.fromDate);
+                self.setInitialDateComponent("#to-date", self.toDate);
             }
         });
     });

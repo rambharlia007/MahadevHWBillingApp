@@ -16,11 +16,11 @@ namespace MahadevHWBillingApp.Controllers
             return View(_profile);
         }
 
-        public JsonResult GetData(string fromDate = null, string toDate = null)
+        public JsonResult GetData(string fromDate, string toDate)
         {
             var items = Helper.Dapper.Get<Purchase>(Query.GetPurchase(fromDate, toDate));
-            var footerSum = items.GetTotalForPurchase();
-            return Json(new {data=items, footer = footerSum}, JsonRequestBehavior.AllowGet);
+            var footerSum = items.FooterSum();
+            return Json(new {data = items, footer = footerSum}, JsonRequestBehavior.AllowGet);
         }
 
         public JsonResult GetDataById(int id)

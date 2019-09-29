@@ -15,7 +15,12 @@
     [v-cloak] {
         display: none;
     }
-
+    span.jq-dte {
+        width: 125px;
+        border: 1px solid #ced4da;
+        padding: 0px;
+        margin: 0px;
+    }
     .modal-form-header {
         padding-top: 10px;
         padding-bottom: 10px;
@@ -86,10 +91,11 @@
             <h4 style="padding-left: 15px;">Sales</h4>
         </div>
         <div class="col-md-4">
-            <button style="margin-top:25px; float:right;" type="button" class="btn btn-success btn-sm" v-on:click="addNewBill()">Add New Bill</button>
+            <button style="margin-top:25px; margin-left: 10px; float:right;" type="button" class="btn btn-success btn-sm" v-on:click="addNewBill()">Add New Bill</button>
+            <button style="margin-top: 25px; float: right;" type="button" class="btn btn-success btn-sm" v-on:click="downloadReport()">Download Report</button>
         </div>
     </div>
-    <div style="margin-top:20px;">
+    <div>
         <div class="alert alert-success alert-dismissible fade show" role="alert" v-cloak v-bind:class="{hide:!alertMessage}" style="margin-top: 20px;">
             {{alertMessage}}
             <button type="button" class="close" v-on:click="closeAlertMessage('alertMessage')" aria-label="Close">
@@ -103,23 +109,45 @@
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
+        
+        <div class="col-md-6" style="margin-top: 10px; margin-bottom: 10px;" v-cloak>
+            <span>From &nbsp;</span>
+            <input type="text"  id="from-date" class="form-control form-control-sm date-range">
+            <span style="padding-left: 50px;">To &nbsp;</span>
+            <input  type="text" id="to-date" class="form-control form-control-sm date-range">
+        </div>  
 
         <div class="card">
             <div class="card-body" style="font-size:14px;">
                 <table id="sale-table" class="table text-secondary" style="font-size:14px;">
                     <thead class="thead-light">
-                        <tr>
-                            <th>Date <small>(DD-MM-YYYY)</small></th>
-                            <th>Invoice</th>
-                            <th>Customer GSTIN</th>
-                            <th>SGST Amount</th>
-                            <th>CGST Amount</th>
-                            <th>Sub Total</th>
-                            <th>Total Amount</th>
-                            <th>Edit</th>
-                            <th>Delete</th>
-                        </tr>
+                    <tr>
+                        <th>Date </th>
+                        <th>Invoice</th>
+                        <th>Customer GSTIN</th>
+                        <th>SGST Amount</th>
+                        <th>CGST Amount</th>
+                        <th>Sub Total</th>
+                        <th>Total Amount</th>
+                        <th>Print Bill</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
                     </thead>
+                    <tfoot>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th>Total</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
@@ -128,12 +156,24 @@
 
 <script>
 
-    $(document).ready(function () {
+    $(document).ready(function() {
+
+        function GetDateRange() {
+            var date = new Date();
+            var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+            var month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
+            var startDate = `01-${month}-${date.getFullYear()}`;
+            var endDate = `${day}-${month}-${date.getFullYear()}`;
+            return { startDate: startDate, endDate: endDate };
+        }
 
         var obj = {
             alertFailureMessage: "",
             alertMessage: "",
-            tableRef:null
+            tableRef: null,
+            footerTotal: {},
+            fromDate: GetDateRange().startDate,
+            toDate: GetDateRange().endDate
         }
 
         new Vue({
@@ -145,7 +185,6 @@
                     $.get("/sale/Remove?id=" + id,
                         function() {
                             self.alertMessage = "sale record deleted succesfully";
-                            // self.initialLoad();
                         }).fail(function() {
                         self.alertFailureMessage = "Internal server error";
                     });
@@ -160,6 +199,10 @@
                         var id = $(this).attr("data-id");
                         window.location.href = `/Billing/New/${id}`;
                     });
+                    $(".print-bill").click(function(e) {
+                        var id = $(this).attr("data-id");
+                        window.location.href = `/Billing/New/${id}?pid=${id}`;
+                    });
                 },
                 closeAlertMessage: function(property) {
                     // set alert message to empty
@@ -172,10 +215,11 @@
                     var self = this;
                     self.tableRef = $("#sale-table").DataTable({
                         ajax: {
-                            url: "/sale/GetData",
+                            url: `/sale/GetData?fromDate=${self.fromDate}&toDate=${self.toDate}`,
                             type: "GET",
                             dataSrc: function(json) {
-                                return json;
+                                self.footerTotal = json.footer;
+                                return json.data;
                             },
                             error: function(xhr, error) {
                                 if (xhr.status === 401) alert("Unauthorised user");
@@ -186,34 +230,129 @@
                             footer: true
                         },
                         columns: [
-                            { data: "Date" },
+                            { data: "FormatDate" },
                             { data: "Invoice" },
                             { data: "CustomerGSTIN" },
-                            { data: "TotalSGSTAmount" },
-                            { data: "TotalCGSTAmount" },
-                            { data: "SubTotal" },
-                            { data: "TotalAmount" },
                             {
+                                data:"TotalSGSTAmount",
                                 render: function(data, type, row, meta) {
-                                    return `<i class="fa fa-edit pointer edit-sale" data-id=${row.Id}></i>`;
+                                    return Number(data).toLocaleString();
+                                }
+                            },
+                            {
+                                data:"TotalCGSTAmount",
+                                render: function(data, type, row, meta) {
+                                    return Number(data).toLocaleString();
+                                }
+                            },
+                            {
+                                data:"SubTotal",
+                                render: function(data, type, row, meta) {
+                                    return Number(data).toLocaleString();
+                                }
+                            },
+                            {
+                                data:"TotalAmount",
+                                render: function(data, type, row, meta) {
+                                    return Number(data).toLocaleString();
                                 }
                             },
                             {
                                 render: function(data, type, row, meta) {
-                                    return `<i class="fa fa-trash pointer delete-sale" data-id=${row.Id}></i>`;
+                                    return `<i class="fa fa-print pointer print-bill text-center" data-id=${row.Id}></i>`;
+                                }
+                            },
+                            {
+                                render: function(data, type, row, meta) {
+                                    return `<i class="fa fa-edit pointer edit-sale text-center" data-id=${row.Id}></i>`;
+                                }
+                            },
+                            {
+                                render: function(data, type, row, meta) {
+                                    return `<i class="fa fa-trash pointer delete-sale text-center" data-id=${row.Id}></i>`;
                                 }
                             }
                         ],
                         lengthMenu: [[5, 20, 25, 30, 100], [5, 20, 25, 30, 100]],
                         initComplete: function(settings, json) {
                             self.bindTableClickEvents();
+                        },
+                        footerCallback: function () {
+                            if (Object.entries(self.footerTotal).length) {
+                                var inrSymbol = "<i class='fa fa-inr' aria-hidden='true'></i>";
+                                var api = this.api();
+                                $(api.column(3).footer()).html(inrSymbol +
+                                    Number(self.footerTotal.CGST).toLocaleString()
+                                );
+                                $(api.column(4).footer()).html(inrSymbol +
+                                    Number(self.footerTotal.CGST).toLocaleString()
+                                );
+                                $(api.column(5).footer()).html(inrSymbol +
+                                    Number(self.footerTotal.SubAmount).toLocaleString()
+                                );
+                                $(api.column(6).footer()).html(inrSymbol +
+                                    Number(self.footerTotal.Amount).toLocaleString()
+                                );
+                            }
                         }
                     });
-                }
+                },
+                setInitialDateComponent: function (id, date) {
+                    var formatDate = date.split("-");
+                    $(id).siblings().children(".jq-dte-day").val(formatDate[0]);
+                    $(id).siblings().children(".jq-dte-month").val(formatDate[1]);
+                    $(id).siblings().children(".jq-dte-year").val(formatDate[2]);
+                    $(id).siblings().children(".jq-dte-day").removeClass("hint");
+                    $(id).siblings().children(".jq-dte-month").removeClass("hint");
+                    $(id).siblings().children(".jq-dte-year").removeClass("hint");
+                },
+                tableReload: function () {
+                    var self = this;
+                    self.tableRef.ajax.url(`/Sale/GetData?fromDate=${self.fromDate}&toDate=${self.toDate}`).load(self.bindTableClickEvents);
+                },
+                getFormatedDate: function (value) {
+                    var tempDate = value.split("-");
+                    return `${tempDate[2]}-${tempDate[1]}-${tempDate[0]}`; // DD-MM-YYYY
+                },
+                downloadReport: function() {
+                    var self = this;
+                    var endPoint = `/Report/Sale?fromDate=${self.fromDate}&toDate=${self.toDate}`;
+                    $.get(endPoint,
+                        function(data, status) {
+                            window.location = endPoint;
+                        }).fail(function() {
+                        self.alertFailureMessage = "Internal server error";
+                    });
+                },
             },
             mounted() {
                 var self = this;
                 this.getTableData();
+
+                $('.date-range').datetextentry({
+                    field_order: 'DMY',
+                    on_change: function(date_str) {
+                        if (date_str) {
+                            var value = $(this)[0].$element.attr("id");
+                            if (value === "to-date") {
+                                self.toDate = self.getFormatedDate(date_str);
+                                self.tableReload();
+                            } else {
+                                self.fromDate = self.getFormatedDate(date_str);
+                                if (self.toDate)
+                                    self.tableReload();
+                            }
+                        }
+                    }
+                });
+
+                $('#sale-table').on( 'draw.dt', function () {
+                    self.bindTableClickEvents();
+                } );
+
+                self.setInitialDateComponent("#from-date", self.fromDate);
+                self.setInitialDateComponent("#to-date", self.toDate);
+
             }
         });
     });

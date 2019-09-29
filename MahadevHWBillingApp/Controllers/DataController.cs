@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 
@@ -9,25 +10,6 @@ namespace MahadevHWBillingApp.Controllers
 {
     public class DataController : BaseController
     {
-
-        public  string GenerateName(int len)
-        {
-            Random r = new Random();
-            string[] consonants = { "b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "l", "n", "p", "q", "r", "s", "sh", "zh", "t", "v", "w", "x" };
-            string[] vowels = { "a", "e", "i", "o", "u", "ae", "y" };
-            string Name = "";
-            Name += consonants[r.Next(consonants.Length)].ToUpper();
-            Name += vowels[r.Next(vowels.Length)];
-            int b = 2; //b tells how many times a new letter has been added. It's 2 right now because the first two letters are already in the name.
-            while (b < len)
-            {
-                Name += consonants[r.Next(consonants.Length)];
-                b++;
-                Name += vowels[r.Next(vowels.Length)];
-                b++;
-            }
-            return Name;
-        }
 
         // GET: Data
         public JsonResult Purchase()
@@ -50,7 +32,7 @@ namespace MahadevHWBillingApp.Controllers
                             data.Add(new Purchase()
                             {
                                 Date = date,
-                                BusinessName = GenerateName(5+k),
+                                BusinessName = $"Busn-{i}{j}{k}",
                                 Invoice = date.ToString("yyyyMMddHHmmss")+k.ToString(),
                                 TotalAmount = am,
                                 TotalCGSTAmount = tax,
@@ -70,6 +52,91 @@ namespace MahadevHWBillingApp.Controllers
         
         }
 
+
+        public JsonResult Sales()
+        {
+            using (var transaction = _mahadevHwContext.Database.BeginTransaction())
+            {
+                try
+                {
+
+
+                    var data = new List<Sale>();
+                    for (int i = 0; i < 12; i++)
+                    {
+                        var monthStartDate = DateTime.Now.AddMonths(-i).Date;
+
+                        for (int j = 0; j < 30; j++)
+                        {
+                            var date = monthStartDate.AddDays(-j).Date;
+                            for (int k = 0; k < 3; k++)
+                            {
+
+
+                                var gst = new[] {5, 9, 15, 18};
+                                var gen = new Random();
+                                var products = new List<SaleItem>();
+
+                                for (int m = 0; m < 5; m++)
+                                {
+                                    var price = gen.Next(5000, 15000);
+                                    var taxper = gst[gen.Next(0, 3)];
+                                    products.Add(new SaleItem()
+                                    {
+                                        ItemId = m + 1,
+                                        Name = $"item-{m + 1}",
+                                        Quantity = 10,
+                                        Price = price,
+                                        TotalAmount = price * 10,
+                                        CGST = taxper,
+                                        TotalCGSTAmount = (taxper * price * 10) / 100,
+                                        SGST = taxper,
+                                        TotalSGSTAmount = (taxper * price * 10) / 100
+                                    });
+                                }
+
+                                var ta = products.Sum(e => e.TotalAmount);
+                                var tta = products.Sum(e => e.TotalCGSTAmount);
+
+                                var saleDetails = new Sale()
+                                {
+                                    Date = date,
+                                    BusinessName = $"B-{i}-{j}-{k}",
+                                    Invoice = date.ToString("yyyyMMddHHmmss") + k.ToString(),
+                                    TotalAmount = ta + tta + tta,
+                                    TotalCGSTAmount = tta,
+                                    TotalSGSTAmount = tta,
+                                    CustomerGSTIN = "AK123" + date.ToString("yyyyMMddHHmmss") + k.ToString(),
+                                    CustomerName = "RGDJSJ" + k.ToString(),
+                                    SubTotal = ta
+                                };
+                                _mahadevHwContext.Sales.Add(saleDetails);
+                                _mahadevHwContext.SaveChanges();
+
+                                foreach (var saleItem in products)
+                                {
+                                    saleItem.SaleId = saleDetails.Id;
+                                    _mahadevHwContext.SaleItems.Add(saleItem);
+                                }
+
+                                _mahadevHwContext.SaveChanges();
+
+                            }
+                        }
+                    }
+
+                    transaction.Commit();
+                    return Json("Done", JsonRequestBehavior.AllowGet);
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    Response.StatusCode = (int) HttpStatusCode.InternalServerError;
+                    return Json("Error", JsonRequestBehavior.AllowGet);
+                }
+            }
+        }
+
         public JsonResult Product()
         {
             try
@@ -77,7 +144,7 @@ namespace MahadevHWBillingApp.Controllers
                 var taxPer = new int[] { 5, 9, 15, 18 };
                 var data = new List<Item>();
                 var gen = new Random();
-                for (int i = 0; i < 2000; i++)
+                for (int i = 1; i <= 10000; i++)
                 {
                     var t = taxPer[gen.Next(4)];
                     var p = (decimal) gen.Next(5000);
@@ -91,7 +158,7 @@ namespace MahadevHWBillingApp.Controllers
                         Discount = d,
                         DiscountPrice = dp,
                         Quantity = gen.Next(100, 1000),
-                        Name = GenerateName(5 + gen.Next(5)) + i.ToString(),
+                        Name = $"Pro-{i}",
                         MeasuringUnit = "1 U",
                     });
                 }
