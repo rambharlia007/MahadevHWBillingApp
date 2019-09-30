@@ -1,0 +1,247 @@
+﻿
+@{
+                /**/
+
+                ViewBag.Title = "New";
+}
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+
+<div id="app" v-cloak>
+    <div class="row d-print-none" style="background-color: #f6f7f8 !important;">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" style="padding-bottom: 0px; margin-bottom: 0px; background-color: #f6f7f8 !important;">
+                    <li class="breadcrumb-item"><i class="fa fa-home">&nbsp;</i><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                </ol>
+            </nav>
+            <h4 style="padding-left: 15px;">Dashboard</h4>
+        </div>
+    </div>
+    <div class="row pt-3">
+        <div class="col-md-4 offset-2">
+            <div class="card" v-show="!isPreview" style="font-size: 0.85em; color: #6c757d !important;">
+                <div class="card-body">
+                    <div>
+                        <div id="chartContainer1" style="height: 370px; width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card" v-show="!isPreview" style="font-size: 0.85em; color: #6c757d !important;">
+                <div class="card-body">
+                    <div>
+                        <div id="chartContainer2" style="height: 370px; width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row pt-3">
+        <div class="col-md-8 offset-2">
+            <div class="card" v-show="!isPreview" style="font-size: 0.85em; color: #6c757d !important;">
+                <div class="card-body">
+                    <div>
+                        <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @*<div class="col-md-6">
+                <div class="card" v-show="!isPreview" style="font-size: 0.85em; color: #6c757d !important;">
+                    <div class="card-body">
+                        <div>
+                            <div id="chartContainer4" style="height: 370px; width: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>*@
+
+    </div>
+
+</div>
+
+    <script>
+        $(document).ready(function () {
+
+            CanvasJS.addColorSet("appShades",
+                [
+                    "#ABEBC6 ",
+                    "#AED6F1",
+                   // "#F8C471"
+                ]);
+                    
+            var chart = new CanvasJS.Chart("chartContainer", {
+                animationEnabled: true,
+                colorSet:"appShades",
+                theme: "light2", // "light1", "light2", "dark1", "dark2"
+                title: {
+                    text: "Sale-Purchase monthly report",
+                    fontSize: 20,
+                },
+                axisY: {
+                    title: "Amount (INR)"
+                },
+                toolTip: {
+                    shared: true
+                },
+                data: [{
+                    type: "column",
+                    showInLegend: true,
+                    //   legendMarkerColor: "grey",
+                    name: "Purchases (INR)",
+                    legendText: "Purchases",
+                    dataPoints: [
+                        { y: 300878, label: "Jan" },
+                        { y: 266455, label: "Saudi" },
+                        { y: 169709, label: "Canada" },
+                        { y: 158400, label: "Iran" },
+                        { y: 142503, label: "Iraq" },
+                        { y: 101500, label: "Kuwait" },
+                        { y: 97800, label: "UAE" },
+                        { y: 80000, label: "Russia" },
+                        { y: 142503, label: "Iraq" },
+                        { y: 101500, label: "Kuwait" },
+                        { y: 97800, label: "UAE" },
+                        { y: 80000, label: "Russia" }
+                    ]
+                },
+                {
+                    type: "column",
+                    showInLegend: true,
+                    axisYType: "secondary",
+                    legendText: "Sales",
+                    name: "Sales (INR)",
+                    dataPoints: [
+                        { y: 30087, label: "Jan" },
+                        { y: 26645, label: "Saudi" },
+                        { y: 16970, label: "Canada" },
+                        { y: 15840, label: "Iran" },
+                        { y: 14250, label: "Iraq" },
+                        { y: 10150, label: "Kuwait" },
+                        { y: 97890, label: "UAE" },
+                        { y: 80050, label: "Russia" },
+                        { y: 142503, label: "Iraq" },
+                        { y: 101500, label: "Kuwait" },
+                        { y: 97800, label: "UAE" },
+                        { y: 80000, label: "Russia" }
+                    ]
+                }]
+            });
+
+
+            var chart3 = new CanvasJS.Chart("chartContainer3", {
+                animationEnabled: true,
+                title: {
+                    text: "Purchase monthly report",
+                    fontSize: 20,
+                    fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
+                    fontWeight: "bold",
+                },
+                data: [{
+                    type: "pie",
+                    startAngle: 240,
+                    showInLegend: true,
+                    yValueFormatString: "##0.00\" INR\"",
+                    indexLabel: "{name} {y}",
+                    dataPoints: [
+                        { y: 984548, name: "Jan", color: "#82E0AA" },
+                        { y: 85400, name: "Feb", color: "#3498DB" },
+                        { y: 85478, name: "March", color: "#F8C471" },
+                        { y: 85478, name: "Apr" },
+                        { y: 85478, name: "May" },
+                        { y: 85478, name: "Jun" },
+                        { y: 85478, name: "July" },
+                        { y: 85478, name: "Aug" },
+                        { y: 85478, name: "Sept" },
+                        { y: 85478, name: "Oct" },
+                        { y: 85478, name: "Nov" },
+                        { y: 85478, name: "Dec" },
+                    ]
+                }]
+            });
+
+            var chart4 = new CanvasJS.Chart("chartContainer4", {
+                animationEnabled: true,
+                title: {
+                    text: "Sales monthly report",
+                    fontSize: 20,
+                    fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
+                    fontWeight: "bold",
+                },
+                data: [{
+                    type: "pie",
+                    startAngle: 240,
+                    showInLegend: true,
+                    yValueFormatString: "##0.00\" INR\"",
+                    indexLabel: "{name} {y}",
+                    dataPoints: [
+                        { y: 984548, name: "Jan", color: "#82E0AA" },
+                        { y: 85400, name: "Feb", color: "#3498DB" },
+                        { y: 85478, name: "March", color: "#F8C471" },
+                        { y: 85478, name: "Apr" },
+                        { y: 85478, name: "May" },
+                        { y: 85478, name: "Jun" },
+                        { y: 85478, name: "July" },
+                        { y: 85478, name: "Aug" },
+                        { y: 85478, name: "Sept" },
+                        { y: 85478, name: "Oct" },
+                        { y: 85478, name: "Nov" },
+                        { y: 85478, name: "Dec" },
+                    ]
+                }]
+            });
+
+            var chart1 = new CanvasJS.Chart("chartContainer1", {
+                animationEnabled: true,
+                title: {
+                    text: "Purchase yearly report with tax",
+                    fontSize: 20,
+                    fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
+                    fontWeight: "bold",
+                },
+                data: [{
+                    type: "pie",
+                    startAngle: 240,
+                    showInLegend: true,
+                    yValueFormatString: "##0.00\" INR\"",
+                    indexLabel: "{name} {y}",
+                    dataPoints: [
+                        { y: 984548, name: "Purchases", color: "#82E0AA" },
+                        { y: 85400, name: "SGST", color: "#3498DB" },
+                        { y: 85478, name: "CGST", color: "#F8C471" },
+                    ]
+                }]
+            });
+
+            var chart2 = new CanvasJS.Chart("chartContainer2", {
+                animationEnabled: true,
+                title: {
+                    text: "Sales yearly report with tax",
+                    fontSize: 20,
+                    fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
+                    fontWeight: "bold",
+                },
+                data: [{
+                    type: "pie",
+                    startAngle: 240,
+                    showInLegend: true,
+                    yValueFormatString: "##0.00\" INR\"",
+                    indexLabel: "{name} {y}",
+                    dataPoints: [
+                        { y: 998457, name: "Purchases", color: "#82E0AA" },
+                        { y: 80400, name: "SGST", color: "#3498DB" },
+                        { y: 85478, name: "CGST", color: "#F8C471" },
+                    ]
+                }]
+            });
+
+            chart.render();
+            chart1.render();
+            chart2.render();
+            chart3.render();
+            chart4.render();
+        });
+    </script>

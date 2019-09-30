@@ -276,6 +276,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\BillingController.cs" />
+    <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\DataController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ItemController.cs" />
@@ -399,6 +400,7 @@
     <Content Include="Views\Sale\List.cshtml" />
     <Content Include="Views\Purchase\List.cshtml" />
     <Content Include="Views\Profile\New.cshtml" />
+    <Content Include="Views\Dashboard\New.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
