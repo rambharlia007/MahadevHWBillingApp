@@ -18,5 +18,7 @@ namespace MahadevHWBillingApp.Models
         public decimal CGST { get; set; }
         public decimal TotalCGSTAmount { get; set; }
         public decimal TotalSGSTAmount { get; set; }
+        public decimal Discount { get; set; }
+        public decimal TotalDiscount { get; set; }
     }
 }

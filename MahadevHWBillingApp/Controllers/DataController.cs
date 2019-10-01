@@ -69,7 +69,7 @@ namespace MahadevHWBillingApp.Controllers
                         for (int j = 0; j < 30; j++)
                         {
                             var date = monthStartDate.AddDays(-j).Date;
-                            for (int k = 0; k < 3; k++)
+                            for (int k = 0; k < 2; k++)
                             {
 
 

@@ -4,7 +4,8 @@
 
                 ViewBag.Title = "New";
 }
-<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
 
 
 <div id="app" v-cloak>
@@ -20,228 +21,237 @@
         </div>
     </div>
     <div class="row pt-3">
-        <div class="col-md-4 offset-2">
+        <div class="col-md-6">
             <div class="card" v-show="!isPreview" style="font-size: 0.85em; color: #6c757d !important;">
                 <div class="card-body">
                     <div>
-                        <div id="chartContainer1" style="height: 370px; width: 100%;"></div>
+                        <canvas id="test2" width="700" height="200" style="max-height:300px;"></canvas>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
             <div class="card" v-show="!isPreview" style="font-size: 0.85em; color: #6c757d !important;">
                 <div class="card-body">
                     <div>
-                        <div id="chartContainer2" style="height: 370px; width: 100%;"></div>
+                        <canvas id="test3" width="700" height="200" style="max-height:300px;"></canvas>
                     </div>
                 </div>
             </div>
         </div>
+        @*<div class="col-md-3">
+            <div class="card" v-show="!isPreview" style="font-size: 0.85em; color: #6c757d !important;">
+                <div class="card-body">
+                    <div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card" v-show="!isPreview" style="font-size: 0.85em; color: #6c757d !important;">
+                <div class="card-body">
+                    <div>
+                    </div>
+                </div>
+            </div>
+        </div>*@
     </div>
     <div class="row pt-3">
-        <div class="col-md-8 offset-2">
+        <div class="col-md-12">
             <div class="card" v-show="!isPreview" style="font-size: 0.85em; color: #6c757d !important;">
                 <div class="card-body">
                     <div>
-                        <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+                        <canvas id="test1" width="700" height="100" style="max-height:300px;"></canvas>
                     </div>
                 </div>
             </div>
         </div>
-        @*<div class="col-md-6">
-                <div class="card" v-show="!isPreview" style="font-size: 0.85em; color: #6c757d !important;">
-                    <div class="card-body">
-                        <div>
-                            <div id="chartContainer4" style="height: 370px; width: 100%;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>*@
-
     </div>
-
 </div>
 
     <script>
+
+        var random = function () {
+            var res = [];
+            for (i = 0; i < 12; i++) {
+                res.push(Math.ceil(Math.random() * 10000000));
+            }
+            return res;
+        }
+
+        var purchaseColor = function () {
+            var res = [];
+            for (i = 0; i < 12; i++) {
+                res.push("rgba(54, 162, 235, 0.2)");
+            }
+            return res;
+        }
+
+        var purchaseBG = function () {
+            var res = [];
+            for (i = 0; i < 12; i++) {
+                res.push("rgb(54, 162, 235)");
+            }
+            return res;
+        }
+        var SaleColor = function () {
+            var res = [];
+            for (i = 0; i < 12; i++) {
+                res.push("rgba(75, 192, 192, 0.2)");
+            }
+            return res;
+        }
+        var SaleBG = function () {
+            var res = [];
+            for (i = 0; i < 12; i++) {
+                res.push("rgb(75, 192, 192)");
+            }
+            return res;
+        }
+
         $(document).ready(function () {
 
-            CanvasJS.addColorSet("appShades",
-                [
-                    "#ABEBC6 ",
-                    "#AED6F1",
-                   // "#F8C471"
-                ]);
-                    
-            var chart = new CanvasJS.Chart("chartContainer", {
-                animationEnabled: true,
-                colorSet:"appShades",
-                theme: "light2", // "light1", "light2", "dark1", "dark2"
-                title: {
-                    text: "Sale-Purchase monthly report",
-                    fontSize: 20,
+            Chart.defaults.global.legend.position = "bottom";
+
+            new Chart(document.getElementById("test1"), {
+                "type": "bar",
+                "data": {
+                    "labels": ["January", "February", "March", "April", "May", "June", "July", "August", "Sep", "Oct", "Nov", "Dec"],
+                    "datasets": [{
+                        "label": "Purchase",
+                        "data": random(),
+                        "fill": false,
+                        "backgroundColor": "rgba(54, 162, 235, 0.2)",
+                        "borderColor": purchaseBG(),
+                        "borderWidth": 1
+                    }, {
+                        "label": "Sale",
+                        "data": random(),
+                        "fill": false,
+                        "backgroundColor": SaleColor(),
+                        "borderColor": SaleBG(),
+                        "borderWidth": 1
+                    }]
                 },
-                axisY: {
-                    title: "Amount (INR)"
-                },
-                toolTip: {
-                    shared: true
-                },
-                data: [{
-                    type: "column",
-                    showInLegend: true,
-                    //   legendMarkerColor: "grey",
-                    name: "Purchases (INR)",
-                    legendText: "Purchases",
-                    dataPoints: [
-                        { y: 300878, label: "Jan" },
-                        { y: 266455, label: "Saudi" },
-                        { y: 169709, label: "Canada" },
-                        { y: 158400, label: "Iran" },
-                        { y: 142503, label: "Iraq" },
-                        { y: 101500, label: "Kuwait" },
-                        { y: 97800, label: "UAE" },
-                        { y: 80000, label: "Russia" },
-                        { y: 142503, label: "Iraq" },
-                        { y: 101500, label: "Kuwait" },
-                        { y: 97800, label: "UAE" },
-                        { y: 80000, label: "Russia" }
-                    ]
-                },
-                {
-                    type: "column",
-                    showInLegend: true,
-                    axisYType: "secondary",
-                    legendText: "Sales",
-                    name: "Sales (INR)",
-                    dataPoints: [
-                        { y: 30087, label: "Jan" },
-                        { y: 26645, label: "Saudi" },
-                        { y: 16970, label: "Canada" },
-                        { y: 15840, label: "Iran" },
-                        { y: 14250, label: "Iraq" },
-                        { y: 10150, label: "Kuwait" },
-                        { y: 97890, label: "UAE" },
-                        { y: 80050, label: "Russia" },
-                        { y: 142503, label: "Iraq" },
-                        { y: 101500, label: "Kuwait" },
-                        { y: 97800, label: "UAE" },
-                        { y: 80000, label: "Russia" }
-                    ]
-                }]
+                "options": {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'Sale-Purchase last 12 months report'
+                    },
+                    "scales": {
+                        "yAxes": [{
+                            "ticks": {
+                                "beginAtZero": true,
+                                callback: function (label, index, labels) {
+                                    return label.toLocaleString();
+                                }
+                            },
+                            gridLines: {
+                                display: false
+                            }
+                        }],
+                        xAxes: [{
+                            gridLines: {
+                                display: true
+                            }
+                        }]
+                    },
+                    tooltips: {
+                        mode:"index",
+                        callbacks: {
+                            label: function (tooltipItem, data) {
+                                var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].toLocaleString() || '';
+                                var label = data.datasets[tooltipItem.datasetIndex].label;
+                                if (value) {
+                                    value = ' ' + label + ': ' + value + ' INR';
+                                }
+                                return value;
+                            }
+                        }
+                    }
+                }
             });
 
+            var chartColors = {
+                "SGST": "rgb(133, 193, 233)",
+                "CGST": "rgb(127,179,213)",
+                "Sale": "rgb(126,218,198)",
+                "Purchase": "rgb(125,206,160)"
+            };
 
-            var chart3 = new CanvasJS.Chart("chartContainer3", {
-                animationEnabled: true,
-                title: {
-                    text: "Purchase monthly report",
-                    fontSize: 20,
-                    fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
-                    fontWeight: "bold",
-                },
-                data: [{
-                    type: "pie",
-                    startAngle: 240,
-                    showInLegend: true,
-                    yValueFormatString: "##0.00\" INR\"",
-                    indexLabel: "{name} {y}",
-                    dataPoints: [
-                        { y: 984548, name: "Jan", color: "#82E0AA" },
-                        { y: 85400, name: "Feb", color: "#3498DB" },
-                        { y: 85478, name: "March", color: "#F8C471" },
-                        { y: 85478, name: "Apr" },
-                        { y: 85478, name: "May" },
-                        { y: 85478, name: "Jun" },
-                        { y: 85478, name: "July" },
-                        { y: 85478, name: "Aug" },
-                        { y: 85478, name: "Sept" },
-                        { y: 85478, name: "Oct" },
-                        { y: 85478, name: "Nov" },
-                        { y: 85478, name: "Dec" },
+            var config2 = {
+                type: 'pie',
+                data: {
+                    datasets: [{
+                        data: [
+                            50000,4500,4500
+                        ],
+                        backgroundColor: [
+                            chartColors.Purchase,
+                            chartColors.SGST,
+                            chartColors.CGST
+                        ],
+                        label: 'Dataset 1'
+                    }],
+                    labels: [
+                        'Purchase',
+                        'SGST',
+                        'CGST'
                     ]
-                }]
-            });
-
-            var chart4 = new CanvasJS.Chart("chartContainer4", {
-                animationEnabled: true,
-                title: {
-                    text: "Sales monthly report",
-                    fontSize: 20,
-                    fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
-                    fontWeight: "bold",
                 },
-                data: [{
-                    type: "pie",
-                    startAngle: 240,
-                    showInLegend: true,
-                    yValueFormatString: "##0.00\" INR\"",
-                    indexLabel: "{name} {y}",
-                    dataPoints: [
-                        { y: 984548, name: "Jan", color: "#82E0AA" },
-                        { y: 85400, name: "Feb", color: "#3498DB" },
-                        { y: 85478, name: "March", color: "#F8C471" },
-                        { y: 85478, name: "Apr" },
-                        { y: 85478, name: "May" },
-                        { y: 85478, name: "Jun" },
-                        { y: 85478, name: "July" },
-                        { y: 85478, name: "Aug" },
-                        { y: 85478, name: "Sept" },
-                        { y: 85478, name: "Oct" },
-                        { y: 85478, name: "Nov" },
-                        { y: 85478, name: "Dec" },
-                    ]
-                }]
-            });
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'Purchase with tax report'
+                    }
+                }
+            };
 
-            var chart1 = new CanvasJS.Chart("chartContainer1", {
-                animationEnabled: true,
-                title: {
-                    text: "Purchase yearly report with tax",
-                    fontSize: 20,
-                    fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
-                    fontWeight: "bold",
+            var config3 = {
+                type: 'pie',
+                data: {
+                    datasets: [{
+                        data: [
+                         65000, 7500,7500
+                        ],
+                        backgroundColor: [
+                            chartColors.Sale,
+                            chartColors.SGST,
+                            chartColors.CGST
+                        ],
+                        label: 'Dataset 1'
+                    }],
+                    labels: [
+                        'Sale',
+                        'SGST',
+                        'CGST'
+                    ]
                 },
-                data: [{
-                    type: "pie",
-                    startAngle: 240,
-                    showInLegend: true,
-                    yValueFormatString: "##0.00\" INR\"",
-                    indexLabel: "{name} {y}",
-                    dataPoints: [
-                        { y: 984548, name: "Purchases", color: "#82E0AA" },
-                        { y: 85400, name: "SGST", color: "#3498DB" },
-                        { y: 85478, name: "CGST", color: "#F8C471" },
-                    ]
-                }]
-            });
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'Sale with tax report'
+                    }
+                }
+            };
 
-            var chart2 = new CanvasJS.Chart("chartContainer2", {
-                animationEnabled: true,
-                title: {
-                    text: "Sales yearly report with tax",
-                    fontSize: 20,
-                    fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
-                    fontWeight: "bold",
-                },
-                data: [{
-                    type: "pie",
-                    startAngle: 240,
-                    showInLegend: true,
-                    yValueFormatString: "##0.00\" INR\"",
-                    indexLabel: "{name} {y}",
-                    dataPoints: [
-                        { y: 998457, name: "Purchases", color: "#82E0AA" },
-                        { y: 80400, name: "SGST", color: "#3498DB" },
-                        { y: 85478, name: "CGST", color: "#F8C471" },
-                    ]
-                }]
-            });
+            var ctx2 = document.getElementById('test2')
+            new Chart(ctx2, config2);
+            var ctx3 = document.getElementById('test3')
+            new Chart(ctx3, config3);
 
-            chart.render();
-            chart1.render();
-            chart2.render();
-            chart3.render();
-            chart4.render();
+
+            var obj = {};
+            //new Vue({
+            //    el: '#app',
+            //    data: obj,
+            //    mounted: {
+
+            //    }
+            //});
+
         });
     </script>
