@@ -4,9 +4,9 @@
 
                 ViewBag.Title = "New";
 }
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
 
+<link href="~/Content/chart.min.css" rel="stylesheet" />
+<script src="~/Scripts/chart.bundle.min.js"></script>
 
 <div id="app" v-cloak>
     <div class="row d-print-none" style="background-color: #f6f7f8 !important;">
@@ -22,157 +22,118 @@
     </div>
     <div class="row pt-3">
         <div class="col-md-6">
-            <div class="card" v-show="!isPreview" style="font-size: 0.85em; color: #6c757d !important;">
+            <div class="card" style="font-size: 0.85em; color: #6c757d !important;">
                 <div class="card-body">
                     <div>
-                        <canvas id="test2" width="700" height="200" style="max-height:300px;"></canvas>
+                        <table class="table table-bordered table-sm" style="font-size: 0.85em; color: rgb(108, 117, 125) !important;">
+                            <tbody>
+                            <tr>
+                                <th colspan="5" class="text-center">Sales Monthly report (Last 15 months)</th>
+                            </tr>
+                            <tr>
+                                <th colspan="5" class="text-center">Sales</th>
+                            </tr>
+                            <tr>
+                                <th class="text-center">Month</th>
+                                <th class="text-center">SGST</th>
+                                <th class="text-center">CGST</th>
+                                <th class="text-center">Sub Amount</th>
+                                <th class="text-center">Amount</th>
+                            </tr>
+                            <tr v-for="(sale,index) in sales">
+                                <th>{{sale.name}}</th>
+                                <td>{{sale.data.SGST.toLocaleString()}}</td>
+                                <td>{{sale.data.CGST.toLocaleString()}}</td>
+                                <td>{{sale.data.SubAmount.toLocaleString()}}</td>
+                                <td>{{sale.data.Amount.toLocaleString()}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card" style="font-size: 0.85em; color: #6c757d !important;">
+                <div class="card-body">
+                    <div>
+                        <table class="table table-bordered table-sm" style="font-size: 0.85em; color: rgb(108, 117, 125) !important;">
+                            <tbody>
+                            <tr>
+                                <th colspan="5" class="text-center">Purchase Monthly report (Last 15 months)</th>
+                            </tr>
+                            <tr>
+                                <th colspan="5" class="text-center">Purchase</th>
+                            </tr>
+                            <tr>
+                                <th class="text-center">Month</th>
+                                <th class="text-center">SGST</th>
+                                <th class="text-center">CGST</th>
+                                <th class="text-center">Sub Amount</th>
+                                <th class="text-center">Amount</th>
+                            </tr>
+                            <tr v-for="(purchase,index) in purchases">
+                                <th>{{purchase.name}}</th>
+                                <td>{{purchase.data.SGST.toLocaleString()}}</td>
+                                <td>{{purchase.data.CGST.toLocaleString()}}</td>
+                                <td>{{purchase.data.SubAmount.toLocaleString()}}</td>
+                                <td>{{purchase.data.Amount.toLocaleString()}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row pt-3">
+        <div class="col-md-6">
+            <div class="card"  style="font-size: 0.85em; color: #6c757d !important;">
+                <div class="card-body">
+                    <div>
+                        <canvas id="sale-pie" width="700" height="250" style="max-height: 300px;"></canvas>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card" v-show="!isPreview" style="font-size: 0.85em; color: #6c757d !important;">
+            <div class="card"  style="font-size: 0.85em; color: #6c757d !important;">
                 <div class="card-body">
                     <div>
-                        <canvas id="test3" width="700" height="200" style="max-height:300px;"></canvas>
+                        <canvas id="purchase-pie" width="700" height="250" style="max-height: 300px;"></canvas>
                     </div>
                 </div>
             </div>
         </div>
-        @*<div class="col-md-3">
-            <div class="card" v-show="!isPreview" style="font-size: 0.85em; color: #6c757d !important;">
-                <div class="card-body">
-                    <div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card" v-show="!isPreview" style="font-size: 0.85em; color: #6c757d !important;">
-                <div class="card-body">
-                    <div>
-                    </div>
-                </div>
-            </div>
-        </div>*@
     </div>
     <div class="row pt-3">
         <div class="col-md-12">
-            <div class="card" v-show="!isPreview" style="font-size: 0.85em; color: #6c757d !important;">
+            <div class="card" style="font-size: 0.85em; color: #6c757d !important;">
                 <div class="card-body">
                     <div>
-                        <canvas id="test1" width="700" height="100" style="max-height:300px;"></canvas>
+                        <canvas id="sale-bar" width="700" height="150" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row pt-3">
+        <div class="col-md-12">
+            <div class="card" style="font-size: 0.85em; color: #6c757d !important;">
+                <div class="card-body">
+                    <div>
+                        <canvas id="purchase-bar" width="700" height="150" style="max-height: 300px;"></canvas>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<script>
 
-    <script>
-
-        var random = function () {
-            var res = [];
-            for (i = 0; i < 12; i++) {
-                res.push(Math.ceil(Math.random() * 10000000));
-            }
-            return res;
-        }
-
-        var purchaseColor = function () {
-            var res = [];
-            for (i = 0; i < 12; i++) {
-                res.push("rgba(54, 162, 235, 0.2)");
-            }
-            return res;
-        }
-
-        var purchaseBG = function () {
-            var res = [];
-            for (i = 0; i < 12; i++) {
-                res.push("rgb(54, 162, 235)");
-            }
-            return res;
-        }
-        var SaleColor = function () {
-            var res = [];
-            for (i = 0; i < 12; i++) {
-                res.push("rgba(75, 192, 192, 0.2)");
-            }
-            return res;
-        }
-        var SaleBG = function () {
-            var res = [];
-            for (i = 0; i < 12; i++) {
-                res.push("rgb(75, 192, 192)");
-            }
-            return res;
-        }
 
         $(document).ready(function () {
-
-            Chart.defaults.global.legend.position = "bottom";
-
-            new Chart(document.getElementById("test1"), {
-                "type": "bar",
-                "data": {
-                    "labels": ["January", "February", "March", "April", "May", "June", "July", "August", "Sep", "Oct", "Nov", "Dec"],
-                    "datasets": [{
-                        "label": "Purchase",
-                        "data": random(),
-                        "fill": false,
-                        "backgroundColor": "rgba(54, 162, 235, 0.2)",
-                        "borderColor": purchaseBG(),
-                        "borderWidth": 1
-                    }, {
-                        "label": "Sale",
-                        "data": random(),
-                        "fill": false,
-                        "backgroundColor": SaleColor(),
-                        "borderColor": SaleBG(),
-                        "borderWidth": 1
-                    }]
-                },
-                "options": {
-                    responsive: true,
-                    title: {
-                        display: true,
-                        text: 'Sale-Purchase last 12 months report'
-                    },
-                    "scales": {
-                        "yAxes": [{
-                            "ticks": {
-                                "beginAtZero": true,
-                                callback: function (label, index, labels) {
-                                    return label.toLocaleString();
-                                }
-                            },
-                            gridLines: {
-                                display: false
-                            }
-                        }],
-                        xAxes: [{
-                            gridLines: {
-                                display: true
-                            }
-                        }]
-                    },
-                    tooltips: {
-                        mode:"index",
-                        callbacks: {
-                            label: function (tooltipItem, data) {
-                                var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].toLocaleString() || '';
-                                var label = data.datasets[tooltipItem.datasetIndex].label;
-                                if (value) {
-                                    value = ' ' + label + ': ' + value + ' INR';
-                                }
-                                return value;
-                            }
-                        }
-                    }
-                }
-            });
-
             var chartColors = {
                 "SGST": "rgb(133, 193, 233)",
                 "CGST": "rgb(127,179,213)",
@@ -180,78 +141,238 @@
                 "Purchase": "rgb(125,206,160)"
             };
 
-            var config2 = {
-                type: 'pie',
-                data: {
-                    datasets: [{
-                        data: [
-                            50000,4500,4500
-                        ],
-                        backgroundColor: [
-                            chartColors.Purchase,
-                            chartColors.SGST,
-                            chartColors.CGST
-                        ],
-                        label: 'Dataset 1'
-                    }],
-                    labels: [
-                        'Purchase',
-                        'SGST',
-                        'CGST'
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    title: {
-                        display: true,
-                        text: 'Purchase with tax report'
-                    }
-                }
+           
+
+            var obj = {
+                sales: [],
+                purchases: [],
+                saleBarChart: {labels:[], data:[]},
+                purchaseBarChart: { labels: [], data: [] }
             };
+            new Vue({
+                el: '#app',
+                data: obj,
+                methods: {
+                    setChartFormattedData: function () {
+                        var self = this;
 
-            var config3 = {
-                type: 'pie',
-                data: {
-                    datasets: [{
-                        data: [
-                         65000, 7500,7500
-                        ],
-                        backgroundColor: [
-                            chartColors.Sale,
-                            chartColors.SGST,
-                            chartColors.CGST
-                        ],
-                        label: 'Dataset 1'
-                    }],
-                    labels: [
-                        'Sale',
-                        'SGST',
-                        'CGST'
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    title: {
-                        display: true,
-                        text: 'Sale with tax report'
+                        for (var j = 0; j < this.sales.length-1; j++)
+                        {
+                            self.saleBarChart.labels.push(this.sales[j].name);
+                            self.saleBarChart.data.push(this.sales[j].data.Amount);
+                        }
+
+                        for (var j = 0; j < this.purchases.length-1; j++) {
+                            self.purchaseBarChart.labels.push(this.purchases[j].name);
+                            self.purchaseBarChart.data.push(this.purchases[j].data.Amount);
+                        }
+                    },
+                    barChart: function () {
+                        var self = this;
+                        new Chart(document.getElementById("purchase-bar"),
+                            {
+                                "type": "bar",
+                                "data": {
+                                    "labels": self.purchaseBarChart.labels,
+                                    "datasets": [
+                                        {
+                                            "label": "Purchase",
+                                            "data": self.purchaseBarChart.data,
+                                            "fill": false,
+                                            "backgroundColor": "rgba(54, 162, 235, 0.2)",
+                                            "borderColor": "rgb(54, 162, 235)",
+                                            "borderWidth": 1
+                                        }
+                                    ]
+                                },
+                                "options": {
+                                    responsive: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Purchase report'
+                                    },
+                                    "scales": {
+                                        "yAxes": [
+                                            {
+                                                "ticks": {
+                                                    "beginAtZero": true,
+                                                    callback: function (label, index, labels) {
+                                                        return label.toLocaleString();
+                                                    }
+                                                },
+                                                gridLines: {
+                                                    display: false
+                                                }
+                                            }
+                                        ],
+                                        xAxes: [
+                                            {
+                                                gridLines: {
+                                                    display: true
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    tooltips: {
+                                        mode: "index",
+                                        callbacks: {
+                                            label: function (tooltipItem, data) {
+                                                var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]
+                                                    .toLocaleString() ||
+                                                    '';
+                                                var label = data.datasets[tooltipItem.datasetIndex].label;
+                                                if (value) {
+                                                    value = ' ' + label + ': ' + value + ' INR';
+                                                }
+                                                return value;
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        new Chart(document.getElementById("sale-bar"),
+                            {
+                                "type": "bar",
+                                "data": {
+                                    "labels": self.saleBarChart.labels,
+                                    "datasets": [
+                                        {
+                                            "label": "Sale",
+                                            "data": self.saleBarChart.data,
+                                            "fill": false,
+                                            "backgroundColor": "rgba(54, 162, 235, 0.2)",
+                                            "borderColor": "rgb(54, 162, 235)",
+                                            "borderWidth": 1
+                                        }
+                                    ]
+                                },
+                                "options": {
+                                    responsive: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Sale report'
+                                    },
+                                    "scales": {
+                                        "yAxes": [
+                                            {
+                                                "ticks": {
+                                                    "beginAtZero": true,
+                                                    callback: function (label, index, labels) {
+                                                        return label.toLocaleString();
+                                                    }
+                                                },
+                                                gridLines: {
+                                                    display: false
+                                                }
+                                            }
+                                        ],
+                                        xAxes: [
+                                            {
+                                                gridLines: {
+                                                    display: true
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    tooltips: {
+                                        mode: "index",
+                                        callbacks: {
+                                            label: function (tooltipItem, data) {
+                                                var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]
+                                                    .toLocaleString() ||
+                                                    '';
+                                                var label = data.datasets[tooltipItem.datasetIndex].label;
+                                                if (value) {
+                                                    value = ' ' + label + ': ' + value + ' INR';
+                                                }
+                                                return value;
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+
+                    },
+                    pieChart: function () {
+                        var self = this;
+                        var saleSumData = self.sales[self.sales.length - 1].data;
+                        var purchaseSumData = self.purchases[self.purchases.length - 1].data;
+                        var piePurchaseConfig = {
+                            type: 'pie',
+                            data: {
+                                datasets: [{
+                                    data: [
+                                        purchaseSumData.SubAmount, purchaseSumData.SGST, purchaseSumData.CGST
+                                    ],
+                                    backgroundColor: [
+                                        chartColors.Purchase,
+                                        chartColors.SGST,
+                                        chartColors.CGST
+                                    ],
+                                    label: 'Dataset 1'
+                                }],
+                                labels: [
+                                    'Purchase',
+                                    'SGST',
+                                    'CGST'
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                title: {
+                                    display: true,
+                                    text: 'Purchase with tax report'
+                                }
+                            }
+                        };
+
+                        var pieSaleConfig = {
+                            type: 'pie',
+                            data: {
+                                datasets: [{
+                                    data: [
+                                        saleSumData.SubAmount, saleSumData.SGST, saleSumData.CGST
+                                    ],
+                                    backgroundColor: [
+                                        chartColors.Sale,
+                                        chartColors.SGST,
+                                        chartColors.CGST
+                                    ],
+                                    label: 'Dataset 1'
+                                }],
+                                labels: [
+                                    'Sale',
+                                    'SGST',
+                                    'CGST'
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                title: {
+                                    display: true,
+                                    text: 'Sale with tax report'
+                                }
+                            }
+                        };
+
+                        new Chart(document.getElementById('sale-pie'), pieSaleConfig);
+                        new Chart(document.getElementById('purchase-pie'), piePurchaseConfig);
+
                     }
+                },
+                mounted() {
+                    var self = this;
+                    $(".nav-link-dashboard").addClass("active");
+                    Chart.defaults.global.legend.position = "bottom";
+                    $.get("/Dashboard/Get",
+                        function(res) {
+                            self.sales = res.saleData;
+                            self.purchases = res.purchaseData;
+                            self.setChartFormattedData();
+                            self.barChart();
+                            self.pieChart();
+                        });
                 }
-            };
-
-            var ctx2 = document.getElementById('test2')
-            new Chart(ctx2, config2);
-            var ctx3 = document.getElementById('test3')
-            new Chart(ctx3, config3);
-
-
-            var obj = {};
-            //new Vue({
-            //    el: '#app',
-            //    data: obj,
-            //    mounted: {
-
-            //    }
-            //});
-
+            });
         });
     </script>

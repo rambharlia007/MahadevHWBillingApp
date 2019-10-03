@@ -160,6 +160,7 @@ namespace MahadevHWBillingApp.Controllers
                         Quantity = gen.Next(100, 1000),
                         Name = $"Pro-{i}",
                         MeasuringUnit = "1 U",
+                        HSN = $"HSN-{i}"
                     });
                 }
                 _mahadevHwContext.Items.AddRange(data);

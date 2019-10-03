@@ -9,6 +9,7 @@ using System.Web.Mvc;
 
 namespace MahadevHWBillingApp.Controllers
 {
+    [HandleError]
     public class BillingController : BaseController
     {
         // GET: Billing

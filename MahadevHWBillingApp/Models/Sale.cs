@@ -15,5 +15,9 @@ namespace MahadevHWBillingApp.Models
         public string Invoice { get; set; }
         public DateTime Date { get; set; }
         public string FormatDate => Date.ToString("dd-MM-yyyy");
+        public string CustomerAddress { get; set; }
+        public string CustomerMobileNumber { get; set; }
+        public string DispatchVehicleNumber { get; set; }
+        public string DispatchReferenceName { get; set; }
     }
 }

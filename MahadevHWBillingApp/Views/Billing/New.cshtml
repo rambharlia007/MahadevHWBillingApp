@@ -97,13 +97,13 @@
                             <th style="width: 45px" scope="col">#</th>
                             <th class="text-center" v-if="Id" scope="col"></th>
                             <th class="text-center" style="width: 200px;" scope="col">Name</th>
+                            <th class="text-center" scope="col">HSN/SAC</th>
                             <th class="text-center" scope="col">Price</th>
                             <th class="text-center" scope="col">Quantity</th>
-                            <th class="text-center" scope="col">Discount %</th>
+                            <th class="text-center" scope="col">Disc %</th>
                             <th class="text-center" scope="col">GST %</th>
                             <th class="text-center" scope="col">CGST</th>
                             <th class="text-center" scope="col">SGST</th>
-                            <th class="text-center" scope="col">Discount</th>
                             <th class="text-center" scope="col">Total</th>
                         </tr>
                     </thead>
@@ -114,13 +114,14 @@
                             <td style="width: 200px;">
                                 <select v-bind:id="'product-sel-'+index" :data-id="index" class="product-select-2 js-example-basic-single js-states form-control"></select>
                             </td>
+                            <td> <input type="text" readonly v-model="item.HSN" class="form-control form-control-sm"></td>
                             <td> <input type="text" v-model="item.Price" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
                             <td> <input type="text" v-model="item.Quantity" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
                             <td> <input type="text" v-model="item.Discount" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
                             <td> <input type="text" v-model="item.GST" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
                             <td> <input type="text" readonly v-model="item.TotalCGSTAmount" class="form-control form-control-sm"></td>
                             <td> <input type="text" readonly v-model="item.TotalSGSTAmount" class="form-control form-control-sm"></td>
-                            <td> <input type="text" readonly v-model="item.TotalDiscount" class="form-control form-control-sm"></td>
+                            @*<td> <input type="text" readonly v-model="item.TotalDiscount" class="form-control form-control-sm"></td>*@
                             <td> <input type="text" readonly v-model="item.TotalAmount" class="form-control form-control-sm"></td>
                         </tr>
                     </tbody>
@@ -142,12 +143,24 @@
                             </tr>
                             <tr>
                                 <th>Phone Number:</th>
-                                <td><input type="text" v-model="CustomerGSTIN" class="form-control form-control-sm"></td>
+                                <td><input type="text" v-model="CustomerMobileNumber" class="form-control form-control-sm"></td>
                             </tr>
                             <tr>
                                 <th>Address:</th>
                                 <td>
                                     <textarea v-model="CustomerAddress" class="form-control form-control-sm"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Dispatched Vehicle No.</th>
+                                <td>
+                                    <input v-model="DispatchVehicleNumber" class="form-control form-control-sm"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Dispatched Reference(s):</th>
+                                <td>
+                                    <input v-model="DispatchReferenceName" class="form-control form-control-sm"/>
                                 </td>
                             </tr>
                         </table>
@@ -298,7 +311,7 @@
                             </tr>
                             <tr>
                                 <td>Phone:</td>
-                                <td>4242553252</td>
+                                <td>{{CustomerMobileNumber}}</td>
                             </tr>
                         </table>
                     </div>
@@ -312,6 +325,18 @@
                                 <th>Invoice:</th>
                                 <td>{{Invoice}}</td>
                             </tr>
+                            <tr>
+                                <th>Dispatched Vehicle No.</th>
+                                <td>
+                                    {{DispatchVehicleNumber}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Dispatched Reference(s):</th>
+                                <td>
+                                    {{DispatchReferenceName}}
+                                </td>
+                            </tr>
                         </table>
                     </div>
                 </div>
@@ -321,13 +346,13 @@
                             <tr>
                                 <th scope="col" style="width: 45px;">#</th>
                                 <th scope="col" style="width: 200px;">Product</th>
+                                <th scope="col">HSN/SAC</th>
                                 <th scope="col">GST Rate</th>
                                 <th scope="col">SGST Tax</th>
                                 <th scope="col">CGST Tax</th>
                                 <th scope="col">Quantity</th>
                                 <th scope="col">Rate</th>
                                 <th scope="col">Discount %</th>
-                                <th scope="col">Discount</th>
                                 <th scope="col">Amount</th>
                             </tr>
                         </thead>
@@ -335,13 +360,14 @@
                             <tr v-for="(item,index) in items" v-if="item.Name">
                                 <td class="center">{{index+1}}</td>
                                 <td class="left strong" style="width: 200px;">{{item.Name}}</td>
+                                <td class="right">{{item.HSN}}</td>
                                 <td class="right">{{Number(item.GST)}}%</td>
                                 <td class="center">{{Number(item.TotalSGSTAmount).toLocaleString()}}</td>
                                 <td class="center">{{Number(item.TotalCGSTAmount).toLocaleString()}}</td>
                                 <td class="center">{{Number(item.Quantity).toLocaleString()}}</td>
                                 <td class="right">{{Number(item.Price).toLocaleString()}}</td>
                                 <td class="center">{{Number(item.Discount).toLocaleString()}}</td>
-                                <td class="center">{{Number(item.TotalDiscount).toLocaleString()}}</td>
+                                @*<td class="center">{{Number(item.TotalDiscount).toLocaleString()}}</td>*@
                                 <td class="center">{{Number(item.TotalAmount).toLocaleString()}}</td>
                             </tr>
                         </tbody>
@@ -462,6 +488,7 @@
         for (var i = 0; i < 25; i++) {
             items.push({
                 Name: "",
+                HSN: "",
                 MeasuringUnit: "",
                 Quantity: "",
                 TotalCGSTAmount: "",
@@ -481,7 +508,7 @@
 
         function getDate() {
             var date = new Date();
-           return  `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
+            return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
         }
 
         function generateInvoiceNumber() {
@@ -506,13 +533,16 @@
             isSelect2Rendered: true,
             CustomerName: "",
             CustomerGSTIN: "",
-            CustomerAddress:"",
+            CustomerAddress: "",
+            CustomerMobileNumber: "",
+            DispatchVehicleNumber: "",
+            DispatchReferenceName: "",
             Id: 0,
             Invoice: generateInvoiceNumber(),
             TotalInWords: "",
             Date: getDate(),
             RoundOff: "",
-            isPrintOnly:false // This property is set to true only if print is given from sales grid
+            isPrintOnly: false // This property is set to true only if print is given from sales grid
         }
         new Vue({
             el: '#app',
@@ -522,21 +552,23 @@
                     var ref = this.items[index];
                     var taxInPercentage = ref.GST / 2;
                     var totalAmountWithNoDiscount = Math.round((ref.Price * ref.Quantity) * 100) / 100;
-                    var discountPrice = ref.Discount ? totalAmountWithNoDiscount - (ref.Price * ref.Quantity * ref.Discount) / 100 : totalAmountWithNoDiscount;
-                    ref.TotalAmount = discountPrice;
+                    var discountPrice = ref.Discount
+                        ? totalAmountWithNoDiscount - (ref.Price * ref.Quantity * ref.Discount) / 100
+                        : totalAmountWithNoDiscount;
+                    ref.TotalAmount = Math.round(discountPrice * 100) / 100;
                     ref.TotalDiscount = Math.round((totalAmountWithNoDiscount - discountPrice) * 100) / 100;
                     var tax = Math.round(((ref.TotalAmount * taxInPercentage) / 100) * 100) / 100;
                     ref.TotalCGSTAmount = tax;
                     ref.TotalSGSTAmount = tax;
                 },
-                closeAlertMessage: function (property) {
+                closeAlertMessage: function(property) {
                     this[property] = "";
                 },
                 showOrHidePreview: function(value) {
                     this.isPreview = value;
                     this.TotalInWords = convertNumberToWords(this.total);
                 },
-                print: function () {
+                print: function() {
                     this.isPreview = true;
                     window.print();
                 },
@@ -557,6 +589,10 @@
                                 BusinessName: "@Model.BusinessName",
                                 CustomerName: self.CustomerName,
                                 CustomerGSTIN: self.CustomerGSTIN,
+                                CustomerAddress: self.CustomerGSTIN,
+                                CustomerMobileNumber: self.CustomerMobileNumber,
+                                DispatchReferenceName: self.DispatchReferenceName,
+                                DispatchVehicleNumber:self.DispatchVehicleNumber,
                                 TotalCGSTAmount: self.tax / 2,
                                 TotalSGSTAmount: self.tax / 2,
                                 TotalAmount: self.total,
@@ -612,7 +648,8 @@
                                         CGST: product.CGST,
                                         SGST: product.SGST,
                                         DiscountPrice: product.DiscountPrice,
-                                        Discount: product.Discount
+                                        Discount: product.Discount,
+                                        HSN: product.HSN
                                     });
                                 });
 
@@ -627,7 +664,7 @@
                     });
 
                     $('.product-select-2').on('select2:select',
-                        function (e) {
+                        function(e) {
                             var index = parseInt($(this).attr('data-id'));
                             var data = e.params.data;
                             self.items[index].ItemId = data.id;
@@ -639,6 +676,7 @@
                             self.items[index].Quantity = 1;
                             self.items[index].Discount = data.Discount || 0;
                             self.items[index].DiscountPrice = data.DiscountPrice;
+                            self.items[index].HSN = data.HSN;
                             self.calculatePerItemAmount(index);
                         });
                 }
@@ -682,6 +720,7 @@
             },
             mounted() {
                 var self = this;
+                $(".nav-link-bill").addClass("active");
                 var url = window.location.href;
                 var isPrint = url.includes("pid");
                 var id = parseInt(url.substring(url.lastIndexOf('/') + 1));
@@ -692,6 +731,10 @@
                 if (Number.isInteger(id)) {
                     $.get(`/Sale/GetDataById/${id}`,
                         function(data) {
+                            self.CustomerAddress = data.SaleDetail.CustomerAddress,
+                            self.CustomerMobileNumber = data.SaleDetail.CustomerMobileNumber,
+                            self.DispatchVehicleNumber = data.SaleDetail.DispatchVehicleNumber,
+                            self.DispatchReferenceName = data.SaleDetail.DispatchReferenceName,
                             self.CustomerName = data.SaleDetail.CustomerName;
                             self.CustomerGSTIN = data.SaleDetail.CustomerGSTIN;
                             self.TotalCGSTAmount = self.tax / 2;
@@ -718,6 +761,7 @@
                                     self.items[index].SaleId = data.SaleId;
                                     self.items[index].Discount = data.Discount;
                                     self.items[index].TotalDiscount = data.TotalDiscount;
+                                    self.items[index].HSN = data.HSN;
                                 });
                             };
                         });

@@ -103,7 +103,7 @@
             el: '#app',
             data: obj,
             methods: {
-                saveProfile: function(e) {
+                saveProfile: function (e) {
                     var self = this;
                     var endPoint = this.Id > 0 ? "/Profile/Edit" : "/Profile/Save";
                     var formData = {
@@ -122,11 +122,11 @@
                             self.alertMessage = res.Message;
                             $(".navbar-brand").text(self.BusinessName);
                             $(".user-name").text(self.Owner);
-                        }).fail(function(res) {
-                        self.alertFailureMessage = res;
-                    });
+                        }).fail(function (res) {
+                            self.alertFailureMessage = res;
+                        });
                 },
-                closeAlertMessage: function(property) {
+                closeAlertMessage: function (property) {
                     // set alert message to empty
                     this[property] = "";
                 },
@@ -134,9 +134,10 @@
             computed: {
             },
             mounted() {
+                $(".nav-link-profile").addClass("active");
                 var self = this;
                 $.get("/Profile/Get",
-                    function(res) {
+                    function (res) {
                         console.log(res);
                         if (res) {
                             self.BusinessName = res.BusinessName;
@@ -147,10 +148,10 @@
                             self.Address = res.Address;
                             self.Id = res.Id;
                         }
-                    }).fail(function() {
-                    self.alertFailureMessage = "Internal server error";
-                });
+                    }).fail(function () {
+                        self.alertFailureMessage = "Internal server error";
+                    });
             }
-        })
+        });
     });
 </script>

@@ -20,5 +20,6 @@ namespace MahadevHWBillingApp.Models
         public decimal TotalSGSTAmount { get; set; }
         public decimal Discount { get; set; }
         public decimal TotalDiscount { get; set; }
+        public string HSN { get; set; }
     }
 }

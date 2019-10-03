@@ -80,6 +80,7 @@
                 <thead class="thead-light">
                     <tr>
                         <th>Name</th>
+                        <th>HSN/SAC</th>
                         <th>Measuring Unit</th>
                         <th>Quantity Available</th>
                         <th>SGST (%)</th>
@@ -114,6 +115,12 @@
                             <label class="col-sm-2 col-form-label">Name</label>
                             <div class="col-sm-10">
                                 <input v-model="item.Name" type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">HSN/SAC</label>
+                            <div class="col-sm-10">
+                                <input v-model="item.HSN" type="text" class="form-control">
                             </div>
                         </div>
                         <div class="form-group row">
@@ -187,6 +194,7 @@
                             <tr class="table-row">
                                 <th style="width: 45px" scope="col">#</th>
                                 <th scope="col">Name</th>
+                                <th scope="col">HSN/SAC</th>
                                 <th scope="col">Measuring Unit</th>
                                 <th scope="col">Quantity Available</th>
                                 <th scope="col">SGST (%)</th>
@@ -200,6 +208,7 @@
                             <tr class="table-row" v-for="(item,index) in newItems">
                                 <td style="width: 45px">{{index+1}}</td>
                                 <td> <input type="text" v-model="item.Name" class="form-control form-control-sm"></td>
+                                <td> <input type="text" v-model="item.HSN" class="form-control form-control-sm"></td>
                                 <td> <input type="text" v-model="item.MeasuringUnit" class="form-control form-control-sm"></td>
                                 <td> <input type="number" v-model="item.Quantity" class="form-control form-control-sm"></td>
                                 <td> <input type="number" v-model="item.SGST" class="form-control form-control-sm"></td>
@@ -224,7 +233,7 @@
 
 <script>
 
-    $(document).ready(function () {
+    $(document).ready(function() {
 
         function addEmptyNewItems() {
             var result = [];
@@ -237,7 +246,8 @@
                     Discount: "",
                     Quantity: "",
                     MeasuringUnit: "",
-                    DiscountPrice:""
+                    DiscountPrice: "",
+                    HSN: ""
                 });
             }
             return result;
@@ -246,27 +256,27 @@
         var obj = {
             items: [],
             item: {},
-            alertFailureMessage:"",
+            alertFailureMessage: "",
             alertMessage: "",
             newItems: addEmptyNewItems(),
-            tableRef:null
+            tableRef: null
         }
 
         new Vue({
             el: '#app',
             data: obj,
             methods: {
-                calculatePerItemDiscount: function (index) {
+                calculatePerItemDiscount: function(index) {
                     var currentItem = this.newItems[index];
                     if (currentItem.Discount) {
-                        
+
                         currentItem.DiscountPrice =
                             currentItem.Price - ((currentItem.Discount / 100) * currentItem.Price);
                     } else {
                         currentItem.DiscountPrice = currentItem.Price;
                     }
                 },
-                deleteItem: function (id) {
+                deleteItem: function(id) {
                     var self = this;
                     self.isSpinner = true
                     $.get("/item/RemoveItem?id=" + id,
@@ -277,21 +287,10 @@
                         self.alertFailureMessage = "Internal server error";
                     });
                 },
-                openModalForAddProduct: function () {
+                openModalForAddProduct: function() {
                     $("#add-product").modal("show");
                 },
-                addProduct: function () {
-                    this.newItems.push({
-                        Name: "",
-                        Price: "",
-                        CGST: "",
-                        SGST: "",
-                        Category: "",
-                        Quantity: "",
-                        MeasuringUnit: ""
-                    });
-                },
-                saveNewProduct: function () {
+                saveNewProduct: function() {
                     var self = this;
                     var validData = [];
                     self.newItems.forEach(function(data) {
@@ -307,7 +306,9 @@
                             dataType: 'json',
                             contentType: 'application/json; charset=utf-8',
                             success: function() {
-                                self.alertMessage = `${validData.length} Product Added succesfully. ${30 - validData.length} Product were left empty`;
+                                self.alertMessage =
+                                    `${validData.length} Product Added succesfully. ${30 - validData.length
+                                    } Product were left empty`;
                                 self.newItems = addEmptyNewItems();
                                 self.tableRef.ajax.reload(self.bindTableClickEvents);
                             }
@@ -315,15 +316,17 @@
                     } else {
                         self.alertFailureMessage = "30 off 30 invalid Product record were found";
                     }
-                    
+
                 },
                 saveEditItem: function() {
                     var self = this;
                     if (self.item) {
-                        $.post("/item/EditItem", self.item, function( data ) {
-                            self.alertMessage = "Item Edited succesfully";
-                            self.tableRef.ajax.reload(self.bindTableClickEvents);
-                        }).fail(function() {
+                        $.post("/item/EditItem",
+                            self.item,
+                            function(data) {
+                                self.alertMessage = "Item Edited succesfully";
+                                self.tableRef.ajax.reload(self.bindTableClickEvents);
+                            }).fail(function() {
                             self.alertFailureMessage = "Internal server error";
                         });
                     }
@@ -338,7 +341,7 @@
                         self.alertFailureMessage = "Internal server error";
                     });
                 },
-                bindTableClickEvents: function () {
+                bindTableClickEvents: function() {
                     var self = this;
                     $(".edit-item").click(function(e) {
                         var id = $(this).attr("data-id");
@@ -351,20 +354,20 @@
                     });
 
                 },
-                closeAlertMessage: function (property) {
+                closeAlertMessage: function(property) {
                     // set alert message to empty
                     this[property] = "";
                 },
-                getTableData: function () {
+                getTableData: function() {
                     var self = this;
                     self.tableRef = $("#product-table").DataTable({
                         ajax: {
                             url: "/item/GetData",
                             type: "GET",
-                            dataSrc: function (json) {
+                            dataSrc: function(json) {
                                 return json;
                             },
-                            error: function (xhr, error) {
+                            error: function(xhr, error) {
                                 if (xhr.status === 401) alert("Unauthorised user");
                             }
                         },
@@ -374,6 +377,7 @@
                         },
                         columns: [
                             { data: "Name" },
+                            { data: "HSN" },
                             { data: "MeasuringUnit" },
                             { data: "Quantity" },
                             { data: "SGST" },
@@ -382,29 +386,28 @@
                             { data: "Price" },
                             { data: "DiscountPrice" },
                             {
-                                render: function (data, type, row, meta) {
+                                render: function(data, type, row, meta) {
                                     return `<i class="fa fa-edit pointer edit-item" data-id=${row.Id}></i>`;
 
                                 }
                             },
                             {
-                                render: function (data, type, row, meta) {
-                                    return `<i class="fa fa-trash pointer delete-item" data-id=${row.Id}></i>`;  
+                                render: function(data, type, row, meta) {
+                                    return `<i class="fa fa-trash pointer delete-item" data-id=${row.Id}></i>`;
                                 }
                             }
                         ],
                         lengthMenu: [[5, 20, 25, 30, 100], [5, 20, 25, 30, 100]],
-                        initComplete: function (settings, json) {
+                        initComplete: function(settings, json) {
                             self.bindTableClickEvents();
                         }
                     });
                 }
             },
             mounted() {
+                $(".nav-link-item").addClass("active");
                 this.getTableData();
-            },
-        })
+            }
+        });
     });
-
-
 </script>
