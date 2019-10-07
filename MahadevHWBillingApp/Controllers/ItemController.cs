@@ -1,20 +1,31 @@
 ﻿using MahadevHWBillingApp.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 using MahadevHWBillingApp.Helper;
+using WebGrease.Css.Extensions;
 
 namespace MahadevHWBillingApp.Controllers
 {
+    [HandleError]
     public class ItemController : BaseController
     {
         public ActionResult Index()
         {
+            if (_profile.IsEligible == 0)
+                return RedirectToAction("Admin", "Error");
+            else if (_profile.IsEligible == 1 && _profile.IsFreeTrial == 2)
+            {
+                return RedirectToAction("FreeTrial", "Error");
+            }
             return View(_profile);
         }
 
         public ActionResult New()
         {
+            if (_mahadevHwContext is null)
+                return RedirectToAction("InternalServerError", "Error");
             return View(_profile);
         }
 
@@ -29,6 +40,7 @@ namespace MahadevHWBillingApp.Controllers
         public JsonResult GetDataBySearch(string q)
         {
             var items = Helper.Dapper.Get<Item>(Query.GetItemBySearch(q));
+            items.ForEach((data) => { data.Name = $"{data.Name} ({data.MeasuringUnit})"; });
             var response = Json(items, JsonRequestBehavior.AllowGet);
             response.MaxJsonLength = int.MaxValue;
             return response;

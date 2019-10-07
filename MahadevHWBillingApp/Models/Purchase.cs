@@ -12,11 +12,14 @@ namespace MahadevHWBillingApp.Models
     {
         [SpreadsheetExclude]
         public int Id { get; set; }
-        public string BusinessName { get; set; }
+        public string DistributorName { get; set; }
+        public string DistributorGSTIN { get; set; }
         public decimal TotalCGSTAmount { get; set; }
         public decimal TotalSGSTAmount { get; set; }
+        public decimal SubAmount { get; set; }
         public decimal TotalAmount { get; set; }
         public string Invoice { get; set; }
+        public string TempDate { get; set; }
         [SpreadsheetExclude]
         public DateTime Date { get; set; }
 

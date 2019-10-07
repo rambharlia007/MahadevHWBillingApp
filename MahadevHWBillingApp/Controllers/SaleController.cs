@@ -4,10 +4,17 @@ using System.Web.Mvc;
 
 namespace MahadevHWBillingApp.Controllers
 {
+    [HandleError]
     public class SaleController : BaseController
     {
         public ActionResult List()
         {
+            if (_profile.IsEligible == 0)
+                return RedirectToAction("Admin", "Error");
+            else if (_profile.IsEligible == 1 && _profile.IsFreeTrial == 2)
+            {
+                return RedirectToAction("FreeTrial", "Error");
+            }
             return View(_profile);
         }
 

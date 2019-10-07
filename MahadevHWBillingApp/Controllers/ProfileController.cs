@@ -8,10 +8,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MahadevHWBillingApp.Controllers
 {
+    [HandleError]
     public class ProfileController : BaseController
     {
         public ActionResult New()
         {
+            if (_profile.IsEligible == 0)
+                return RedirectToAction("Admin", "Error");
+            else if (_profile.IsEligible == 1 && _profile.IsFreeTrial == 2)
+            {
+                return RedirectToAction("FreeTrial", "Error");
+            }
             return View(_profile);
         }
 
@@ -27,9 +34,14 @@ namespace MahadevHWBillingApp.Controllers
         [HttpPost]
         public JsonResult Edit(Profile profile)
         {
-            _mahadevHwContext.Entry(profile).State = EntityState.Modified;
+            _profile.BusinessName = profile.BusinessName;
+            _profile.MobileNumber = profile.MobileNumber;
+            _profile.Address = profile.Address;
+            _profile.Email = profile.Email;
+            _profile.GSTIN = profile.GSTIN;
+            _profile.Owner = profile.Owner;
             _mahadevHwContext.SaveChanges();
-            _profile = profile;
+
             return Json(new {Id = profile.Id, Message = "Profile edited successfully"});
         }
 

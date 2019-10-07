@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System;
+using System.Web.Mvc;
 
 namespace MahadevHWBillingApp.Controllers
 {
@@ -10,6 +11,15 @@ namespace MahadevHWBillingApp.Controllers
         }
 
         public ActionResult InternalServerError()
+        {
+            return View(_profile);
+        }
+        public ActionResult Admin()
+        {
+            return View(_profile);
+        }
+
+        public ActionResult FreeTrial()
         {
             return View(_profile);
         }

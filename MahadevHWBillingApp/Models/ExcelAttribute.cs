@@ -2,7 +2,7 @@
 
 namespace MahadevHWBillingApp.Models
 {
-    public class ExcelAttribute : Attribute
+    public class ExcelAttribute : System.Attribute
     {
         public string ColumnIndex { get; set; }
         public string Format { get; set; }

@@ -57,5 +57,10 @@ namespace MahadevHWBillingApp.Helper
             return DateTime.ParseExact(date, "dd-MM-yyyy", CultureInfo.InvariantCulture)
                 .ToString("yyyy-MM-dd HH:mm:ss");
         }
+
+        public static DateTime ToCustomDateTimeFormat(this string date)
+        {
+            return DateTime.ParseExact(date, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+        }
     }
 }

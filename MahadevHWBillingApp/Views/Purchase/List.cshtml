@@ -120,28 +120,32 @@
                     <table id="product-table"
                            class="table text-secondary" style="font-size: 14px;">
                         <thead class="thead-light">
-                        <tr>
-                            <th>Date <small>(DD-MM-YYYY)</small></th>
-                            <th>Invoice</th>
-                            <th>Business</th>
-                            <th>SGST Amount</th>
-                            <th>CGST Amount</th>
-                            <th>Total Amount</th>
-                            <th>Edit</th>
-                            <th>Delete</th>
-                        </tr>
+                            <tr>
+                                <th>Date</th>
+                                <th>Invoice</th>
+                                <th>Distributor</th>
+                                <th>Distributor GSTIN</th>
+                                <th>SGST Amount</th>
+                                <th>CGST Amount</th>
+                                <th>Sub Amount</th>
+                                <th>Total Amount</th>
+                                <th>Edit</th>
+                                <th>Delete</th>
+                            </tr>
                         </thead>
                         <tfoot>
-                        <tr>
-                            <th></th>
-                            <th></th>
-                            <th>Total</th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                        </tr>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th>Total</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
                         </tfoot>
                     </table>
                 </div>
@@ -165,7 +169,7 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Date</label>
                                 <div class="col-sm-10">
-                                        <input type="text" id="purchase-edit-date-in" class="form-control purchase-edit-date">
+                                    <input type="text" id="purchase-edit-date-in" class="form-control purchase-edit-date">
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -177,7 +181,13 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Business</label>
                                 <div class="col-sm-10">
-                                    <input v-model="purchase.BusinessName" type="text" class="form-control">
+                                    <input v-model="purchase.DistributorName" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Business</label>
+                                <div class="col-sm-10">
+                                    <input v-model="purchase.DistributorGSTIN" type="text" class="form-control">
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -190,6 +200,12 @@
                                 <label class="col-sm-2 col-form-label">CGST Amount</label>
                                 <div class="col-sm-10">
                                     <input v-model="purchase.TotalCGSTAmount" type="number" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Total Amount</label>
+                                <div class="col-sm-10">
+                                    <input v-model="purchase.SubAmount" type="number" class="form-control">
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -227,9 +243,11 @@
                                     <th class="text-center pr-0" style="width: 35px" scope="col">#</th>
                                     <th class="text-center pr-0" style="width: 140px" scope="col">Date</th>
                                     <th class="text-center pr-0" style="width: 150px;" scope="col">Invoice</th>
-                                    <th class="text-center pr-0" style="width: 150px;">Name</th>
+                                    <th class="text-center pr-0" style="width: 150px;">Distributor</th>
+                                    <th class="text-center pr-0" style="width: 150px;">Dist. GSTIN</th>
                                     <th class="text-center pr-0" scope="col">SGST Amount</th>
                                     <th class="text-center pr-0" scope="col">CGST Amount</th>
+                                    <th class="text-center pr-0" scope="col">Sub Amount</th>
                                     <th class="text-center pr-0" scope="col">Total Amount</th>
                                 </tr>
                             </thead>
@@ -237,11 +255,13 @@
                                 <tr class="table-row" v-for="(purchase,index) in newPurchases">
                                     <td class="pr-0" style="width: 35px">{{index+1}}</td>
                                     <td class="pr-0" style="width: 140px" v-bind:["data-id"]="index"> <input type="text" v-model="purchase.Date" class="form-control form-control-sm purchase-date"></td>
-                                    <td class="pr-0" style="width: 150px;"> <input type="text" v-model="purchase.Invoice"  class="form-control form-control-sm"></td>
-                                    <td class="pr-0" style="width: 150px;"> <input type="text" v-model="purchase.BusinessName"  class="form-control form-control-sm"></td>
-                                    <td class="pr-0"> <input type="number"  v-model="purchase.TotalCGSTAmount" class="form-control form-control-sm"></tdclass="pr-0">
-                                    <td class="pr-0"> <input type="number"  v-model="purchase.TotalSGSTAmount" class="form-control form-control-sm"></td>
-                                    <td class="pr-0"> <input type="number"  v-model="purchase.TotalAmount" class="form-control form-control-sm"></td>
+                                    <td class="pr-0" style="width: 150px;"> <input type="text" v-model="purchase.Invoice" class="form-control form-control-sm"></td>
+                                    <td class="pr-0" style="width: 150px;"> <input type="text" v-model="purchase.DistributorName" class="form-control form-control-sm"></td>
+                                    <td class="pr-0" style="width: 150px;"> <input type="text" v-model="purchase.DistributorGSTIN" class="form-control form-control-sm"></td>
+                                    <td class="pr-0"> <input type="number" v-model="purchase.TotalCGSTAmount" class="form-control form-control-sm"></td>
+                                    <td class="pr-0"> <input type="number" v-model="purchase.TotalSGSTAmount" class="form-control form-control-sm"></td>
+                                    <td class="pr-0"> <input type="number" v-model="purchase.SubAmount" class="form-control form-control-sm"></td>
+                                    <td class="pr-0"> <input type="number" v-model="purchase.TotalAmount" class="form-control form-control-sm"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -321,10 +341,13 @@
                     self.newPurchases.forEach((data) => {
                         if (data.Date &&
                             data.Invoice &&
-                            data.BusinessName &&
+                            data.DistributorName &&
+                            data.DistributorGSTIN &&
                             data.TotalCGSTAmount &&
                             data.TotalSGSTAmount &&
+                            data.SubAmount &&
                             data.TotalAmount) {
+                            data.TempDate = data.Date;
                             validData.push(data);
                         }
                     });
@@ -420,7 +443,8 @@
                         columns: [
                             { data: "FormatDate" },
                             { data: "Invoice" },
-                            { data: "BusinessName" },
+                            { data: "DistributorName" },
+                            { data: "DistributorGSTIN" },
                             {
                                 data: "TotalSGSTAmount",
                                 render: function (data, type, row, meta) {
@@ -429,6 +453,12 @@
                             },
                             {
                                 data: "TotalCGSTAmount",
+                                render: function (data, type, row, meta) {
+                                    return Number(data).toLocaleString();
+                                }
+                            },
+                            {
+                                data: "SubAmount",
                                 render: function (data, type, row, meta) {
                                     return Number(data).toLocaleString();
                                 }
@@ -459,13 +489,16 @@
                             if (Object.entries(self.footerTotal).length) {
                                 var inrSymbol = "<i class='fa fa-inr' aria-hidden='true'></i>";
                                 var api = this.api();
-                                $(api.column(3).footer()).html(
+                                $(api.column(4).footer()).html(
                                     inrSymbol + Number(self.footerTotal.SGST).toLocaleString()
                                 );
-                                $(api.column(4).footer()).html(
+                                $(api.column(5).footer()).html(
                                     inrSymbol + Number(self.footerTotal.CGST).toLocaleString()
                                 );
-                                $(api.column(5).footer()).html(
+                                $(api.column(6).footer()).html(
+                                    inrSymbol + Number(self.footerTotal.Amount).toLocaleString()
+                                );
+                                $(api.column(7).footer()).html(
                                     inrSymbol + Number(self.footerTotal.Amount).toLocaleString()
                                 );
                             }

@@ -274,12 +274,12 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\BillingController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\DataController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
-    <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ItemController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\PurchaseController.cs" />
@@ -292,6 +292,7 @@
     <Compile Include="Helper\Extension.cs" />
     <Compile Include="Helper\Query.cs" />
     <Compile Include="Models\Bill.cs" />
+    <Compile Include="Models\EncryptDecryptData.cs" />
     <Compile Include="Models\ExcelAttribute.cs" />
     <Compile Include="Models\Excel\PurchaseExcel.cs" />
     <Compile Include="Models\Excel\SaleExcel.cs" />
@@ -378,7 +379,9 @@
     <Content Include="Scripts\umd\popper.js" />
     <Content Include="Scripts\umd\popper.min.js" />
     <Content Include="Scripts\vue.min.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -412,9 +415,12 @@
     <Content Include="Views\Dashboard\New.cshtml" />
     <Content Include="Views\Error\PageNotFound.cshtml" />
     <Content Include="Views\Error\InternalServerError.cshtml" />
+    <Content Include="Views\Error\Admin.cshtml" />
+    <Content Include="Views\Error\FreeTrial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\Admin\" />
     <Folder Include="Views\Base\" />
     <Folder Include="Views\Data\" />
     <Folder Include="Views\Report\" />

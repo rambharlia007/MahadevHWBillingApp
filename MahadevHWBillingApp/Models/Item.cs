@@ -13,5 +13,6 @@
         public int Discount { get; set; }
         public decimal DiscountPrice { get; set; }
         public string HSN { get; set; }
+        public int SoldQuantity { get; set; }
     }
 }

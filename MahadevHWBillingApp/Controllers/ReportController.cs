@@ -13,13 +13,19 @@ using WebGrease.Css.Extensions;
 
 namespace MahadevHWBillingApp.Controllers
 {
-
+    [HandleError]
     public class ReportController : BaseController
     {
         // GET: Report
         public ActionResult Index()
         {
-            return View();
+            if (_profile.IsEligible == 0)
+                return RedirectToAction("Admin", "Error");
+            else if (_profile.IsEligible == 1 && _profile.IsFreeTrial == 2)
+            {
+                return RedirectToAction("FreeTrial", "Error");
+            }
+            return View(_profile);
         }
 
         public ActionResult Sale(string fromDate, string toDate)

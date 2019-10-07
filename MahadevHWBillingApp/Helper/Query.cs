@@ -86,7 +86,7 @@ namespace MahadevHWBillingApp.Helper
             var from = fromDate.ToCustomFormat();
             var to = toDate.ToCustomFormat();
             return
-                $"Select BusinessName Name,TotalCGSTAmount CGST, TotalSGSTAmount SGST, Date, TotalAmount Amount, Invoice From Purchase Where Date >= '{from}' and Date <= '{to}' Order By Date";
+                $"Select DistributorName Name, DistributorGSTIN, SubAmount, TotalCGSTAmount CGST, TotalSGSTAmount SGST, Date, TotalAmount Amount, Invoice From Purchase Where Date >= '{from}' and Date <= '{to}' Order By Date";
         }
 
         public static string DeleteItem(IList<int> ids)

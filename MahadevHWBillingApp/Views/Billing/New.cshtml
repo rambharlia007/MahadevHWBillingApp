@@ -508,7 +508,9 @@
 
         function getDate() {
             var date = new Date();
-            return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
+            var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+            var month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
+            return `${day}-${month}-${date.getFullYear()}`;
         }
 
         function generateInvoiceNumber() {
@@ -598,7 +600,7 @@
                                 TotalAmount: self.total,
                                 Invoice: self.Invoice,
                                 SubTotal: self.subTotal,
-                                Date: self.Date,
+                                TempDate: self.Date,
                                 Id:self.Id
                             },
                             SaleItems: validData

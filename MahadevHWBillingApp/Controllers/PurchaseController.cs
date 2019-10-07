@@ -3,16 +3,24 @@ using MahadevHWBillingApp.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
 namespace MahadevHWBillingApp.Controllers
 {
+    [HandleError]
     public class PurchaseController : BaseController
     {
         public ActionResult List()
         {
+            if (_profile.IsEligible == 0)
+                return RedirectToAction("Admin", "Error");
+            else if (_profile.IsEligible == 1 && _profile.IsFreeTrial == 2)
+            {
+                return RedirectToAction("FreeTrial", "Error");
+            }
             return View(_profile);
         }
 
@@ -34,8 +42,11 @@ namespace MahadevHWBillingApp.Controllers
         {
             foreach (var purchase in purchases)
             {
+                purchase.Date = DateTime.ParseExact(purchase.TempDate, "dd-MM-yyyy",
+                    CultureInfo.InvariantCulture);
                 _mahadevHwContext.Purchase.Add(purchase);
             }
+
             _mahadevHwContext.SaveChanges();
             return Json("Item created");
         }

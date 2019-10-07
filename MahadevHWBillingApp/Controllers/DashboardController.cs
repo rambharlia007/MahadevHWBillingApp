@@ -4,15 +4,32 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using MahadevHWBillingApp.Helper;
+using MahadevHWBillingApp.Models;
+using Microsoft.Ajax.Utilities;
 
 namespace MahadevHWBillingApp.Controllers
 {
+    //[HandleError]
     public class DashboardController : BaseController
     {
-        // GET: Dashboard
         public ActionResult New()
         {
-            return View(_profile);
+            try
+            {
+                if (_profile.IsEligible == 0)
+                    return RedirectToAction("Admin", "Error");
+                else if (_profile.IsEligible == 1 && _profile.IsFreeTrial == 2)
+                {
+                    return RedirectToAction("FreeTrial", "Error");
+                }
+                return View(_profile);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+           
         }
 
         public JsonResult Get()

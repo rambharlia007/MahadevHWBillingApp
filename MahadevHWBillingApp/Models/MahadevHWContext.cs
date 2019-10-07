@@ -1,9 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using System.Configuration;
-using System.Linq;
-using System.Web;
 
 namespace MahadevHWBillingApp.Models
 {
@@ -28,11 +25,12 @@ namespace MahadevHWBillingApp.Models
             builder.UseSqlite(ConnectionString);
         }
 
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<Item>();
             builder.Entity<Profile>();
-            builder.Entity<Purchase>().Ignore(e=>e.FormatDate);
+            builder.Entity<Purchase>().Ignore(e => e.FormatDate);
             builder.Entity<Sale>();
             builder.Entity<SaleItem>();
             base.OnModelCreating(builder);

@@ -12,16 +12,22 @@ namespace MahadevHWBillingApp.Models.Excel
         [ExcelAttribute(ColumnIndex = "B")]
         public string Invoice { get; set; }
 
-        [ExcelAttribute(ColumnIndex = "C")]
+        [ExcelAttribute(ColumnIndex = "C", ColumnName = "Distributor")]
         public string Name { get; set; }
 
-        [ExcelAttribute(ColumnIndex = "D", Format = "#,##0.00", IsTotalRequired = true)]
-        public decimal CGST { get; set; }
+        [ExcelAttribute(ColumnIndex = "D", ColumnName = "Distributor GSTIN")]
+        public string DistributorGSTIN { get; set; }
 
         [ExcelAttribute(ColumnIndex = "E", Format = "#,##0.00", IsTotalRequired = true)]
-        public decimal SGST { get; set; }
+        public decimal CGST { get; set; }
 
         [ExcelAttribute(ColumnIndex = "F", Format = "#,##0.00", IsTotalRequired = true)]
+        public decimal SGST { get; set; }
+
+        [ExcelAttribute(ColumnIndex = "G", ColumnName = "Sub Amount" ,Format = "#,##0.00", IsTotalRequired = true)]
+        public decimal SubAmount { get; set; }
+
+        [ExcelAttribute(ColumnIndex = "H", Format = "#,##0.00", IsTotalRequired = true)]
         public decimal Amount { get; set; }
 
         [SpreadsheetExclude]

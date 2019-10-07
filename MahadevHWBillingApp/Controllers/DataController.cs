@@ -8,6 +8,7 @@ using System.Web.Mvc;
 
 namespace MahadevHWBillingApp.Controllers
 {
+    [HandleError]
     public class DataController : BaseController
     {
 
@@ -32,7 +33,8 @@ namespace MahadevHWBillingApp.Controllers
                             data.Add(new Purchase()
                             {
                                 Date = date,
-                                BusinessName = $"Busn-{i}{j}{k}",
+                                DistributorName = $"Busn-{i}{j}{k}",
+                                DistributorGSTIN = "DIS" + date.ToString("yyyyMMddHHmmss") + k.ToString(),
                                 Invoice = date.ToString("yyyyMMddHHmmss")+k.ToString(),
                                 TotalAmount = am,
                                 TotalCGSTAmount = tax,
