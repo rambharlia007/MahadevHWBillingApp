@@ -54,6 +54,8 @@ namespace MahadevHWBillingApp.Controllers
         [HttpPost]
         public JsonResult Edit(Purchase purchase)
         {
+            purchase.Date = DateTime.ParseExact(purchase.TempDate, "dd-MM-yyyy",
+                   CultureInfo.InvariantCulture);
             _mahadevHwContext.Entry(purchase).State = EntityState.Modified;
             _mahadevHwContext.SaveChanges();
             return Json("Item Edited");

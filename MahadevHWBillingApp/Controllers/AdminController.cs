@@ -12,7 +12,9 @@ namespace MahadevHWBillingApp.Controllers
         private string apiKey = "hdst58Mb2orw9J+oeJpifxNEu92maDyhfLYhzepxgoc=";
         public JsonResult Grant(string key)
         {
+            var computerName = System.Net.Dns.GetHostName();
             var validKey = EncryptDecryptData.Encrypt(key);
+
             if(!validKey.Equals(apiKey))
                 return Json("Invalid key", JsonRequestBehavior.AllowGet);
 
@@ -25,7 +27,8 @@ namespace MahadevHWBillingApp.Controllers
                 Email = "test@gmail.com",
                 Address = "101A Kr puram",
                 IsEligible = 1,
-                Key = EncryptDecryptData.Encrypt(DateTime.Now.Date.AddDays(90).ToString("dd-MM-yyyy"))
+                Key = EncryptDecryptData.Encrypt(DateTime.Now.Date.AddDays(90).ToString("dd-MM-yyyy")),
+                K1 = EncryptDecryptData.Encrypt(computerName)
             };
 
             var profiles = _mahadevHwContext.Profiles;
@@ -33,7 +36,6 @@ namespace MahadevHWBillingApp.Controllers
             {
                 var dbProfile = profiles.First();
                 dbProfile.IsEligible = 1;
-                dbProfile.Key = EncryptDecryptData.Encrypt(DateTime.Now.Date.AddDays(90).ToString("dd-MM-yyyy"));
                 _profile = profile;
                 _mahadevHwContext.SaveChanges();
             }

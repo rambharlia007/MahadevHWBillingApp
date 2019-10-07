@@ -1,5 +1,6 @@
 ﻿using MahadevHWBillingApp.Helper;
 using MahadevHWBillingApp.Models;
+using System.Linq;
 using System.Web.Mvc;
 
 namespace MahadevHWBillingApp.Controllers
@@ -22,7 +23,7 @@ namespace MahadevHWBillingApp.Controllers
         {
             var items = Helper.Dapper.Get<Sale>(Query.GetSale(fromDate, toDate));
             var footerSum = items.FooterSum();
-            return Json(new {data = items, footer = footerSum}, JsonRequestBehavior.AllowGet);
+            return Json(new { data = items, footer = footerSum }, JsonRequestBehavior.AllowGet);
         }
 
         public JsonResult GetDataById(int id)

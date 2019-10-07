@@ -416,7 +416,6 @@
                         var id = $(this).attr("data-id");
                         self.deleteItem(id);
                     });
-
                 },
                 closeAlertMessage: function(property) {
                     // set alert message to empty
@@ -532,7 +531,7 @@
                     field_order: 'DMY',
                     on_change: function(date_str) {
                         if (date_str) {
-                            self.purchase.Date = self.getFormatedDate(date_str);
+                            self.purchase.TempDate = self.getFormatedDate(date_str);
                         }
                     }
                 });

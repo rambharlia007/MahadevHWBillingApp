@@ -15,7 +15,6 @@ namespace MahadevHWBillingApp.Controllers
             try
             {
                 _mahadevHwContext = new MahadevHWContext();
-               // if (_profile != null) return;
                 _profile = _mahadevHwContext.Profiles.FirstOrDefault() ?? new Profile()
                 {
                     BusinessName = "Demo Business",

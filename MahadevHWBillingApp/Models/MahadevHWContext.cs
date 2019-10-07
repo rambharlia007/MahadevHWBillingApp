@@ -32,7 +32,6 @@ namespace MahadevHWBillingApp.Models
             builder.Entity<Profile>();
             builder.Entity<Purchase>().Ignore(e => e.FormatDate);
             builder.Entity<Sale>();
-            builder.Entity<SaleItem>();
             base.OnModelCreating(builder);
         }
     }

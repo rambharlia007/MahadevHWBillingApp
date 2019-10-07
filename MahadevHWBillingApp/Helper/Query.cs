@@ -102,10 +102,16 @@ namespace MahadevHWBillingApp.Helper
             return $"Select * From Items Where Id in ({id})";
         }
 
-        internal static string GetSaleAndProducts(int id)
+        public static string GetSaleAndProducts(int id)
         {
             return
                 $"Select * from Sales Where Id = {id}; Select SI.*, I.Name From SaleItems SI inner join Items I on SI.ItemId = I.Id Where SaleId = {id}";
+        }
+
+        public static string GetProductsByBill(int id)
+        {
+            return
+                $"Select SI.ItemId, SI.Quantity From SaleItems SI inner join Items I on SI.ItemId = I.Id Where SaleId = {id}";
         }
 
         public static string GetItemBySearch(string filter)

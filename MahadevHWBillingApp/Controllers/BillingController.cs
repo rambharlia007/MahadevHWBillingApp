@@ -19,7 +19,7 @@ namespace MahadevHWBillingApp.Controllers
         {
             if (_profile.IsEligible == 0)
                 return RedirectToAction("Admin", "Error");
-            else if(_profile.IsEligible == 1 && _profile.IsFreeTrial == 2)
+            else if (_profile.IsEligible == 1 && _profile.IsFreeTrial == 2)
             {
                 return RedirectToAction("FreeTrial", "Error");
             }
@@ -50,14 +50,14 @@ namespace MahadevHWBillingApp.Controllers
                     _mahadevHwContext.SaveChanges();
 
                     transaction.Commit();
-                    return Json(new {Message = "Save successfull"});
+                    return Json(new { Message = "Save successfull" });
 
                 }
                 catch (Exception ex)
                 {
                     transaction.Rollback();
                     Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                    return Json(new {Message = "Internal Server error"});
+                    return Json(new { Message = "Internal Server error" });
                 }
             }
         }
@@ -67,10 +67,29 @@ namespace MahadevHWBillingApp.Controllers
             {
                 try
                 {
+                    bill.SaleDetail.Date = DateTime.ParseExact(bill.SaleDetail.TempDate, "dd-MM-yyyy",
+                        CultureInfo.InvariantCulture);
+                    var productQuantityTracks = Helper.Dapper.Get<ProductQuantityTrack>(Query.GetProductsByBill(bill.SaleDetail.Id));
+                    var trackProductIds = productQuantityTracks.Select(e => e.ItemId);
                     _mahadevHwContext.Entry(bill.SaleDetail).State = EntityState.Modified;
                     foreach (var saleItem in bill.SaleItems)
                     {
-                        _mahadevHwContext.Entry(saleItem).State = EntityState.Modified;
+                        var productData = _mahadevHwContext.Items.First(e => e.Id == saleItem.ItemId);
+                        if (trackProductIds.Contains(saleItem.ItemId))
+                        {
+                            var previousAddedQuantity = productQuantityTracks.First(e => e.ItemId == saleItem.ItemId).Quantity;
+                            var updateQuantityCount = saleItem.Quantity - previousAddedQuantity;
+                            productData.Quantity = productData.Quantity - updateQuantityCount;
+                            productData.SoldQuantity += updateQuantityCount;
+                            _mahadevHwContext.Entry(saleItem).State = EntityState.Modified;
+                        }
+                        else
+                        {
+                            saleItem.SaleId = bill.SaleDetail.Id;
+                            productData.Quantity -= saleItem.Quantity;
+                            productData.SoldQuantity += saleItem.Quantity;
+                            _mahadevHwContext.SaleItems.Add(saleItem);
+                        }
                     }
 
                     _mahadevHwContext.SaveChanges();

@@ -585,6 +585,14 @@
                             validData.push(data);
                         }
                     });
+
+                    // might be new or edit based on Id.
+                    var apiEndPoint = "/Billing/Save";
+
+                    if (self.Id) {
+                        apiEndPoint = "/Billing/Edit";
+                    }
+
                     if (validData.length) {
                         var finalData = {
                             SaleDetail: {
@@ -605,11 +613,6 @@
                             },
                             SaleItems: validData
                         }
-
-                        var apiEndPoint = "/Billing/Save";
-                        if (self.Id)
-                            apiEndPoint = "/Billing/Edit";
-
 
                         $.ajax({
                             type: 'POST',
@@ -744,7 +747,7 @@
                             self.total = data.SaleDetail.TotalAmount;
                             self.Invoice = data.SaleDetail.Invoice;
                             self.SubTotal = data.SaleDetail.subTotal;
-                            self.Date = data.SaleDetail.FormatDate;
+                            self.TempDate = data.SaleDetail.FormatDate;
                             self.Id = data.SaleDetail.Id;
 
                             if (self.items.length) {
