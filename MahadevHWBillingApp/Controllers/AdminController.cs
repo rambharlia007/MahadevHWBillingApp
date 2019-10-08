@@ -36,6 +36,7 @@ namespace MahadevHWBillingApp.Controllers
             {
                 var dbProfile = profiles.First();
                 dbProfile.IsEligible = 1;
+                dbProfile.K1 = profile.K1;
                 _profile = profile;
                 _mahadevHwContext.SaveChanges();
             }

@@ -12,7 +12,7 @@ namespace MahadevHWBillingApp.Helper
 {
     public static class Dapper
     {
-        private static readonly string _connectionString = ConfigurationManager.ConnectionStrings["GstContext"].ConnectionString;
+        private static readonly string _connectionString = Generic.GetConnectionString();
         public static IEnumerable<T> Get<T>(string query) where T : class
         {
             using (var con = new SQLiteConnection(_connectionString))

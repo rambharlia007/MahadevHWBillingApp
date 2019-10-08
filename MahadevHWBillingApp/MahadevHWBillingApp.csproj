@@ -290,6 +290,7 @@
     </Compile>
     <Compile Include="Helper\Dapper.cs" />
     <Compile Include="Helper\Extension.cs" />
+    <Compile Include="Helper\Generic.cs" />
     <Compile Include="Helper\Query.cs" />
     <Compile Include="Models\Bill.cs" />
     <Compile Include="Models\EncryptDecryptData.cs" />
@@ -354,6 +355,9 @@
     <Content Include="fonts\fontawesome-webfont.woff" />
     <Content Include="fonts\fontawesome-webfont.ttf" />
     <Content Include="fonts\fontawesome-webfont.eot" />
+    <Content Include="GSTBilling.db">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />

@@ -20,28 +20,41 @@ namespace MahadevHWBillingApp.Models
         {
             get
             {
-                var value = string.IsNullOrEmpty(Key) ? null : EncryptDecryptData.Decrypt(Key);
-                if (!string.IsNullOrEmpty(value) && IsEligible == 1)
-                {
-                    try
-                    {
-                        var parseDate = value.Trim().ToCustomDateTimeFormat();
-                        if (DateTime.Now.Date > parseDate)
-                        {
-                            return 2;
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        using (var context = new MahadevHWContext())
-                        {
-                            var profile = context.Profiles.First();
-                            profile.IsEligible = 0;
-                            context.SaveChanges();
-                        }
+                if (string.IsNullOrEmpty(Key) && string.IsNullOrEmpty(K1))
+                    return 0;
+                else if (IsEligible != 1)
+                    return 0;
 
+                var value = EncryptDecryptData.Decrypt(Key);
+                var K1Value = EncryptDecryptData.Decrypt(K1);
+                if (!K1Value.Equals(System.Net.Dns.GetHostName()))
+                {
+                    using (var context = new MahadevHWContext())
+                    {
+                        var profile = context.Profiles.First();
+                        profile.IsEligible = 0;
+                        context.SaveChanges();
+                    }
+                    return 0;
+                }
+
+                try
+                {
+                    var parseDate = value.Trim().ToCustomDateTimeFormat();
+                    if (DateTime.Now.Date > parseDate)
+                    {
                         return 2;
                     }
+                }
+                catch (Exception e)
+                {
+                    using (var context = new MahadevHWContext())
+                    {
+                        var profile = context.Profiles.First();
+                        profile.IsEligible = 0;
+                        context.SaveChanges();
+                    }
+                    return 2;
                 }
                 return 0;
             }

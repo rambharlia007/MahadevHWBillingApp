@@ -6,8 +6,8 @@ namespace MahadevHWBillingApp.Models
 {
     public class MahadevHWContext : DbContext
     {
-        public static readonly string ConnectionString =
-            ConfigurationManager.ConnectionStrings["GstContext"].ConnectionString;
+        public static readonly string ConnectionString = Helper.Generic.GetConnectionString();
+            
 
         public DbSet<Item> Items { get; set; }
         public DbSet<Profile> Profiles { get; set; }

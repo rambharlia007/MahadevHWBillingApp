@@ -540,7 +540,7 @@
             DispatchVehicleNumber: "",
             DispatchReferenceName: "",
             Id: 0,
-            Invoice: generateInvoiceNumber(),
+            Invoice: "",
             TotalInWords: "",
             Date: getDate(),
             RoundOff: "",
@@ -576,6 +576,12 @@
                 },
                 afterPrint: function() {
                     this.save();
+                },
+                getRunningInvoice: function () {
+                    var self = this;
+                    $.get("/Sale/GetInvoice", function (data) {
+                        self.Invoice = data;
+                    });
                 },
                 save: function() {
                     var self = this;
@@ -725,6 +731,7 @@
             },
             mounted() {
                 var self = this;
+                self.getRunningInvoice();
                 $(".nav-link-bill").addClass("active");
                 var url = window.location.href;
                 var isPrint = url.includes("pid");

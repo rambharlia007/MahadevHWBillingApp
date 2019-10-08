@@ -33,5 +33,14 @@ namespace MahadevHWBillingApp.Controllers
             response.MaxJsonLength = int.MaxValue;
             return response;
         }
+
+        public JsonResult GetInvoice()
+        {
+            var currentInvoice = Helper.Dapper.Get<string>("Select Invoice From Sales order by Id Desc Limit 1");
+            if (!currentInvoice.Any())
+                return Json("A-1", JsonRequestBehavior.AllowGet);
+            var invoice = Helper.Generic.Invoice(currentInvoice.FirstOrDefault());
+            return Json(invoice, JsonRequestBehavior.AllowGet);
+        }
     }
 }
