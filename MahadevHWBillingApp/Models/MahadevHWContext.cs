@@ -7,7 +7,7 @@ namespace MahadevHWBillingApp.Models
     public class MahadevHWContext : DbContext
     {
         public static readonly string ConnectionString = Helper.Generic.GetConnectionString();
-            
+
 
         public DbSet<Item> Items { get; set; }
         public DbSet<Profile> Profiles { get; set; }
@@ -17,6 +17,7 @@ namespace MahadevHWBillingApp.Models
 
         public MahadevHWContext()
         {
+            System.IO.Directory.CreateDirectory("C:\\SqlServerDataBase\\DataBase");
             Database.EnsureCreated();
         }
 

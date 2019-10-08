@@ -6,7 +6,7 @@ namespace MahadevHWBillingApp.Helper
     {
         public static string GetConnectionString()
         {
-            return @"Data Source=.\GSTBilling.db";
+            return @"Data Source=C:\SqlServerDataBase\DataBase\GSTBilling.db";
         }
         public static string Invoice(string data)
         {
