@@ -21,14 +21,14 @@ namespace MahadevHWBillingApp.Controllers
             {
                 var data = new List<Purchase>();
                 var gen = new Random();
-                for (int i = 0; i < 12; i++)
+                for (int i = 0; i < 18; i++)
                 {
                     var monthStartDate = DateTime.Now.AddMonths(-i).Date;
 
                     for (int j = 0; j < 30; j++)
                     {
                         var date = monthStartDate.AddDays(-j).Date;
-                        for (int k = 0; k < 5; k++)
+                        for (int k = 0; k < 2; k++)
                         {
                             var am = gen.Next(5000);
                             decimal tax = (decimal)(am * 0.09);
@@ -37,10 +37,11 @@ namespace MahadevHWBillingApp.Controllers
                                 Date = date,
                                 DistributorName = $"Busn-{i}{j}{k}",
                                 DistributorGSTIN = "DIS" + date.ToString("yyyyMMddHHmmss") + k.ToString(),
-                                Invoice = date.ToString("yyyyMMddHHmmss")+k.ToString(),
-                                TotalAmount = am,
+                                Invoice = date.ToString("yyyyMMddHHmmss") + k.ToString(),
+                                TotalAmount = am + 2 * tax,
                                 TotalCGSTAmount = tax,
-                                TotalSGSTAmount = tax
+                                TotalSGSTAmount = tax,
+                                SubAmount = am
                             });
                         }
                     }
@@ -55,84 +56,23 @@ namespace MahadevHWBillingApp.Controllers
             }
         
         }
-
-        public JsonResult EDate(string data, string key)
-        {
-            RijndaelManaged objrij = new RijndaelManaged();
-            //set the mode for operation of the algorithm
-            objrij.Mode = CipherMode.CBC;
-            //set the padding mode used in the algorithm.
-            objrij.Padding = PaddingMode.PKCS7;
-            //set the size, in bits, for the secret key.
-            objrij.KeySize = 0x80;
-            //set the block size in bits for the cryptographic operation.
-            objrij.BlockSize = 0x80;
-            //set the symmetric key that is used for encryption & decryption.
-            byte[] passBytes = Encoding.UTF8.GetBytes(key);
-            //set the initialization vector (IV) for the symmetric algorithm
-            byte[] EncryptionkeyBytes = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-            int len = passBytes.Length;
-            if (len > EncryptionkeyBytes.Length)
-            {
-                len = EncryptionkeyBytes.Length;
-            }
-            Array.Copy(passBytes, EncryptionkeyBytes, len);
-            objrij.Key = EncryptionkeyBytes;
-            objrij.IV = EncryptionkeyBytes;
-            //Creates symmetric AES object with the current key and initialization vector IV.
-            ICryptoTransform objtransform = objrij.CreateEncryptor();
-            byte[] textDataByte = Encoding.UTF8.GetBytes(data);
-            //Final transform the test string.
-            var finalData = Convert.ToBase64String(objtransform.TransformFinalBlock(textDataByte, 0, textDataByte.Length));
-
-            return Json(finalData, JsonRequestBehavior.AllowGet);
-
-        }
-
-        public JsonResult DDate(string data, string key)
-        {
-            RijndaelManaged objrij = new RijndaelManaged();
-            objrij.Mode = CipherMode.CBC;
-            objrij.Padding = PaddingMode.PKCS7;
-            objrij.KeySize = 0x80;
-            objrij.BlockSize = 0x80;
-            byte[] encryptedTextByte = Convert.FromBase64String(data);
-            byte[] passBytes = Encoding.UTF8.GetBytes(key);
-            byte[] EncryptionkeyBytes = new byte[0x10];
-            int len = passBytes.Length;
-            if (len > EncryptionkeyBytes.Length)
-            {
-                len = EncryptionkeyBytes.Length;
-            }
-            Array.Copy(passBytes, EncryptionkeyBytes, len);
-            objrij.Key = EncryptionkeyBytes;
-            objrij.IV = EncryptionkeyBytes;
-            byte[] TextByte = objrij.CreateDecryptor().TransformFinalBlock(encryptedTextByte, 0, encryptedTextByte.Length);
-            var finalData = Encoding.UTF8.GetString(TextByte);  //it will return readable string
-            return Json(finalData, JsonRequestBehavior.AllowGet);
-
-        }
-
         public JsonResult Sales()
         {
             using (var transaction = _mahadevHwContext.Database.BeginTransaction())
             {
                 try
                 {
-
-
+                    int index = 1;
                     var data = new List<Sale>();
-                    for (int i = 0; i < 12; i++)
+                    for (int i = 0; i < 18; i++)
                     {
                         var monthStartDate = DateTime.Now.AddMonths(-i).Date;
 
                         for (int j = 0; j < 30; j++)
                         {
                             var date = monthStartDate.AddDays(-j).Date;
-                            for (int k = 0; k < 2; k++)
+                            for (int k = 0; k < 1; k++)
                             {
-
-
                                 var gst = new[] {5, 9, 15, 18};
                                 var gen = new Random();
                                 var products = new List<SaleItem>();
@@ -162,7 +102,7 @@ namespace MahadevHWBillingApp.Controllers
                                 {
                                     Date = date,
                                     BusinessName = $"B-{i}-{j}-{k}",
-                                    Invoice = date.ToString("yyyyMMddHHmmss") + k.ToString(),
+                                    Invoice = $"A-{index++}",
                                     TotalAmount = ta + tta + tta,
                                     TotalCGSTAmount = tta,
                                     TotalSGSTAmount = tta,
@@ -204,7 +144,7 @@ namespace MahadevHWBillingApp.Controllers
                 var taxPer = new int[] { 5, 9, 15, 18 };
                 var data = new List<Item>();
                 var gen = new Random();
-                for (int i = 1; i <= 10000; i++)
+                for (int i = 1; i <= 1000; i++)
                 {
                     var t = taxPer[gen.Next(4)];
                     var p = (decimal) gen.Next(5000);
@@ -233,7 +173,5 @@ namespace MahadevHWBillingApp.Controllers
             }
 
         }
-
-
     }
 }

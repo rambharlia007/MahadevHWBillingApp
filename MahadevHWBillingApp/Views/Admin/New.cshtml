@@ -1,0 +1,112 @@
+﻿@{
+    ViewBag.Title = "New";
+}
+<style>
+    [v-cloak] {
+        display: none;
+    }
+</style>
+<div id="app" v-cloak>
+    <div class="row d-print-none" style="background-color: #f6f7f8 !important;">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" style="padding-bottom: 0px; margin-bottom: 0px; background-color: #f6f7f8 !important;">
+                    <li class="breadcrumb-item"><i class="fa fa-home">&nbsp;</i><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Admin</li>
+                </ol>
+            </nav>
+            <h4 style="padding-left: 15px;">Profile</h4>
+        </div>
+    </div>
+    <div style="margin-top:20px;">
+        <div class="alert alert-success alert-dismissible fade show" role="alert" v-cloak v-show="alertMessage" style="margin-top: 20px;">
+            {{alertMessage}}
+            <button type="button" class="close" v-on:click="closeAlertMessage('alertMessage')" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <div v-cloak class="alert alert-danger alert-dismissible fade show" role="alert" v-show="alertFailureMessage" style="margin-top: 20px;">
+            {{alertFailureMessage}}
+            <button type="button" class="close" v-on:click="closeAlertMessage('alertFailureMessage')" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card justify-content-center">
+                <div class="card-body" style="font-size:14px;">
+                    <div class="form-group row">
+                        <label class="col-md-2">Granted By</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" v-model="GrantedBy">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-2">Permission</label>
+                        <div class="col-md-10">
+                            <select class="form-control" v-model="permissionType">
+                                <option value="grant">Grant</option>
+                                <option value="revoke">Revoke</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-2">Owner</label>
+                        <div class="col-md-10">
+                            <input type="password" class="form-control" v-model="Key">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-10">
+                            <button class="btn btn-primary" v-on:click="grantPermission()">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var obj = {
+            alertFailureMessage: "",
+            alertMessage: "",
+            GrantedBy: "",
+            Key: "",
+            permissionType : "grant"
+        }
+        new Vue({
+            el: '#app',
+            data: obj,
+            methods: {
+                grantPermission: function (e) {
+                    var self = this;
+
+                    var endPoint = "/Admin/Grant";
+                    if (self.permissionType === "revoke")
+                        endPoint = "/Admin/Revoke";
+
+                    var formData = {
+                        GrantedBy: this.GrantedBy,
+                        Key: this.Key
+                    }
+                    $.post(endPoint,
+                        formData,
+                        function (res) {
+                            self.alertMessage = "Permission Granted"
+                        }).fail(function (res) {
+                            self.alertFailureMessage = res;
+                        });
+                },
+                closeAlertMessage: function (property) {
+                    // set alert message to empty
+                    this[property] = "";
+                },
+            }
+        });
+    });
+</script>

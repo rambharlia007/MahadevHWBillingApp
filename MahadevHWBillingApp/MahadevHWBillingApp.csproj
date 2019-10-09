@@ -300,6 +300,7 @@
     <Compile Include="Models\Item.cs" />
     <Compile Include="Models\ItemConfiguration.cs" />
     <Compile Include="Models\MahadevHWContext.cs" />
+    <Compile Include="Models\Permission.cs" />
     <Compile Include="Models\Profile.cs" />
     <Compile Include="Models\Purchase.cs" />
     <Compile Include="Models\Sale.cs" />
@@ -418,10 +419,10 @@
     <Content Include="Views\Error\InternalServerError.cshtml" />
     <Content Include="Views\Error\Admin.cshtml" />
     <Content Include="Views\Error\FreeTrial.cshtml" />
+    <Content Include="Views\Admin\New.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Admin\" />
     <Folder Include="Views\Base\" />
     <Folder Include="Views\Data\" />
     <Folder Include="Views\Report\" />

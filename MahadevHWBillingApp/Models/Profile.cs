@@ -16,6 +16,7 @@ namespace MahadevHWBillingApp.Models
         public int IsEligible { get; set; }
         public string Key { get; set; }
         public string K1 { get; set; }
+        public string GrantedBy { get; set; }
         public int IsFreeTrial
         {
             get

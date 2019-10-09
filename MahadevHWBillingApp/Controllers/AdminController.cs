@@ -10,22 +10,22 @@ namespace MahadevHWBillingApp.Controllers
     public class AdminController : BaseController
     {
         private string apiKey = "hdst58Mb2orw9J+oeJpifxNEu92maDyhfLYhzepxgoc=";
-        public JsonResult Grant(string key)
+        public ActionResult New()
+        {
+            return View(_profile);
+        }
+        public JsonResult Grant(Permission permission)
         {
             var computerName = System.Net.Dns.GetHostName();
-            var validKey = EncryptDecryptData.Encrypt(key);
+            var validKey = EncryptDecryptData.Encrypt(permission.Key);
 
-            if(!validKey.Equals(apiKey))
+            if (!validKey.Equals(apiKey))
                 return Json("Invalid key", JsonRequestBehavior.AllowGet);
 
             var profile = new Profile()
             {
                 BusinessName = "Demo Business",
                 Owner = "Demo User",
-                MobileNumber = "4242553252",
-                GSTIN = "2552552325",
-                Email = "test@gmail.com",
-                Address = "101A Kr puram",
                 IsEligible = 1,
                 Key = EncryptDecryptData.Encrypt(DateTime.Now.Date.AddDays(90).ToString("dd-MM-yyyy")),
                 K1 = EncryptDecryptData.Encrypt(computerName)
@@ -49,9 +49,9 @@ namespace MahadevHWBillingApp.Controllers
             return Json("Granted", JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult Revoke(string key)
+        public JsonResult Revoke(Permission permission)
         {
-            var validKey = EncryptDecryptData.Encrypt(key);
+            var validKey = EncryptDecryptData.Encrypt(permission.Key);
             if (!validKey.Equals(apiKey)) return Json("Invalid key", JsonRequestBehavior.AllowGet);
             var profile = _mahadevHwContext.Profiles.First();
             profile.IsEligible = 0;
