@@ -7,7 +7,11 @@
     .pointer {
         cursor: pointer;
     }
-
+    .grid-edit {
+        text-decoration: underline;
+        color: #158cba;
+        cursor: pointer;
+    }
     .hide {
         display: none;
     }
@@ -130,7 +134,6 @@
                         <th>Sub Total</th>
                         <th>Total Amount</th>
                         <th>Print Bill</th>
-                        <th>Edit</th>
                         <th>Delete</th>
                     </tr>
                     </thead>
@@ -139,7 +142,6 @@
                         <th></th>
                         <th></th>
                         <th>Total</th>
-                        <th></th>
                         <th></th>
                         <th></th>
                         <th></th>
@@ -231,7 +233,12 @@
                         },
                         columns: [
                             { data: "FormatDate" },
-                            { data: "Invoice" },
+                            {
+                                data: "Invoice",
+                                render: function (data, type, row, meta) {
+                                    return `<span class="edit-sale grid-edit text-center" data-id=${row.Id}>${data}</span>`;
+                                }
+                            },
                             { data: "CustomerGSTIN" },
                             {
                                 data:"TotalSGSTAmount",
@@ -262,11 +269,7 @@
                                     return `<i class="fa fa-print pointer print-bill text-center" data-id=${row.Id}></i>`;
                                 }
                             },
-                            {
-                                render: function(data, type, row, meta) {
-                                    return `<i class="fa fa-edit pointer edit-sale text-center" data-id=${row.Id}></i>`;
-                                }
-                            },
+                           
                             {
                                 render: function(data, type, row, meta) {
                                     return `<i class="fa fa-trash pointer delete-sale text-center" data-id=${row.Id}></i>`;

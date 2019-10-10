@@ -7,6 +7,11 @@
     .pointer {
         cursor: pointer;
     }
+    .grid-edit {
+        text-decoration: underline;
+        color: #158cba;
+        cursor:pointer;
+    }
     .hide {
         display: none;
     }
@@ -79,9 +84,9 @@
                    class="table text-secondary" style="font-size:14px;">
                 <thead class="thead-light">
                     <tr>
-                        <th>Name</th>
+                        <th style="min-width:150px">Name</th>
                         <th>HSN/SAC</th>
-                        <th>Measuring Unit</th>
+                        <th>PER</th>
                         <th>Quantity Available</th>
                         <th>Quantity Sold</th>
                         <th>SGST (%)</th>
@@ -89,7 +94,6 @@
                         <th>Discount %</th>
                         <th>List Price</th>
                         <th>Discount Price</th>
-                        <th>Edit</th>
                         <th>Delete</th>
                     </tr>
                 </thead>
@@ -125,9 +129,13 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label">Measuring Unit</label>
+                            <label class="col-sm-2 col-form-label">PER</label>
                             <div class="col-sm-10">
-                                <input v-model="item.MeasuringUnit" type="text" class="form-control">
+                                <select class="form-control" v-model="item.MeasuringUnit">
+                                    <option value="Unit">Unit</option>
+                                    <option value="Bag">Bag</option>
+                                    <option value="Box">Box</option>
+                                </select>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -200,9 +208,9 @@
                         <thead class="thead-light table-head">
                             <tr class="table-row">
                                 <th style="width: 45px" scope="col">#</th>
-                                <th scope="col">Name</th>
+                                <th style="width:150px !important" scope="col">Name</th>
                                 <th scope="col">HSN/SAC</th>
-                                <th scope="col">Measuring Unit</th>
+                                <th scope="col">PER</th>
                                 <th scope="col">Quantity Available</th>
                                 <th scope="col">SGST (%)</th>
                                 <th scope="col">CGST (%)</th>
@@ -214,9 +222,15 @@
                         <tbody class="table-body">
                             <tr class="table-row" v-for="(item,index) in newItems">
                                 <td style="width: 45px">{{index+1}}</td>
-                                <td> <input type="text" v-model="item.Name" class="form-control form-control-sm"></td>
+                                <td style="width:150px !important"> <input type="text" v-model="item.Name" class="form-control form-control-sm"></td>
                                 <td> <input type="text" v-model="item.HSN" class="form-control form-control-sm"></td>
-                                <td> <input type="text" v-model="item.MeasuringUnit" class="form-control form-control-sm"></td>
+                                <td>
+                                    <select class="form-control form-control-sm" v-model="item.MeasuringUnit">
+                                        <option value="Unit">Unit</option>
+                                        <option value="Bag">Bag</option>
+                                        <option value="Box">Box</option>
+                                    </select>   
+                                </td>
                                 <td> <input type="number" v-model="item.Quantity" class="form-control form-control-sm"></td>
                                 <td> <input type="number" v-model="item.SGST" class="form-control form-control-sm"></td>
                                 <td> <input type="number" v-model="item.CGST" class="form-control form-control-sm"></td>
@@ -393,7 +407,13 @@
                         },
                         columns: [
                             { data: "Name" },
-                            { data: "HSN" },
+                            {
+                                data: "HSN",
+                                render: function (data, type, row, meta) {
+                                    return `<span class="edit-item grid-edit" data-id=${row.Id}>${data}</span>`;
+
+                                }
+                            },
                             { data: "MeasuringUnit" },
                             { data: "Quantity" },
                             { data: "SoldQuantity" },
@@ -402,12 +422,6 @@
                             { data: "Discount" },
                             { data: "Price" },
                             { data: "DiscountPrice" },
-                            {
-                                render: function(data, type, row, meta) {
-                                    return `<i class="fa fa-edit pointer edit-item" data-id=${row.Id}></i>`;
-
-                                }
-                            },
                             {
                                 render: function(data, type, row, meta) {
                                     return `<i class="fa fa-trash pointer delete-item" data-id=${row.Id}></i>`;
