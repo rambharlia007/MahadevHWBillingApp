@@ -176,13 +176,13 @@
                                         <th class="text-center">
                                             {{propertyName}}%
                                         </th>
-                                        <td>{{Number(value).toLocaleString()}}</td>
+                                        <td>{{displayFormat(value)}}</td>
                                     </tr>
                                     <tr>
                                         <th class="text-center">
                                             Total
                                         </th>
-                                        <th>{{Number(tax/2).toLocaleString()}}</th>
+                                        <th>{{displayFormat(tax/2)}}</th>
                                     </tr>
                                 </table>
                             </div>
@@ -195,13 +195,13 @@
                                         <th class="text-center">
                                             {{propertyName}}%
                                         </th>
-                                        <td>{{Number(value).toLocaleString()}}</td>
+                                        <td>{{displayFormat(value)}}</td>
                                     </tr>
                                     <tr>
                                         <th class="text-center">
                                             Total
                                         </th>
-                                        <th>{{Number(tax/2).toLocaleString()}}</th>
+                                        <th>{{displayFormat(tax/2)}}</th>
                                     </tr>
                                 </table>
                             </div>
@@ -211,13 +211,13 @@
                                         <th>
                                             Sub Total
                                         </th>
-                                        <td>{{Number(subTotal).toLocaleString()}}</td>
+                                        <td>{{displayFormat(subTotal)}}</td>
                                     </tr>
                                     <tr>
                                         <th>
                                             Tax
                                         </th>
-                                        <td>{{Number(tax).toLocaleString()}}</td>
+                                        <td>{{displayFormat(tax)}}</td>
                                     </tr>
                                     <tr>
                                         <th>
@@ -229,7 +229,7 @@
                                         <th>
                                             Total
                                         </th>
-                                        <th>{{Number(total).toLocaleString()}}</th>
+                                        <th>{{displayFormat(total)}}</th>
                                     </tr>
                                 </table>
                             </div>
@@ -269,6 +269,7 @@
     <div id="print-bill" class="card" v-show="isPreview" style="font-size: 0.85em;color: #6c757d !important;">
             <div class="card-header text-center">
                 <strong class="text-center">Tax Invoice</strong>
+                <span class="pull-right">(ORIGINAL FOR RECIPIENT)</span>
             </div>
             <div class="card-body">
                 <div class="row mb-4">
@@ -341,7 +342,7 @@
                     </div>
                 </div>
                 <div class="table-responsive-sm">
-                    <table class="table table-sm" style="color: #6c757d !important;">
+                    <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-custom table-bordered table-sm">
                         <thead>
                             <tr>
                                 <th scope="col" style="width: 45px;">#</th>
@@ -361,87 +362,53 @@
                                 <td class="center">{{index+1}}</td>
                                 <td class="left strong" style="width: 200px;">{{item.Name}}</td>
                                 <td class="right">{{item.HSN}}</td>
-                                <td class="right">{{Number(item.GST)}}%</td>
-                                <td class="center">{{Number(item.TotalSGSTAmount).toLocaleString()}}</td>
-                                <td class="center">{{Number(item.TotalCGSTAmount).toLocaleString()}}</td>
-                                <td class="center">{{Number(item.Quantity).toLocaleString()}}</td>
-                                <td class="right">{{Number(item.Price).toLocaleString()}}</td>
-                                <td class="center">{{Number(item.Discount).toLocaleString()}}</td>
-                                @*<td class="center">{{Number(item.TotalDiscount).toLocaleString()}}</td>*@
-                                <td class="center">{{Number(item.TotalAmount).toLocaleString()}}</td>
+                                <td class="right">{{displayFormat(item.GST)}}%</td>
+                                <td class="center">{{displayFormat(item.TotalSGSTAmount)}}</td>
+                                <td class="center">{{displayFormat(item.TotalCGSTAmount)}}</td>
+                                <td class="center">{{displayFormat(item.Quantity)}}</td>
+                                <td class="right">{{displayFormat(item.Price)}}</td>
+                                <td class="center">{{displayFormat(item.Discount)}}</td>
+                                <td class="center">{{displayFormat(item.TotalAmount)}}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="5"></td>
+                                <td colspan="4"></td>
+                                <td><strong>{{displayFormat(subTotal)}}</strong></td>
+                            </tr>
+                            <template v-for="(value, propertyName) in taxSlot">
+                                <tr>
+                                    <td colspan="5"></td>
+                                    <td colspan="4" class="text-center">
+                                        <strong>SGST@@{{propertyName}}%</strong>
+                                    </td>
+                                    <td>{{displayFormat(value)}}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5"></td>
+                                    <td colspan="4" class="text-center">
+                                        <strong>CGST@@{{propertyName}}%</strong>
+                                    </td>
+                                    <td>{{displayFormat(value)}}</td>
+                                </tr>
+                            </template>
+                            <tr>
+                                <td colspan="5"></td>
+                                <td colspan="4" class="text-center">
+                                    <strong>Round Off</strong>
+                                </td>
+                                <td>{{displayFormat(RoundOff)}}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="5"></td>
+                                <td colspan="4" class="text-center">
+                                    <strong>Total</strong>
+                                </td>
+                                <td><strong>{{displayFormat(total)}}</strong></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
                 <hr>
-                <div class="row">
-                    <div class="col-lg-4 col-sm-4 ml-auto">
-                        <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
-                            <tr>
-                                <th class="text-center" colspan="2">State Tax</th>
-                            </tr>
-                            <tr v-for="(value, propertyName) in taxSlot">
-                                <th class="text-center">
-                                    {{propertyName}}%
-                                </th>
-                                <td>{{Number(value).toLocaleString()}}</td>
-                            </tr>
-                            <tr>
-                                <th class="text-center">
-                                   Total
-                                </th>
-                                <th>{{Number(tax/2).toLocaleString()}}</th>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="col-lg-4 col-sm-4 ml-auto" style="color: #6c757d !important;">
-                        <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
-                            <tr>
-                                <th class="text-center" colspan="2">Central Tax</th>
-                            </tr>
-                            <tr v-for="(value, propertyName) in taxSlot">
-                                <th class="text-center">
-                                    {{propertyName}}%
-                                </th>
-                                <td>{{Number(value).toLocaleString()}}</td>
-                            </tr>
-                            <tr>
-                                <th class="text-center">
-                                    Total
-                                </th>
-                                <th>{{Number(tax/2).toLocaleString()}}</th>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="col-lg-4 col-sm-4 ml-auto">
-                        <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
-                            <tr>
-                                <th>
-                                    Sub Total
-                                </th>
-                                <td>{{Number(subTotal).toLocaleString()}}</td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    Tax
-                                </th>
-                                <td>{{Number(tax).toLocaleString()}}</td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    Round Off
-                                </th>
-                                <td>{{RoundOff}}</td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    Total
-                                </th>
-                                <th>{{Number(total).toLocaleString()}}</th>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
                 <div class="row">
                     <div class="col-md-12">
                         <span>
@@ -566,6 +533,9 @@
                 closeAlertMessage: function(property) {
                     this[property] = "";
                 },
+                displayFormat: function (data) {
+                    return Number(data).toLocaleString(undefined, { minimumFractionDigits: 2 })
+                },
                 showOrHidePreview: function(value) {
                     this.isPreview = value;
                     this.TotalInWords = convertNumberToWords(this.total);
@@ -574,14 +544,18 @@
                     this.isPreview = true;
                     window.print();
                 },
-                afterPrint: function() {
-                    this.save();
+                afterPrint: function () {
+                    if (!this.isPrintOnly)
+                        this.save();
                 },
                 getRunningInvoice: function () {
                     var self = this;
                     $.get("/Sale/GetInvoice", function (data) {
                         self.Invoice = data;
                     });
+                },
+                roundOffTwoPlace: function (number) {
+                    return 0 || Math.round(number * 100) / 100
                 },
                 save: function() {
                     var self = this;
@@ -709,7 +683,7 @@
                     this.items.forEach(function(item) {
                         totalAmount += parseFloat(item.TotalAmount || 0);
                     });
-                    return totalAmount;
+                    return this.roundOffTwoPlace(totalAmount);
                 },
                 tax: function() {
                     var totalTax = 0;
@@ -719,14 +693,14 @@
                                 100) /
                             100;
                     });
-                    return totalTax;
+                    return this.roundOffTwoPlace(totalTax);
                 },
                 total: function() {
                     var total = Math.round((parseFloat(this.subTotal) + parseFloat(this.tax)) * 100) / 100;
                     var roundOffTotal = Math.ceil(total);
                     this.RoundOff = (roundOffTotal - total).toFixed(2);
                     this.TotalInWords = convertNumberToWords(roundOffTotal);
-                    return roundOffTotal;
+                    return this.roundOffTwoPlace(roundOffTotal);
                 }
             },
             mounted() {
