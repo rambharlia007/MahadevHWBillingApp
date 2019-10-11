@@ -420,6 +420,7 @@
     <Content Include="Views\Error\Admin.cshtml" />
     <Content Include="Views\Error\FreeTrial.cshtml" />
     <Content Include="Views\Admin\New.cshtml" />
+    <Content Include="Views\Billing\EmptyProduct.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

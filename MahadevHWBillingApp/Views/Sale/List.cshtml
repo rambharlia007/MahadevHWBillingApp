@@ -216,6 +216,7 @@
                 getTableData: function() {
                     var self = this;
                     self.tableRef = $("#sale-table").DataTable({
+                        bSort: false,
                         ajax: {
                             url: `/sale/GetData?fromDate=${self.fromDate}&toDate=${self.toDate}`,
                             type: "GET",

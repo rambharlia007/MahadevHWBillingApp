@@ -159,7 +159,7 @@ namespace MahadevHWBillingApp.Controllers
                         DiscountPrice = dp,
                         Quantity = gen.Next(100, 1000),
                         Name = $"Pro-{i}",
-                        MeasuringUnit = "1 U",
+                        MeasuringUnit = "UNIT",
                         HSN = $"HSN-{i}"
                     });
                 }

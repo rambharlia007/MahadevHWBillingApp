@@ -42,7 +42,13 @@ namespace MahadevHWBillingApp.Helper
                 return con.QueryFirst<T>(query);
             }
         }
-
+        public static int GetCount(string query) 
+        {
+            using (var con = new SQLiteConnection(_connectionString))
+            {
+                return con.QueryFirst<int>(query);
+            }
+        }
         public static void Execute(string query)
         {
             using (var con = new SQLiteConnection(_connectionString))

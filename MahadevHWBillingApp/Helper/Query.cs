@@ -8,18 +8,20 @@ namespace MahadevHWBillingApp.Helper
     {
         public static readonly string GetItem = "Select * From Items";
 
+        public static string GetItemCount = "Select count(Id) From Items";
+
         public static string GetPurchase(string fromDate, string toDate)
         {
             var from = fromDate.ToCustomFormat();
             var to = toDate.ToCustomFormat();
-            return $"Select * From Purchase Where Date >= '{from}' and Date <= '{to}' Order By Date";
+            return $"Select * From Purchase Where Date >= '{from}' and Date <= '{to}' Order By Id";
         }
 
         public static string GetSale(string fromDate, string toDate)
         {
             var from = fromDate.ToCustomFormat();
             var to = toDate.ToCustomFormat();
-            return $"Select * From Sales Where Date >= '{from}' and Date <= '{to}' Order By Date";
+            return $"Select * From Sales Where Date >= '{from}' and Date <= '{to}' Order By Id";
         }
 
         public static string GetSaleExcelDownloadQuery(string fromDate, string toDate)

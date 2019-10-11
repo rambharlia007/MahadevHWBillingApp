@@ -21,5 +21,6 @@ namespace MahadevHWBillingApp.Models
         public decimal Discount { get; set; }
         public decimal TotalDiscount { get; set; }
         public string HSN { get; set; }
+        public string MeasuringUnit { get; set; }
     }
 }

@@ -365,7 +365,7 @@
                                 <td class="right">{{displayFormat(item.GST)}}%</td>
                                 <td class="center">{{displayFormat(item.TotalSGSTAmount)}}</td>
                                 <td class="center">{{displayFormat(item.TotalCGSTAmount)}}</td>
-                                <td class="center">{{displayFormat(item.Quantity)}}</td>
+                                <td class="center">{{displayFormat(item.Quantity) + ' ' +  item.MeasuringUnit}} </td>
                                 <td class="right">{{displayFormat(item.Price)}}</td>
                                 <td class="center">{{displayFormat(item.Discount)}}</td>
                                 <td class="center">{{displayFormat(item.TotalAmount)}}</td>
@@ -634,7 +634,8 @@
                                         SGST: product.SGST,
                                         DiscountPrice: product.DiscountPrice,
                                         Discount: product.Discount,
-                                        HSN: product.HSN
+                                        HSN: product.HSN,
+                                        MeasuringUnit: product.MeasuringUnit
                                     });
                                 });
 
@@ -662,6 +663,7 @@
                             self.items[index].Discount = data.Discount || 0;
                             self.items[index].DiscountPrice = data.DiscountPrice;
                             self.items[index].HSN = data.HSN;
+                            self.items[index].MeasuringUnit = data.MeasuringUnit;
                             self.calculatePerItemAmount(index);
                         });
                 }
@@ -748,6 +750,7 @@
                                     self.items[index].Discount = data.Discount;
                                     self.items[index].TotalDiscount = data.TotalDiscount;
                                     self.items[index].HSN = data.HSN;
+                                    self.items[index].MeasuringUnit = data.MeasuringUnit;
                                 });
                             };
                         });

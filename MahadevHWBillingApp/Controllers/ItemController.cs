@@ -40,9 +40,15 @@ namespace MahadevHWBillingApp.Controllers
         public JsonResult GetDataBySearch(string q)
         {
             var items = Helper.Dapper.Get<Item>(Query.GetItemBySearch(q));
-            items.ForEach((data) => { data.Name = $"{data.Name} ({data.MeasuringUnit})"; });
             var response = Json(items, JsonRequestBehavior.AllowGet);
             response.MaxJsonLength = int.MaxValue;
+            return response;
+        }
+
+        public JsonResult GetCount(string q)
+        {
+            var count = Helper.Dapper.GetCount(Query.GetItemCount);
+            var response = Json(count, JsonRequestBehavior.AllowGet);
             return response;
         }
 

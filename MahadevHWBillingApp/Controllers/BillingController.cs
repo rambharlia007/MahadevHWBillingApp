@@ -23,6 +23,15 @@ namespace MahadevHWBillingApp.Controllers
             {
                 return RedirectToAction("FreeTrial", "Error");
             }
+            else if (Helper.Dapper.GetCount(Query.GetItemCount) == 0)
+            {
+                return RedirectToAction("EmptyProduct", "Billing");
+            }
+            return View(_profile);
+        }
+
+        public ActionResult EmptyProduct()
+        {
             return View(_profile);
         }
 
