@@ -14,7 +14,9 @@ namespace MahadevHWBillingApp.Models
         public DbSet<Purchase> Purchase { get; set; }
         public DbSet<Sale> Sales { get; set; }
         public DbSet<SaleItem> SaleItems { get; set; }
-
+        public DbSet<Contact> Contacts { get; set; }
+        public DbSet<BillCreditDetail> BillCreditDetails { get; set; }
+            
         public MahadevHWContext()
         {
             System.IO.Directory.CreateDirectory("C:\\SqlServerDataBase\\DataBase");
@@ -26,13 +28,14 @@ namespace MahadevHWBillingApp.Models
             builder.UseSqlite(ConnectionString);
         }
 
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<Item>();
             builder.Entity<Profile>();
             builder.Entity<Purchase>().Ignore(e => e.FormatDate);
             builder.Entity<Sale>();
+            builder.Entity<Contact>().Ignore(e => e.IsSaveNewCustomer);
+            builder.Entity<BillCreditDetail>();
             base.OnModelCreating(builder);
         }
     }

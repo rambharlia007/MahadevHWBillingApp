@@ -19,18 +19,25 @@ namespace MahadevHWBillingApp.Models.Excel
         [ExcelAttribute(ColumnIndex = "D", ColumnName = "Customer GSTIN")]
         public string CustomerGSTIN { get; set; }
 
-        [ExcelAttribute(ColumnIndex = "E", Format = "#,##0.00", ColumnName = "5%", IsTotalRequired = true)]
+        [ExcelAttribute(ColumnIndex = "E", Format = "#,##0.00", IsDynamicColumnNaming = true, IsTotalRequired = true)]
         public decimal Tax1 { get; set; }
 
-        [ExcelAttribute(ColumnIndex = "F", Format = "#,##0.00", ColumnName = "9%", IsTotalRequired = true)]
+        [ExcelAttribute(ColumnIndex = "F", Format = "#,##0.00", IsDynamicColumnNaming = true, IsTotalRequired = true)]
         public decimal Tax2 { get; set; }
 
-        [ExcelAttribute(ColumnIndex = "G", Format = "#,##0.00", ColumnName = "15%", IsTotalRequired = true)]
+        [ExcelAttribute(ColumnIndex = "G", Format = "#,##0.00", IsDynamicColumnNaming = true, IsTotalRequired = true)]
         public decimal Tax3 { get; set; }
 
-        [ExcelAttribute(ColumnIndex = "H", Format = "#,##0.00", ColumnName = "18%", IsTotalRequired = true)]
+        [ExcelAttribute(ColumnIndex = "H", Format = "#,##0.00", IsDynamicColumnNaming = true, IsTotalRequired = true)]
         public decimal Tax4 { get; set; }
-        [ExcelAttribute(ColumnIndex = "I", Format = "#,##0.00", ColumnName = "Sub Total", IsTotalRequired = true)]
+
+        [ExcelAttribute(ColumnIndex = "I", Format = "#,##0.00", IsDynamicColumnNaming = true, IsTotalRequired = true)]
+        public decimal Tax5 { get; set; }
+
+        [ExcelAttribute(ColumnIndex = "J", Format = "#,##0.00", IsDynamicColumnNaming = true, IsTotalRequired = true)]
+        public decimal Tax6 { get; set; }
+
+        [ExcelAttribute(ColumnIndex = "K", Format = "#,##0.00", ColumnName = "Sub Total", IsTotalRequired = true)]
         public decimal SubTotal { get; set; }
 
         [SpreadsheetExclude]

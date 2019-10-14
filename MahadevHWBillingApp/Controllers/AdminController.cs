@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -58,6 +59,25 @@ namespace MahadevHWBillingApp.Controllers
             _profile = profile;
             _mahadevHwContext.SaveChanges();
             return Json("Revoked", JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult ChangeDate(string date)
+        {
+            var value = EncryptDecryptData.Encrypt(date);
+            var profile = _mahadevHwContext.Profiles.First();
+            profile.Key = value;
+            _profile = profile;
+            _mahadevHwContext.SaveChanges();
+            return Json("Date Changed", JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult ChangeSystem(string system)
+        {
+            var value = EncryptDecryptData.Encrypt(system);
+            var profile = _mahadevHwContext.Profiles.First();
+            profile.K1 = value;
+            _profile = profile;
+            _mahadevHwContext.SaveChanges();
+            return Json("Date Changed", JsonRequestBehavior.AllowGet);
         }
     }
 }

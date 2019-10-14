@@ -1,0 +1,361 @@
+﻿
+<style>
+    .pointer {
+        cursor: pointer;
+    }
+
+    .grid-edit {
+        text-decoration: underline;
+        color: #158cba;
+        cursor: pointer;
+    }
+
+    .hide {
+        display: none;
+    }
+
+    [v-cloak] {
+        display: none;
+    }
+
+    .table-head, .table-body .table-row {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    @@media only screen and (min-width: 768px) {
+        .table-body {
+            display: block;
+            height: 250PX;
+            overflow-y: scroll;
+        }
+    }
+
+    @@media only screen and (min-width: 992px) {
+        .table-body {
+            display: block;
+            height: 200px;
+            overflow-y: scroll;
+        }
+    }
+
+    @@media only screen and (min-width: 1500px) {
+        .table-body {
+            display: block;
+            max-height: 500px;
+            overflow-y: scroll;
+        }
+    }
+</style>
+
+<div id="app">
+    <div class="row" style="background-color: #f6f7f8 !important;">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" style="padding-bottom: 0px; margin-bottom: 0px; background-color: #f6f7f8 !important;">
+                    <li class="breadcrumb-item"><i class="fa fa-home">&nbsp;</i><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Contacts</li>
+                </ol>
+            </nav>
+            <h4 style="padding-left: 15px;">Contacts</h4>
+        </div>
+        <div class="col-md-4">
+            <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-on:click="openModalForAddProduct()">Add New contact</button>
+        </div>
+    </div>
+    <div style="margin-top:20px;">
+        <div class="alert alert-success alert-dismissible fade show" role="alert" v-cloak v-bind:class="{hide:!alertMessage}" style="margin-top: 20px;">
+            {{alertMessage}}
+            <button type="button" class="close" v-on:click="closeAlertMessage('alertMessage')" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <div v-cloak class="alert alert-danger alert-dismissible fade show" role="alert" v-bind:class="{hide:!alertFailureMessage}" style="margin-top: 20px;">
+            {{alertFailureMessage}}
+            <button type="button" class="close" v-on:click="closeAlertMessage('alertFailureMessage')" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="card-body" style="font-size:14px;">
+                <table id="contact-table"
+                       class="table text-secondary" style="font-size:14px;">
+                    <thead class="thead-light">
+                        <tr>
+                            <th style="min-width:150px">Name</th>
+                            <th style="min-width:150px">Type</th>
+                            <th>GSTIN</th>
+                            <th>Mobile Number</th>
+                            <th>Address</th>
+                            @*<th>Recievables</th>
+                            <th>Payables</th>*@
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+        <!-- The Modal -->
+        <div class="modal" id="myModal">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">Edit contact</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Name</label>
+                                <div class="col-sm-10">
+                                    <input v-model="contact.Name" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">GSTIN</label>
+                                <div class="col-sm-10">
+                                    <input v-model="contact.GSTIN" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">MobileNumber</label>
+                                <div class="col-sm-10">
+                                    <input readonly v-model="contact.MobileNumber" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Address</label>
+                                <div class="col-sm-10">
+                                    <textarea v-model="contact.Address" type="text" class="form-control"> </textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal" v-on:click="saveEditCustomer()">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="add-contact">
+            <div class="modal-dialog modal-dialog-centered modal-xl">
+                <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">Add contact</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <table class="table text-secondary" style="font-size: 14px;">
+                            <thead class="thead-light table-head">
+                                <tr class="table-row">
+                                    <th style="width: 45px" scope="col">#</th>
+                                    <th style="width:150px !important" scope="col">Name</th>
+                                    <th scope="col">Type</th>
+                                    <th scope="col">GSTIN</th>
+                                    <th scope="col">Mobile Number</th>
+                                    <th scope="col">Address</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-body">
+                                <tr class="table-row" v-for="(contact,index) in newCustomers">
+                                    <td style="width: 45px">{{index+1}}</td>
+                                    <td style="width:150px !important"> <input type="text" v-model="contact.Name" class="form-control form-control-sm"></td>
+                                    <td>
+                                        <select class="form-control form-control-sm" v-model="contact.Type">
+                                            <option value="customer">customer</option>
+                                            <option value="vendor">Vendor</option>
+                                        </select>
+                                    </td>
+                                    <td> <input type="text" v-model="contact.GSTIN" class="form-control form-control-sm"></td>
+                                    <td> <input type="number" v-model="contact.MobileNumber" class="form-control form-control-sm"></td>
+                                    <td> <textarea type="number" v-model="contact.Address" class="form-control form-control-sm"></textarea></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal" v-on:click="saveNewCustomer()">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function() {
+
+        function addEmptyNewCustomers() {
+            var result = [];
+            for (var i = 0; i < 20; i++) {
+                result.push({
+                    Name: "",
+                    GSTIN: "",
+                    MobileNumber: "",
+                    Address: "",
+                    Type:""
+                });
+            }
+            return result;
+        }
+
+        var obj = {
+            alertFailureMessage: "",
+            alertMessage: "",
+            newCustomers: addEmptyNewCustomers(),
+            contact: "",
+            editCustomer: {},
+            tableRef: null
+        }
+
+        new Vue({
+            el: '#app',
+            data: obj,
+            methods: {
+                deleteCustomer: function(id) {
+                    var self = this;
+                    $.get("/contact/Remove?id=" + id,
+                        function() {
+                            self.alertMessage = "contact deleted succesfully";
+                            self.tableRef.ajax.reload(self.bindTableClickEvents);
+                        }).fail(function() {
+                        self.alertFailureMessage = "Internal server error";
+                    });
+                },
+                openModalForAddProduct: function() {
+                    $("#add-contact").modal("show");
+                },
+                saveNewCustomer: function() {
+                    var self = this;
+                    var validData = [];
+                    self.newCustomers.forEach(function (data) {
+                        if (data.Name)
+                            validData.push(data);
+                    });
+
+                    if (validData.length) {
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("Add", "contact")',
+                            data: JSON.stringify(validData),
+                            dataType: 'json',
+                            contentType: 'application/json; charset=utf-8',
+                            success: function() {
+                                self.alertMessage =
+                                    `${validData.length} contact Added succesfully.`;
+                                self.newItems = addEmptyNewCustomers();
+                                self.tableRef.ajax.reload(self.bindTableClickEvents);
+                            }
+                        });
+                    } else {
+                        self.alertFailureMessage = "20 off 20 invalid contact record were found";
+                    }
+                }, 
+                saveEditCustomer: function() {
+                    var self = this;
+                    if (self.contact) {
+                        $.post("/contact/update",
+                            self.contact,
+                            function(data) {
+                                self.alertMessage = "cusotmer Edited succesfully";
+                                self.tableRef.ajax.reload(self.bindTableClickEvents);
+                            }).fail(function() {
+                            self.alertFailureMessage = "Internal server error";
+                        });
+                    }
+                },
+                getProductById: function(id) {
+                    var self = this;
+                    $.get(`/contact/get/${id}`,
+                        function (data, status) {
+                            self.contact = data;
+                            $("#myModal").modal("show");
+                        }).fail(function() {
+                        self.alertFailureMessage = "Internal server error";
+                    });
+                },
+                bindTableClickEvents: function() {
+                    var self = this;
+                    $(".edit-contact").click(function(e) {
+                        var id = $(this).attr("data-id");
+                        self.getProductById(id);
+                    });
+
+                    $(".delete-contact").click(function(e) {
+                        var id = $(this).attr("data-id");
+                        self.deleteCustomer(id);
+                    });
+
+                },
+                closeAlertMessage: function(property) {
+                    // set alert message to empty
+                    this[property] = "";
+                },
+                getTableData: function() {
+                    var self = this;
+                    self.tableRef = $("#contact-table").DataTable({
+                        ajax: {
+                            url: "/contact/GetData",
+                            type: "GET",
+                            dataSrc: function (json) {
+                                return json;
+                            },
+                            error: function (xhr, error) {
+                                if (xhr.status === 401) alert("Unauthorised user");
+                            }
+                        },
+                        fixedHeader: {
+                            header: true,
+                            footer: true
+                        },
+                        columns: [
+                            { data: "Name" },
+                            { data: "Type" },
+                            {
+                                data: "GSTIN",
+                                render: function (data, type, row, meta) {
+                                    return `<span class="edit-contact grid-edit" data-id=${row.Id}>${data}</span>`;
+
+                                }
+                            },
+                            { data: "MobileNumber" },
+                            { data: "Address" },
+                            {
+                                render: function (data, type, row, meta) {
+                                    return `<i class="fa fa-trash pointer delete-contact" data-id=${row.Id}></i>`;
+                                }
+                            }
+                        ],
+                        lengthMenu: [[5, 20, 25, 30, 100], [5, 20, 25, 30, 100]],
+                    });
+                }
+            },
+            mounted() {
+                var self = this;
+                $(".nav-link-contact").addClass("active");
+                $('#contact-table').on('draw.dt',
+                    function () {
+                        self.bindTableClickEvents();
+                    });
+                this.getTableData();
+            }
+        });
+    });
+</script>

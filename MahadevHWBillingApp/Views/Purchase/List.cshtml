@@ -124,7 +124,7 @@
                            class="table text-secondary" style="font-size: 14px;">
                         <thead class="thead-light">
                             <tr>
-                                <th>Date</th>
+                                <th style="min-width:80px !important;">Date</th>
                                 <th>Invoice</th>
                                 <th>Distributor</th>
                                 <th>Distributor GSTIN</th>
@@ -270,7 +270,7 @@
 
                     <!-- Modal footer -->
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success" data-dismiss="modal" v-on:click="saveNewPurchase()">Submit</button>
+                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal" v-on:click="saveNewPurchase()">Submit</button>
                     </div>
                 </div>
             </div>
@@ -357,19 +357,21 @@
                 openModalForAddPurchase: function() {
                     $("#add-purchase").modal("show");
                 },
+                displayFormat: function (data) {
+                    return Number(data).toLocaleString(undefined, { minimumFractionDigits: 2 })
+                },
                 saveNewPurchase: function() {
                     var self = this;
                     var validData = [];
                     self.newPurchases.forEach((data) => {
-                        if (data.Date &&
-                            data.Invoice &&
+                        if (data.Invoice &&
                             data.DistributorName &&
                             data.DistributorGSTIN &&
                             data.TotalCGSTAmount &&
                             data.TotalSGSTAmount &&
                             data.SubAmount &&
                             data.TotalAmount) {
-                            data.TempDate = data.Date;
+                            data.TempDate = data.TempDate;
                             validData.push(data);
                         }
                     });
@@ -383,9 +385,9 @@
                             contentType: 'application/json; charset=utf-8',
                             success: function() {
                                 self.alertMessage =
-                                    `${validData.length} purchase Added succesfully. ${30 - validData.length
-                                    } Purchase were left empty`;
+                                    `${validData.length} purchase Added succesfully.`;
                                 self.newPurchases = addEmptyPurchaseObject();
+                                self.tableReload();
                             }
                         });
                     } else {
@@ -512,16 +514,16 @@
                                 var inrSymbol = "<i class='fa fa-inr' aria-hidden='true'></i>";
                                 var api = this.api();
                                 $(api.column(4).footer()).html(
-                                    inrSymbol + Number(self.footerTotal.SGST).toLocaleString()
+                                    inrSymbol + self.displayFormat(self.footerTotal.SGST)
                                 );
                                 $(api.column(5).footer()).html(
-                                    inrSymbol + Number(self.footerTotal.CGST).toLocaleString()
+                                    inrSymbol + self.displayFormat(self.footerTotal.CGST) 
                                 );
                                 $(api.column(6).footer()).html(
-                                    inrSymbol + Number(self.footerTotal.SubAmount).toLocaleString()
+                                    inrSymbol + self.displayFormat(self.footerTotal.SubAmount) 
                                 );
                                 $(api.column(7).footer()).html(
-                                    inrSymbol + Number(self.footerTotal.Amount).toLocaleString()
+                                    inrSymbol + self.displayFormat(self.footerTotal.Amount) 
                                 );
                             }
                         }

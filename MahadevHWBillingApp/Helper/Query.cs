@@ -1,31 +1,60 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 
 namespace MahadevHWBillingApp.Helper
 {
     public static class Query
     {
-        public static readonly string GetItem = "Select * From Items";
+        public static readonly string GetItem = "Select * From Items Where IsDelete = 0";
 
-        public static string GetItemCount = "Select count(Id) From Items";
-
+        public static string GetItemCount = "Select count(Id) From Items Where IsDelete = 0";
+        public static string GetContacts = "Select * From Contacts Where IsDelete = 0";
         public static string GetPurchase(string fromDate, string toDate)
         {
             var from = fromDate.ToCustomFormat();
             var to = toDate.ToCustomFormat();
-            return $"Select * From Purchase Where Date >= '{from}' and Date <= '{to}' Order By Id";
+            return $"Select * From Purchase Where Date >= '{from}' and Date <= '{to}' Order By Date DESC";
         }
 
-        public static string GetSale(string fromDate, string toDate)
+        public static string GetSale(string fromDate, string toDate, int customerId)
         {
             var from = fromDate.ToCustomFormat();
             var to = toDate.ToCustomFormat();
-            return $"Select * From Sales Where Date >= '{from}' and Date <= '{to}' Order By Id";
+            var cond = string.Empty;
+            if (customerId > 0)
+                cond = $"And C.Id = {customerId}";
+            return $@"Select 
+                        S.Id,
+                        S.TotalCGSTAmount, 
+                        S.TotalSGSTAmount,
+                        S.Date,
+                        S.SubTotal,
+                        S.TotalAmount,
+                        C.Name CustomerName,
+                        C.GSTIN CustomerGSTIN,
+                        C.Id CustomerId,
+                        S.Invoice
+                        From Sales S Inner Join Contacts C on S.CustomerId = C.Id 
+                        Where S.Date >= '{from}' and S.Date <= '{to}' {cond} Order By S.Id";
         }
 
-        public static string GetSaleExcelDownloadQuery(string fromDate, string toDate)
+        public static string GetSaleExcelDownloadQuery(string fromDate, string toDate, List<decimal> gstSlots)
         {
+            
+
+            var builder = new StringBuilder();
+            var index = 1;
+            foreach(var data in gstSlots)
+            {
+                builder.Append($@",SUM(CASE 
+			                        WHEN TotalTaxSlot = {data}
+				                        THEN TotalTaxAmount
+			                        END) AS [Tax{index++}]");
+            }
+
+
             var from = fromDate.ToCustomFormat();
             var to = toDate.ToCustomFormat();
             return $@"
@@ -35,22 +64,7 @@ namespace MahadevHWBillingApp.Helper
 	                        ,CustomerGSTIN
 	                        ,CustomerName
 	                        ,SubTotal
-	                        ,SUM(CASE 
-			                        WHEN SGST = 5.0
-				                        THEN T2
-			                        END) AS [Tax1]
-	                        ,SUM(CASE 
-			                        WHEN SGST = 9.0
-				                        THEN T2
-			                        END) AS [Tax2]
-                            ,SUM(CASE 
-			                        WHEN SGST = 15.0
-				                        THEN T2
-			                        END) AS [Tax3]
-	                        ,SUM(CASE 
-			                        WHEN SGST = 18.0
-				                        THEN T2
-			                        END) AS [Tax4]
+	                        {builder.ToString()}
                         FROM (
 	                        SELECT S.BusinessName
 		                        ,S.CustomerName
@@ -58,10 +72,8 @@ namespace MahadevHWBillingApp.Helper
 		                        ,S.Invoice
 		                        ,S.DATE
 		                        ,S.SubTotal
-		                        ,SUM(SI.TotalCGSTAmount) T2
-		                        ,SUM(SI.TotalSGSTAmount) T3
-		                        ,SI.SGST
-		                        ,SI.CGST
+		                        ,SUM(SI.TotalCGSTAmount) + SUM(SI.TotalSGSTAmount) TotalTaxAmount
+		                        ,SI.SGST + SI.CGST TotalTaxSlot
 	                        FROM Sales S
 	                        INNER JOIN SaleItems SI ON S.Id = SI.SaleId
                         Where S.Date >= '{from}' and S.Date <= '{to}'
@@ -101,26 +113,45 @@ namespace MahadevHWBillingApp.Helper
         }
         public static string GetItemById(int id)
         {
-            return $"Select * From Items Where Id in ({id})";
+            return $"Select * From Items Where Id in ({id}) And IsDelete = 0";
         }
 
         public static string GetSaleAndProducts(int id)
         {
             return
-                $"Select * from Sales Where Id = {id}; Select SI.*, I.Name From SaleItems SI inner join Items I on SI.ItemId = I.Id Where SaleId = {id}";
+                $@"
+                    SELECT * 
+                    FROM   sales 
+                    WHERE  id = {id}; 
+
+                    SELECT SI.*, 
+                           I.NAME 
+                    FROM   saleitems SI 
+                           INNER JOIN items I 
+                                   ON SI.itemid = I.id 
+                    WHERE  SI.saleid = {id}; 
+
+                    SELECT C.* 
+                    FROM   Contacts C 
+                           INNER JOIN sales S 
+                                   ON C.id = S.customerid 
+                    WHERE  S.id = {id} ";
         }
 
         public static string GetProductsByBill(int id)
         {
             return
-                $"Select SI.ItemId, SI.Quantity From SaleItems SI inner join Items I on SI.ItemId = I.Id Where SaleId = {id}";
+                $"Select SI.ItemId, SI.Quantity, SI.Id SaleItemId From SaleItems SI inner join Items I on SI.ItemId = I.Id Where SaleId = {id}";
         }
 
         public static string GetItemBySearch(string filter)
         {
-            return $"Select * From Items Where Name like '%{filter}%'";
+            return $"Select * From Items Where IsDelete = 0 AND Name like '%{filter}%'";
         }
-
+        public static string GetContactsBySearch(string filter)
+        {
+            return $"Select * From Contacts Where IsDelete = 0 AND Name like '%{filter}%'";
+        }
         public static string GetPurchaseById(int id)
         {
             return $"Select * From Purchase Where Id in ({id})";

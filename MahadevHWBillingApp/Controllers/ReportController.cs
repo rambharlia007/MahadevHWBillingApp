@@ -31,8 +31,10 @@ namespace MahadevHWBillingApp.Controllers
         public ActionResult Sale(string fromDate, string toDate)
         {
             var months = new List<string>();
+            var gstSlots = Helper.Dapper.GetPrimitive<decimal>("SELECT DISTINCT SGST+CGST FROM SaleItems")
+                .OrderBy(e => e).ToList();
             var data = Helper.Dapper.Get<SaleExcel>(
-                Helper.Query.GetSaleExcelDownloadQuery(fromDate, toDate));
+                Helper.Query.GetSaleExcelDownloadQuery(fromDate, toDate, gstSlots));
 
             IList<IList<SaleExcel>> finalData = new List<IList<SaleExcel>>();
             data.GroupBy(e => e.Date.Date.ToString("MMM", CultureInfo.InvariantCulture)).ForEach((x) =>
@@ -46,6 +48,7 @@ namespace MahadevHWBillingApp.Controllers
             var properties = typeof(SaleExcel).GetProperties();
 
             var index = 0;
+            var dynamicColumnIndex = 0;
 
             foreach (var sheet in excelPackage.Workbook.Worksheets)
             {
@@ -56,7 +59,7 @@ namespace MahadevHWBillingApp.Controllers
 
                 foreach (var property in properties)
                 {
-                    var attr = (ExcelAttribute[]) property.GetCustomAttributes(typeof(ExcelAttribute), true);
+                    var attr = (ExcelAttribute[])property.GetCustomAttributes(typeof(ExcelAttribute), true);
 
                     if (attr.Any())
                     {
@@ -72,6 +75,11 @@ namespace MahadevHWBillingApp.Controllers
                         if (!string.IsNullOrEmpty(attr[0].ColumnName))
                         {
                             sheet.Cells[$"{columnIndex}1"].Value = attr[0].ColumnName;
+                        }
+                        else if (attr[0].IsDynamicColumnNaming && dynamicColumnIndex < gstSlots.Count)
+                        {
+                            sheet.Cells[$"{columnIndex}1"].Value = $@"{gstSlots[dynamicColumnIndex]} %";
+                            dynamicColumnIndex++;
                         }
                     }
                 }

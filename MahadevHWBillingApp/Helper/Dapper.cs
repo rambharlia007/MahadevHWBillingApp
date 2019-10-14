@@ -21,6 +21,14 @@ namespace MahadevHWBillingApp.Helper
             }
         }
 
+        public static IEnumerable<T> GetPrimitive<T>(string query)
+        {
+            using (var con = new SQLiteConnection(_connectionString))
+            {
+                return con.Query<T>(query);
+            }
+        }
+
         public static Bill GetBillDetails(string query)
         {
             using (var con = new SQLiteConnection(_connectionString))
@@ -29,7 +37,8 @@ namespace MahadevHWBillingApp.Helper
                 var result = new Bill
                 {
                     SaleDetail = gridReader.ReadSingle<Sale>(),
-                    SaleItems = gridReader.Read<SaleItem>().ToList()
+                    SaleItems = gridReader.Read<SaleItem>().ToList(),
+                    Customer = gridReader.ReadSingle<Contact>()
                 };
                 return result;
             }

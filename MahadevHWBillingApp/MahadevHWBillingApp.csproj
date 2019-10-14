@@ -277,6 +277,7 @@
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\BillingController.cs" />
+    <Compile Include="Controllers\ContactController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\DataController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
@@ -293,6 +294,8 @@
     <Compile Include="Helper\Generic.cs" />
     <Compile Include="Helper\Query.cs" />
     <Compile Include="Models\Bill.cs" />
+    <Compile Include="Models\BillCreditDetail.cs" />
+    <Compile Include="Models\Contact.cs" />
     <Compile Include="Models\EncryptDecryptData.cs" />
     <Compile Include="Models\ExcelAttribute.cs" />
     <Compile Include="Models\Excel\PurchaseExcel.cs" />
@@ -421,6 +424,7 @@
     <Content Include="Views\Error\FreeTrial.cshtml" />
     <Content Include="Views\Admin\New.cshtml" />
     <Content Include="Views\Billing\EmptyProduct.cshtml" />
+    <Content Include="Views\Contact\List.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

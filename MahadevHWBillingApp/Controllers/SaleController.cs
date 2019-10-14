@@ -19,9 +19,9 @@ namespace MahadevHWBillingApp.Controllers
             return View(_profile);
         }
 
-        public JsonResult GetData(string fromDate, string toDate)
+        public JsonResult GetData(string fromDate, string toDate, int customerId = 0)
         {
-            var items = Helper.Dapper.Get<Sale>(Query.GetSale(fromDate, toDate));
+            var items = Helper.Dapper.Get<SaleDto>(Query.GetSale(fromDate, toDate, customerId));
             var footerSum = items.FooterSum();
             return Json(new { data = items, footer = footerSum }, JsonRequestBehavior.AllowGet);
         }
@@ -41,6 +41,33 @@ namespace MahadevHWBillingApp.Controllers
                 return Json("A-1", JsonRequestBehavior.AllowGet);
             var invoice = Helper.Generic.Invoice(currentInvoice.FirstOrDefault());
             return Json(invoice, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetBillCredit(int id)
+        {
+            var billCreditDetails = Helper.Dapper.Get<BillCreditDetailDto>($"Select * From BillCreditDetails Where SaleId = {id}");
+            var data = new { data = billCreditDetails, sum = billCreditDetails.Sum(e => e.Amount) };
+            return Json(data, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult DeleteBillCredit(int id)
+        {
+            var data = Helper.Dapper.Get<BillCreditDetailDto>($"Delete From BillCreditDetails Where Id = {id}");
+            return Json(data, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult SaveBillCredit(BillCreditDetailDto data)
+        {
+            var billCredit = new BillCreditDetail
+            {
+                Amount = data.Amount,
+                Date = data.UIDateFormat.ToCustomDateTimeFormat(),
+                SaleId = data.SaleId
+            };
+            _mahadevHwContext.BillCreditDetails.Add(billCredit);
+            _mahadevHwContext.SaveChanges();
+            return Json("Bill credit added succesfully");
         }
     }
 }

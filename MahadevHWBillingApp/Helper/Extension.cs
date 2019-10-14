@@ -52,6 +52,18 @@ namespace MahadevHWBillingApp.Helper
             return footer;
         }
 
+        public static FooterTotal FooterSum(this IEnumerable<SaleDto> input)
+        {
+            var footer = new FooterTotal();
+            input.ToList().ForEach((data) =>
+            {
+                footer.CGST += data.TotalCGSTAmount;
+                footer.SGST += data.TotalSGSTAmount;
+                footer.Amount += data.TotalAmount;
+            });
+            return footer;
+        }
+
         public static string ToCustomFormat(this string date)
         {
             return DateTime.ParseExact(date, "dd-MM-yyyy", CultureInfo.InvariantCulture)

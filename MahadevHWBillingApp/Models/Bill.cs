@@ -9,9 +9,11 @@ namespace MahadevHWBillingApp.Models
     {
         public int ItemId { get; set; }
         public int Quantity { get; set; }
+        public int SaleItemId { get; set; }
     }
     public class Bill
     {
+        public Contact Customer { get; set; }
         public Sale SaleDetail { get; set; }
         public List<SaleItem> SaleItems { get; set; }
     }

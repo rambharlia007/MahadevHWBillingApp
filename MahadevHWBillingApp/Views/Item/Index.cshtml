@@ -436,7 +436,12 @@
                 }
             },
             mounted() {
+                var self = this;
                 $(".nav-link-item").addClass("active");
+                $('#product-table').on('draw.dt',
+                    function () {
+                        self.bindTableClickEvents();
+                    });
                 this.getTableData();
             }
         });

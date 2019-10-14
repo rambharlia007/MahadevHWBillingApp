@@ -79,7 +79,9 @@ namespace MahadevHWBillingApp.Controllers
 
         public JsonResult RemoveItem(int id)
         {
-            Helper.Dapper.Execute(Query.DeleteItem(new List<int> {id}));
+            var item =_mahadevHwContext.Items.Where(e => e.Id == id).First();
+            item.IsDelete = 1;
+            _mahadevHwContext.SaveChanges();
             return Json("Item deleted", JsonRequestBehavior.AllowGet);
         }
     }

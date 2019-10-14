@@ -106,8 +106,8 @@ namespace MahadevHWBillingApp.Controllers
                                     TotalAmount = ta + tta + tta,
                                     TotalCGSTAmount = tta,
                                     TotalSGSTAmount = tta,
-                                    CustomerGSTIN = "AK123" + date.ToString("yyyyMMddHHmmss") + k.ToString(),
-                                    CustomerName = "RGDJSJ" + k.ToString(),
+                                    //CustomerGSTIN = "AK123" + date.ToString("yyyyMMddHHmmss") + k.ToString(),
+                                    //CustomerName = "RGDJSJ" + k.ToString(),
                                     SubTotal = ta
                                 };
                                 _mahadevHwContext.Sales.Add(saleDetails);
@@ -137,6 +137,10 @@ namespace MahadevHWBillingApp.Controllers
             }
         }
 
+        public JsonResult GetNext(string input) {
+            return Json(Helper.Generic.Invoice(input), JsonRequestBehavior.AllowGet);
+        }
+
         public JsonResult Product()
         {
             try
@@ -159,7 +163,7 @@ namespace MahadevHWBillingApp.Controllers
                         DiscountPrice = dp,
                         Quantity = gen.Next(100, 1000),
                         Name = $"Pro-{i}",
-                        MeasuringUnit = "UNIT",
+                        MeasuringUnit = "Unit",
                         HSN = $"HSN-{i}"
                     });
                 }
