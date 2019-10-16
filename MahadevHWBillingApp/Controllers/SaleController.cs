@@ -19,6 +19,17 @@ namespace MahadevHWBillingApp.Controllers
             return View(_profile);
         }
 
+        public ActionResult RecordPayment()
+        {   
+            if (_profile.IsEligible == 0)
+                return RedirectToAction("Admin", "Error");
+            else if (_profile.IsEligible == 1 && _profile.IsFreeTrial == 2)
+            {
+                return RedirectToAction("FreeTrial", "Error");
+            }
+            return View(_profile);
+        }
+
         public JsonResult GetData(string fromDate, string toDate, int customerId = 0)
         {
             var items = Helper.Dapper.Get<SaleDto>(Query.GetSale(fromDate, toDate, customerId));
@@ -43,10 +54,11 @@ namespace MahadevHWBillingApp.Controllers
             return Json(invoice, JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult GetBillCredit(int id)
+        public JsonResult GetBillCredit(string fromDate, string toDate, int customerId)
         {
-            var billCreditDetails = Helper.Dapper.Get<BillCreditDetailDto>($"Select * From BillCreditDetails Where SaleId = {id}");
-            var data = new { data = billCreditDetails, sum = billCreditDetails.Sum(e => e.Amount) };
+            var billCreditDetails = Helper.Dapper.Get<BillCreditDetailDto>($"Select * From BillCreditDetails Where CustomerId = {customerId}");
+            var saleDetails = Helper.Dapper.Get<RecordPaymentSaleDto>($"Select Invoice, FormatDate, TotalAmount Amount From Sales Where CustomerId = {customerId}");
+            var data = new { sales = saleDetails, recordPayments = billCreditDetails, sum = saleDetails.Sum(e => e.Amount) };
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
@@ -63,7 +75,7 @@ namespace MahadevHWBillingApp.Controllers
             {
                 Amount = data.Amount,
                 Date = data.UIDateFormat.ToCustomDateTimeFormat(),
-                SaleId = data.SaleId
+                CustomerId = data.CustomerId
             };
             _mahadevHwContext.BillCreditDetails.Add(billCredit);
             _mahadevHwContext.SaveChanges();

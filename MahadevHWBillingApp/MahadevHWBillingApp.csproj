@@ -425,6 +425,7 @@
     <Content Include="Views\Admin\New.cshtml" />
     <Content Include="Views\Billing\EmptyProduct.cshtml" />
     <Content Include="Views\Contact\List.cshtml" />
+    <Content Include="Views\Sale\RecordPayment.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

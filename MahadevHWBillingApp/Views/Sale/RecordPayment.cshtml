@@ -1,0 +1,477 @@
+﻿
+@{
+    ViewBag.Title = "List";
+}
+
+<style>
+    .pointer {
+        cursor: pointer;
+    }
+
+    .grid-edit {
+        text-decoration: underline;
+        color: #158cba;
+        cursor: pointer;
+    }
+
+    .hide {
+        display: none;
+    }
+
+    [v-cloak] {
+        display: none;
+    }
+
+    span.jq-dte {
+        width: 125px;
+        border: 1px solid #ced4da;
+        padding: 0px;
+        margin: 0px;
+    }
+
+    .modal-form-header {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        background-color: rgb(238, 238, 238);
+        margin-bottom: 10px;
+    }
+
+    .text-center {
+        text-align: center
+    }
+
+    .table-head, .table-body .table-row {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    .jq-dte-day {
+        width: 30px !important;
+    }
+
+    .jq-dte-month {
+        width: 30px !important;
+    }
+
+    .jq-dte-year {
+        width: 35px !important;
+    }
+
+    .jq-dte {
+        width: 125px;
+    }
+
+    @@media only screen and (min-width: 768px) {
+        .table-body {
+            display: block;
+            height: 250PX;
+            overflow-y: scroll;
+        }
+    }
+
+    @@media only screen and (min-width: 992px) {
+        .table-body {
+            display: block;
+            height: 200px;
+            overflow-y: scroll;
+        }
+    }
+
+    @@media only screen and (min-width: 1500px) {
+        .table-body {
+            display: block;
+            max-height: 500px;
+            overflow-y: scroll;
+        }
+    }
+</style>
+
+<div id="app">
+    <div class="row" style="background-color: #f6f7f8 !important;">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" style="padding-bottom: 0px; margin-bottom: 0px; background-color: #f6f7f8 !important;">
+                    <li class="breadcrumb-item"><i class="fa fa-home">&nbsp;</i><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Record Payment</li>
+                </ol>
+            </nav>
+            <h4 style="padding-left: 15px;">Record Payment</h4>
+        </div>
+        <div class="col-md-4">
+            <button style="margin-top:25px; margin-left: 10px; float:right;" type="button" class="btn btn-success btn-sm" v-on:click="addNewBill()">Add New Bill</button>
+            <button style="margin-top: 25px; float: right;" type="button" class="btn btn-success btn-sm" v-on:click="downloadReport()">Download Report</button>
+        </div>
+    </div>
+    <div>
+        <div class="alert alert-success alert-dismissible fade show" role="alert" v-cloak v-bind:class="{hide:!alertMessage}" style="margin-top: 20px;">
+            {{alertMessage}}
+            <button type="button" class="close" v-on:click="closeAlertMessage('alertMessage')" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <div v-cloak class="alert alert-danger alert-dismissible fade show" role="alert" v-bind:class="{hide:!alertFailureMessage}" style="margin-top: 20px;">
+            {{alertFailureMessage}}
+            <button type="button" class="close" v-on:click="closeAlertMessage('alertFailureMessage')" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <div class="col-md-12" style="margin-top: 10px; margin-bottom: 10px;" v-cloak>
+            <span>From &nbsp;</span>
+            <input type="text" id="from-date" class="form-control form-control-sm date-range">
+            <span style="padding-left: 50px;">To &nbsp;</span>
+            <input type="text" id="to-date" class="form-control form-control-sm date-range">
+            <span style="padding-left:50px;">Customers: &nbsp;</span>
+            <select style="max-width:200px;" class="customer-select-2 js-example-basic-single js-states form-control"></select>
+            <button v-cloak type="button" class="btn btn-link btn-sm ml-4" v-on:click="downloadReport()">Generate Balance sheet (Customer)</button>
+        </div>
+
+
+        @*<div class="modal" id="add-credit-details">
+            <div class="modal-dialog modal-dialog-centered modal-xl">
+                <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h6 class="modal-title">Add Credit Details. Customer | {{creditData.customerName}}</h6>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
+                                    <tr>
+                                        <th class="text-center" colspan="2">Pay Bill</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Invoice:</th>
+                                        <td>
+                                            {{creditData.invoice}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Name:</th>
+                                        <td>
+                                            {{creditData.customerName}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Total Amount:</th>
+                                        <td>
+                                            {{displayFormat(creditData.totalAmount)}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Balance:</th>
+                                        <td>
+                                            {{displayFormat(creditData.balanceAmount)}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Date:</th>
+                                        <td>
+                                            <input v-model="creditData.UIDateFormat" class="form-control form-control-sm" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Amount</th>
+                                        <td>
+                                            <input v-model="creditData.amount" class="form-control form-control-sm" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" class="text-center">
+                                            <button type="button" class="btn btn-success btn-sm" data-dismiss="modal" v-on:click="saveCreditDetails()">Pay</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6" style="min-height:200px">
+                                <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
+                                    <tr>
+                                        <th colspan="4" class="text-center">Payment Details</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-center">#</th>
+                                        <th class="text-center">Date</th>
+                                        <th class="text-center">Amount</th>
+                                        <th class="text-center">Delete</th>
+                                    </tr>
+                                    <tr v-show="creditListData.length === 0">
+                                        <td class="text-center" colspan="4">No Data Available.</td>
+                                    </tr>
+                                    <tr v-for="(credit,index) in creditListData">
+                                        <td class="text-center">
+                                            {{index+1}}
+                                        </td>
+                                        <td class="text-center">{{credit.FormatDate}}</td>
+                                        <td class="text-center">{{displayFormat(credit.Amount)}}</td>
+                                        <td class="text-center"><i class="fa fa-trash pointer" v-on:click="DeleteBillCredit(credit.Id)"></i></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>*@
+
+
+        <div class="card">
+            <div class="card-body" style="font-size:14px;">
+                <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
+                    <tr>
+                        <th colspan="4" class="text-center">Payment Details</th>
+                    </tr>
+                    <tr>
+                        <th class="text-center">#</th>
+                        <th class="text-center">Date</th>
+                        <th class="text-center">Invoice</th>
+                        <th class="text-center">Credit</th>
+                        <th class="text-center">Debit</th>
+                        <th class="text-center">Balance</th>
+                    </tr>
+                    <tr v-show="creditListData.length === 0">
+                        <td class="text-center" colspan="4">No Data Available.</td>
+                    </tr>
+                    <tr v-for="(credit,index) in creditListData">
+                        <td class="text-center">
+                            {{index+1}}
+                        </td>
+                        <td class="text-center">{{credit.FormatDate}}</td>
+                        <td class="text-center">{{credit.Invoice}}</td>
+                        <td class="text-center">{{displayFormat(credit.Credit)}}</td>
+                        <td class="text-center">{{displayFormat(credit.Debit)}}</td>
+                        <td class="text-center">{{displayFormat(credit.Balance)}}</td>
+                        @*<td class="text-center"><i class="fa fa-trash pointer" v-on:click="DeleteBillCredit(credit.Id)"></i></td>*@
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function() {
+
+        function GetDateRange() {
+            var date = new Date();
+            var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+            var month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
+            var startDate = `01-${month}-${date.getFullYear()}`;
+            var endDate = `${day}-${month}-${date.getFullYear()}`;
+            return { startDate: startDate, endDate: endDate };
+        }
+
+        var obj = {
+            alertFailureMessage: "",
+            alertMessage: "",
+            tableRef: null,
+            footerTotal: {},
+            fromDate: GetDateRange().startDate,
+            toDate: GetDateRange().endDate,
+            creditListData: [],
+            creditData: {
+                saleId: "",
+                customerName: "",
+                totalAmount: "",
+                invoice: "",
+                amount: "",
+                balanceAmount: "",
+                UIDateFormat: ""
+            },
+            customerId: 0
+        }
+
+        new Vue({
+            el: '#app',
+            data: obj,
+            methods: {
+                deleteItem: function(id) {
+                    var self = this;
+                    $.get("/sale/Remove?id=" + id,
+                        function() {
+                            self.alertMessage = "sale record deleted succesfully";
+                        }).fail(function() {
+                        self.alertFailureMessage = "Internal server error";
+                    });
+                },
+                bindTableClickEvents: function() {
+                    var self = this;
+                    $(".edit-sale").click(function(e) {
+                        var id = $(this).attr("data-id");
+                        window.location.href = `/Billing/New/${id}`;
+                    });
+                    $(".print-bill").click(function (e) {
+                        var id = $(this).attr("data-id");
+                        window.location.href = `/Billing/New/${id}?pid=${id}`;
+                    });
+                    $(".bill-credit-detail").click(function (e) {
+                        self.openModalForCreditDetail(this);
+                    });
+
+                    $(".customer-select-2").select2({
+                        ajax: {
+                            url: "/contact/search",
+                            dataType: 'json',
+                            delay: 250,
+                            data: function (params) {
+                                return {
+                                    q: params.term,
+                                    page: params.page
+                                };
+                            },
+                            processResults: function (data, params) {
+                                var customers = [];
+                                customers.push({ id: 0, text: "clear all" });
+                                data.forEach((customer) => {
+                                    customers.push({
+                                        id: customer.Id,
+                                        text: customer.Name,
+                                    });
+                                });
+
+                                return {
+                                    results: customers
+                                };
+                            },
+                            cache: true
+                        },
+                        placeholder: 'Search for a Customer',
+                        minimumInputLength: 1
+                    });
+
+
+                    $('.customer-select-2').on('select2:select',
+                        function (e) {
+                            var data = e.params.data;
+                            if (data.id == 0) {
+                                $('.customer-select-2').val(null).trigger('change');
+                            }
+                            self.customerId = data.id;
+                            self.tableReload();
+                        });
+                },
+                closeAlertMessage: function(property) {
+                    // set alert message to empty
+                    this[property] = "";
+                },
+                displayFormat: function (data) {
+                    return Number(data).toLocaleString(undefined, { minimumFractionDigits: 2 })
+                },
+                openModalForCreditDetail: function (current) {
+                    var self = this;
+                    var row_clicked = $(current).closest('tr');
+                    var row = self.tableRef.row(row_clicked).data();
+                    self.creditData.saleId = row.Id;
+                    self.creditData.customerName = row.CustomerName
+                    self.creditData.totalAmount = row.TotalAmount;
+                    self.creditData.invoice = row.Invoice;
+                    self.getCreditBillData();
+                },
+                DeleteBillCredit: function (id) {
+                    var self = this;
+                    $.get(`/Sale/DeleteBillCredit/${id}`, function (response) {
+                        self.getCreditBillData();
+                    })
+                },
+                getCreditBillData: function () {
+                    var self = this;
+                    $.get(`/Sale/GetBillCredit/${self.creditData.saleId}`, function (response) {
+                        self.creditListData = response.data;
+                        self.creditData.balanceAmount = self.creditData.totalAmount - response.sum;
+                        $("#add-credit-details").modal({ backdrop: 'static', keyboard: false, show: true });
+                    })
+                },
+                saveCreditDetails: function () {
+                    var self = this;
+                    var finalData = {
+                        UIDateFormat: self.creditData.UIDateFormat,
+                        Amount: self.creditData.amount,
+                        SaleId: self.creditData.saleId
+                    }
+                    $.ajax({
+                        type: 'POST',
+                        url: "/Sale/SaveBillCredit",
+                        data: JSON.stringify(finalData),
+                        dataType: 'json',
+                        contentType: 'application/json; charset=utf-8',
+                        success: function () {
+                            self.getCreditBillData();
+                        },
+                        error: function (res) {
+                            self.alertFailureMessage = "Internal server error. Please try to save again";
+                        }
+                    });
+                },
+                getTableData: function() {
+                    var self = this;
+                   
+                },
+                setInitialDateComponent: function (id, date) {
+                    var formatDate = date.split("-");
+                    $(id).siblings().children(".jq-dte-day").val(formatDate[0]);
+                    $(id).siblings().children(".jq-dte-month").val(formatDate[1]);
+                    $(id).siblings().children(".jq-dte-year").val(formatDate[2]);
+                    $(id).siblings().children(".jq-dte-day").removeClass("hint");
+                    $(id).siblings().children(".jq-dte-month").removeClass("hint");
+                    $(id).siblings().children(".jq-dte-year").removeClass("hint");
+                },
+                tableReload: function () {
+                    var self = this;
+                },
+                getFormatedDate: function (value) {
+                    var tempDate = value.split("-");
+                    return `${tempDate[2]}-${tempDate[1]}-${tempDate[0]}`; // DD-MM-YYYY
+                },
+                downloadReport: function() {
+                    var self = this;
+                    var endPoint = `/Report/Sale?fromDate=${self.fromDate}&toDate=${self.toDate}`;
+                    $.get(endPoint,
+                        function(data, status) {
+                            window.location = endPoint;
+                        }).fail(function() {
+                        self.alertFailureMessage = "Internal server error";
+                    });
+                },
+            },
+            mounted() {
+                $(".nav-link-sale").addClass("active");
+                var self = this;
+                this.getTableData();
+
+                $('.date-range').datetextentry({
+                    field_order: 'DMY',
+                    on_change: function(date_str) {
+                        if (date_str) {
+                            var value = $(this)[0].$element.attr("id");
+                            if (value === "to-date") {
+                                self.toDate = self.getFormatedDate(date_str);
+                                self.tableReload();
+                            } else {
+                                self.fromDate = self.getFormatedDate(date_str);
+                                if (self.toDate)
+                                    self.tableReload();
+                            }
+                        }
+                    }
+                });
+
+                $('#sale-table').on( 'draw.dt', function () {
+                    self.bindTableClickEvents();
+                } );
+
+                self.setInitialDateComponent("#from-date", self.fromDate);
+                self.setInitialDateComponent("#to-date", self.toDate);
+
+            }
+        });
+    });
+
+
+</script>
