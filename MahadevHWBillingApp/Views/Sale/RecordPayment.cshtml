@@ -99,8 +99,7 @@
             <h4 style="padding-left: 15px;">Record Payment</h4>
         </div>
         <div class="col-md-4">
-            <button style="margin-top:25px; margin-left: 10px; float:right;" type="button" class="btn btn-success btn-sm" v-on:click="addNewBill()">Add New Bill</button>
-            <button style="margin-top: 25px; float: right;" type="button" class="btn btn-success btn-sm" v-on:click="downloadReport()">Download Report</button>
+            <button style="margin-top:25px; margin-left: 10px; float:right;" type="button" class="btn btn-success btn-sm" v-show="recordPayment.CustomerId" v-on:click="openModalForRecordPayment()">Record Payment</button>
         </div>
     </div>
     <div>
@@ -125,17 +124,22 @@
             <input type="text" id="to-date" class="form-control form-control-sm date-range">
             <span style="padding-left:50px;">Customers: &nbsp;</span>
             <select style="max-width:200px;" class="customer-select-2 js-example-basic-single js-states form-control"></select>
-            <button v-cloak type="button" class="btn btn-link btn-sm ml-4" v-on:click="downloadReport()">Generate Balance sheet (Customer)</button>
         </div>
 
 
-        @*<div class="modal" id="add-credit-details">
+        <div class="modal" id="add-credit-details">
             <div class="modal-dialog modal-dialog-centered modal-xl">
                 <div class="modal-content">
 
                     <!-- Modal Header -->
                     <div class="modal-header">
-                        <h6 class="modal-title">Add Credit Details. Customer | {{creditData.customerName}}</h6>
+                        <div>
+                                Account Statement | <strong>{{recordPayment.CustomerName}}</strong>
+                        </div>
+                        <div class="pull-right">
+                           <span class="pl-3">[{{fromDate}}&nbsp;To&nbsp;</span>
+                           <span>{{toDate}}]</span>
+                        </div>
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                     </div>
 
@@ -145,42 +149,42 @@
                             <div class="col-md-6">
                                 <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
                                     <tr>
-                                        <th class="text-center" colspan="2">Pay Bill</th>
-                                    </tr>
-                                    <tr>
-                                        <th>Invoice:</th>
-                                        <td>
-                                            {{creditData.invoice}}
-                                        </td>
+                                        <th class="text-center" colspan="2">Record Payment</th>
                                     </tr>
                                     <tr>
                                         <th>Name:</th>
                                         <td>
-                                            {{creditData.customerName}}
+                                            {{recordPayment.CustomerName}}
                                         </td>
                                     </tr>
                                     <tr>
                                         <th>Total Amount:</th>
                                         <td>
-                                            {{displayFormat(creditData.totalAmount)}}
+                                            {{displayFormat(recordPayment.TotalAmount)}}
                                         </td>
                                     </tr>
                                     <tr>
                                         <th>Balance:</th>
                                         <td>
-                                            {{displayFormat(creditData.balanceAmount)}}
+                                            {{displayFormat(recordPayment.BalanceAmount)}}
                                         </td>
                                     </tr>
                                     <tr>
                                         <th>Date:</th>
                                         <td>
-                                            <input v-model="creditData.UIDateFormat" class="form-control form-control-sm" />
+                                            <input v-model="recordPayment.UIDateFormat" class="form-control form-control-sm" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Particulars:</th>
+                                        <td>
+                                            <input v-model="recordPayment.Particulars" class="form-control form-control-sm" />
                                         </td>
                                     </tr>
                                     <tr>
                                         <th>Amount</th>
                                         <td>
-                                            <input v-model="creditData.amount" class="form-control form-control-sm" />
+                                            <input v-model="recordPayment.Credit" class="form-control form-control-sm" />
                                         </td>
                                     </tr>
                                     <tr>
@@ -190,66 +194,47 @@
                                     </tr>
                                 </table>
                             </div>
-                            <div class="col-md-6" style="min-height:200px">
-                                <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
-                                    <tr>
-                                        <th colspan="4" class="text-center">Payment Details</th>
-                                    </tr>
-                                    <tr>
-                                        <th class="text-center">#</th>
-                                        <th class="text-center">Date</th>
-                                        <th class="text-center">Amount</th>
-                                        <th class="text-center">Delete</th>
-                                    </tr>
-                                    <tr v-show="creditListData.length === 0">
-                                        <td class="text-center" colspan="4">No Data Available.</td>
-                                    </tr>
-                                    <tr v-for="(credit,index) in creditListData">
-                                        <td class="text-center">
-                                            {{index+1}}
-                                        </td>
-                                        <td class="text-center">{{credit.FormatDate}}</td>
-                                        <td class="text-center">{{displayFormat(credit.Amount)}}</td>
-                                        <td class="text-center"><i class="fa fa-trash pointer" v-on:click="DeleteBillCredit(credit.Id)"></i></td>
-                                    </tr>
-                                </table>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>*@
+        </div>
 
 
         <div class="card">
             <div class="card-body" style="font-size:14px;">
-                <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
-                    <tr>
-                        <th colspan="4" class="text-center">Payment Details</th>
-                    </tr>
-                    <tr>
-                        <th class="text-center">#</th>
-                        <th class="text-center">Date</th>
-                        <th class="text-center">Invoice</th>
-                        <th class="text-center">Credit</th>
-                        <th class="text-center">Debit</th>
-                        <th class="text-center">Balance</th>
-                    </tr>
-                    <tr v-show="creditListData.length === 0">
-                        <td class="text-center" colspan="4">No Data Available.</td>
-                    </tr>
-                    <tr v-for="(credit,index) in creditListData">
-                        <td class="text-center">
-                            {{index+1}}
-                        </td>
-                        <td class="text-center">{{credit.FormatDate}}</td>
-                        <td class="text-center">{{credit.Invoice}}</td>
-                        <td class="text-center">{{displayFormat(credit.Credit)}}</td>
-                        <td class="text-center">{{displayFormat(credit.Debit)}}</td>
-                        <td class="text-center">{{displayFormat(credit.Balance)}}</td>
-                        @*<td class="text-center"><i class="fa fa-trash pointer" v-on:click="DeleteBillCredit(credit.Id)"></i></td>*@
-                    </tr>
-                </table>
+                <div class="row">
+                    <div class="col-md-12">
+                        <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
+                            <tr>
+                                <th colspan="6" class="text-center">
+                                    <span>Account Statement |</span>
+                                    <span v-show="recordPayment.CustomerName">Customer : {{recordPayment.CustomerName}} |</span>
+                                    <span>[{{fromDate + '&nbsp;To&nbsp;' + toDate}}]</span>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th class="text-center">Date</th>
+                                <th class="text-center">Invoice</th>
+                                <th class="text-center" style="width:400px">Particulars</th>
+                                <th class="text-center">Debit</th>
+                                <th class="text-center">Credit</th>
+                                <th class="text-center">Balance</th>
+                            </tr>
+                            <tr v-show="recordPayments.length === 0">
+                                <td class="text-center" colspan="6">No Data Available.</td>
+                            </tr>
+                            <tr v-for="(record,index) in recordPayments">
+                                <td class="text-center">{{record.FormatDate}}</td>
+                                <td class="text-center">{{record.Invoice}}</td>
+                                <td class="text-center" style="width:400px">{{record.Particulars}}</td>
+                                <td class="text-center">{{displayFormat(record.Debit)}}</td>
+                                <td class="text-center">{{displayFormat(record.Credit)}}</td>
+                                <td class="text-center">{{displayFormat(record.Balance)}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -257,7 +242,7 @@
 
 <script>
 
-    $(document).ready(function() {
+    $(document).ready(function () {
 
         function GetDateRange() {
             var date = new Date();
@@ -271,49 +256,36 @@
         var obj = {
             alertFailureMessage: "",
             alertMessage: "",
-            tableRef: null,
-            footerTotal: {},
             fromDate: GetDateRange().startDate,
             toDate: GetDateRange().endDate,
-            creditListData: [],
-            creditData: {
-                saleId: "",
-                customerName: "",
-                totalAmount: "",
-                invoice: "",
-                amount: "",
-                balanceAmount: "",
-                UIDateFormat: ""
-            },
-            customerId: 0
+            recordPayments: [],
+            recordPayment: {
+                Invoice: "",
+                Type: "",
+                Particulars: "",
+                Credit: "",
+                UIDateFormat: "",
+                CustomerId: "",
+                CustomerName: "",
+            }
         }
 
         new Vue({
             el: '#app',
             data: obj,
             methods: {
-                deleteItem: function(id) {
+                deleteItem: function (id) {
                     var self = this;
                     $.get("/sale/Remove?id=" + id,
-                        function() {
+                        function () {
                             self.alertMessage = "sale record deleted succesfully";
-                        }).fail(function() {
-                        self.alertFailureMessage = "Internal server error";
-                    });
+                        }).fail(function () {
+                            self.alertFailureMessage = "Internal server error";
+                        });
                 },
-                bindTableClickEvents: function() {
+                bindTableClickEvents: function () {
                     var self = this;
-                    $(".edit-sale").click(function(e) {
-                        var id = $(this).attr("data-id");
-                        window.location.href = `/Billing/New/${id}`;
-                    });
-                    $(".print-bill").click(function (e) {
-                        var id = $(this).attr("data-id");
-                        window.location.href = `/Billing/New/${id}?pid=${id}`;
-                    });
-                    $(".bill-credit-detail").click(function (e) {
-                        self.openModalForCreditDetail(this);
-                    });
+                  
 
                     $(".customer-select-2").select2({
                         ajax: {
@@ -353,52 +325,42 @@
                             if (data.id == 0) {
                                 $('.customer-select-2').val(null).trigger('change');
                             }
-                            self.customerId = data.id;
-                            self.tableReload();
+                            self.recordPayment.CustomerId = data.id;
+                            self.recordPayment.CustomerName = data.text;
+                            self.getCreditBillData();
                         });
                 },
-                closeAlertMessage: function(property) {
+                closeAlertMessage: function (property) {
                     // set alert message to empty
                     this[property] = "";
                 },
                 displayFormat: function (data) {
                     return Number(data).toLocaleString(undefined, { minimumFractionDigits: 2 })
                 },
-                openModalForCreditDetail: function (current) {
+                openModalForRecordPayment: function (current) {
                     var self = this;
-                    var row_clicked = $(current).closest('tr');
-                    var row = self.tableRef.row(row_clicked).data();
-                    self.creditData.saleId = row.Id;
-                    self.creditData.customerName = row.CustomerName
-                    self.creditData.totalAmount = row.TotalAmount;
-                    self.creditData.invoice = row.Invoice;
-                    self.getCreditBillData();
+                    $("#add-credit-details").modal({ backdrop: 'static', keyboard: false, show: true });
                 },
-                DeleteBillCredit: function (id) {
+                DeleteRecordPayment: function (id) {
                     var self = this;
-                    $.get(`/Sale/DeleteBillCredit/${id}`, function (response) {
+                    $.get(`/Sale/DeleteRecordPayment/${id}`, function (response) {
                         self.getCreditBillData();
                     })
                 },
                 getCreditBillData: function () {
                     var self = this;
-                    $.get(`/Sale/GetBillCredit/${self.creditData.saleId}`, function (response) {
-                        self.creditListData = response.data;
-                        self.creditData.balanceAmount = self.creditData.totalAmount - response.sum;
-                        $("#add-credit-details").modal({ backdrop: 'static', keyboard: false, show: true });
+                    $.get(`/Sale/GetRecordPayment?fromDate=${self.fromDate}&toDate=${self.toDate}&customerId=${self.recordPayment.CustomerId}`, function (response) {
+                        self.recordPayments = response.data;
+                        self.recordPayment.TotalAmount = response.amount;
+                        self.recordPayment.BalanceAmount = response.balance;
                     })
                 },
                 saveCreditDetails: function () {
                     var self = this;
-                    var finalData = {
-                        UIDateFormat: self.creditData.UIDateFormat,
-                        Amount: self.creditData.amount,
-                        SaleId: self.creditData.saleId
-                    }
                     $.ajax({
                         type: 'POST',
-                        url: "/Sale/SaveBillCredit",
-                        data: JSON.stringify(finalData),
+                        url: "/Sale/SaveRecordPayment",
+                        data: JSON.stringify(self.recordPayment),
                         dataType: 'json',
                         contentType: 'application/json; charset=utf-8',
                         success: function () {
@@ -409,9 +371,9 @@
                         }
                     });
                 },
-                getTableData: function() {
+                getTableData: function () {
                     var self = this;
-                   
+
                 },
                 setInitialDateComponent: function (id, date) {
                     var formatDate = date.split("-");
@@ -429,49 +391,42 @@
                     var tempDate = value.split("-");
                     return `${tempDate[2]}-${tempDate[1]}-${tempDate[0]}`; // DD-MM-YYYY
                 },
-                downloadReport: function() {
+                downloadReport: function () {
                     var self = this;
                     var endPoint = `/Report/Sale?fromDate=${self.fromDate}&toDate=${self.toDate}`;
                     $.get(endPoint,
-                        function(data, status) {
+                        function (data, status) {
                             window.location = endPoint;
-                        }).fail(function() {
-                        self.alertFailureMessage = "Internal server error";
-                    });
+                        }).fail(function () {
+                            self.alertFailureMessage = "Internal server error";
+                        });
                 },
             },
             mounted() {
-                $(".nav-link-sale").addClass("active");
+                $(".nav-link-record-payment").addClass("active");
                 var self = this;
                 this.getTableData();
 
                 $('.date-range').datetextentry({
                     field_order: 'DMY',
-                    on_change: function(date_str) {
+                    on_change: function (date_str) {
                         if (date_str) {
                             var value = $(this)[0].$element.attr("id");
                             if (value === "to-date") {
                                 self.toDate = self.getFormatedDate(date_str);
-                                self.tableReload();
+                                self.getCreditBillData();
                             } else {
                                 self.fromDate = self.getFormatedDate(date_str);
                                 if (self.toDate)
-                                    self.tableReload();
+                                    self.getCreditBillData();
                             }
                         }
                     }
                 });
-
-                $('#sale-table').on( 'draw.dt', function () {
-                    self.bindTableClickEvents();
-                } );
-
+                self.bindTableClickEvents();
                 self.setInitialDateComponent("#from-date", self.fromDate);
                 self.setInitialDateComponent("#to-date", self.toDate);
-
             }
         });
     });
-
-
 </script>

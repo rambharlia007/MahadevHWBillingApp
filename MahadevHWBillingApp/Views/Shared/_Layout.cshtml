@@ -16,10 +16,12 @@
     @RenderSection("scripts", required: false)
     <style>
         .header {
-            background-color: #498fab;
-            border-bottom: 3px solid #343a405e;
+            border-bottom: 2px solid #343a405e;
         }
 
+        .nav-bg {
+            background-color: #1f6b8a;
+        }
         .dropdown:hover > .dropdown-menu {
             display: block;
         }
@@ -35,52 +37,55 @@
 
 <body style="background-color:#eee">
 
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top nav-bg" style="height:30px;">
+        <a class="navbar-brand" style="font-size:1.1rem; margin-left:10px;" href=@Url.Action("New","Dashboard")>@Model.BusinessName</a>
+        <div style="color:#ffffffb8; padding-left:40%; font-size:0.9rem;"> <strong>GSTIN:&nbsp;@Model.GSTIN &nbsp; &nbsp; Name: <strong class="user-name">@Model.Owner</strong> &nbsp; &nbsp;User:Tax Payer</strong></div>
+    </nav>
 
-
-    <nav class="navbar navbar-expand-lg navbar-dark header fixed-top">
-        <a class="navbar-brand" href=@Url.Action("New","Dashboard")>@Model.BusinessName</a>
+    <nav class="navbar navbar-expand-lg navbar-dark header fixed-top nav-bg" style="height:30px; margin-top:30px; font-size:0.95rem;">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarColor01">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-custom-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Sales
-                    </a>
-                    <div class="dropdown-menu" style="background-color:#eee; margin-top:-1px;" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item custom-dropdownitem" href=@Url.Action("New", "Billing")>Generate Invoice</a>
-                        <a class="dropdown-item custom-dropdownitem" href=@Url.Action("Index", "Item")>Estimates</a>
-                        <a class="dropdown-item custom-dropdownitem" href=@Url.Action("Index", "Item")>Record Payment</a>
-                        <a class="dropdown-item custom-dropdownitem" href=@Url.Action("List", "Sale")>Sales</a>
-                    </div>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-custom-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Purchase
-                    </a>
-                    <div class="dropdown-menu" style="background-color:#eee; margin-top:-1px;" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item custom-dropdownitem" href=@Url.Action("List", "Purchase")>Purchases</a>
-                        <a class="dropdown-item custom-dropdownitem" href=@Url.Action("Index", "Item")>Products</a>
-                    </div>
+                <li class="nav-item">
+                    <a class="nav-link nav-link-bill" href=@Url.Action("New", "Billing")>Generate Invoice</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link nav-link-dashboard" href=@Url.Action("New", "Dashboard")>Report</a>
+                    <a class="nav-link nav-link-item" href=@Url.Action("index", "Item")>Add Product</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link nav-link-customer" href=@Url.Action("List", "Contact")>Contacts</a>
+                    <a class="nav-link nav-link-sale" href=@Url.Action("List", "Sale")>Sales</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-link-purchase" href=@Url.Action("List", "Purchase")>Purchase</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item">
+                    <a class="nav-link nav-link-record-payment" href=@Url.Action("RecordPayment", "Sale")>Record Payment</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-link-estimates" href=@Url.Action("New", "Dashboard")>Estimates</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-link-report" href=@Url.Action("New", "Dashboard")>Report</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link nav-link-contact" href=@Url.Action("List", "Contact")>Contacts</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link nav-link-profile" href=@Url.Action("New", "Profile")>Profile</a>
                 </li>
             </ul>
         </div>
-        <div style="color:#fff"> <span>Welcome:&nbsp;</span><strong class="user-name"> @Model.Owner</strong></div>
     </nav>
 
     <div class="body-content">
-       
+
         @RenderBody()
         <hr class="d-print-none" />
         <footer class="d-print-none">

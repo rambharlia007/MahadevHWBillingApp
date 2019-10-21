@@ -1,49 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MahadevHWBillingApp.Models
 {
-    public class BillCreditDetail
+    public class RecordPayment
     {
         public int Id { get; set; }
+        public string Invoice { get; set; }
+        public string Particulars { get; set; }
         public int CustomerId { get; set; }
-        public DateTime Date { get; set; }
-        public decimal Amount { get; set; }
-    }
-    public class BillCreditDetailDto : BillCreditDetail
-    {
-        public string FormatDate
-        {
-            get
-            {
-                return Date.ToString("dd-MM-yyyy");
-            }
-        }
-        public string UIDateFormat { get; set; }
-    }
-
-    public class RecordPaymentDto
-    {
-        public int CustomerId { get; set; }
-        public string FormatDate { get; set; }
-        public decimal Credit { get; set; }
+        [NotMapped]
+        public string FormatDate => Date.ToString("dd-MM-yyyy");
+        // Debit, Bill Amount
         public decimal Debit { get; set; }
-        public string Invoice { get; set; }
-        public decimal Amount { get; set; }
-
-        public void SetAmount(int previousAmount)
-        {
-             Amount = previousAmount + Credit - Debit;
-        }
+        // AMount paid for the bill
+        public decimal Credit { get; set; }
+        [NotMapped]
+        public decimal Balance { get; set; }
+        [NotMapped]
+        public string UIDateFormat { get; set; }
+        public DateTime Date { get; set; }
     }
-
-    public class RecordPaymentSaleDto
-    {
-        public string Invoice { get; set; }
-        public decimal Amount { get; set; }
-        public string FormatDate { get; set; }
-    }
-
 }

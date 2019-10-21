@@ -15,7 +15,7 @@ namespace MahadevHWBillingApp.Models
         public DbSet<Sale> Sales { get; set; }
         public DbSet<SaleItem> SaleItems { get; set; }
         public DbSet<Contact> Contacts { get; set; }
-        public DbSet<BillCreditDetail> BillCreditDetails { get; set; }
+        public DbSet<RecordPayment> RecordPayments { get; set; }
             
         public MahadevHWContext()
         {
@@ -35,8 +35,8 @@ namespace MahadevHWBillingApp.Models
             builder.Entity<Purchase>().Ignore(e => e.FormatDate);
             builder.Entity<Sale>();
             builder.Entity<Contact>().Ignore(e => e.IsSaveNewCustomer);
-            builder.Entity<BillCreditDetail>();
+            builder.Entity<RecordPayment>();
             base.OnModelCreating(builder);
-        }
+        } 
     }
 }

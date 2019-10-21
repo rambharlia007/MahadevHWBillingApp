@@ -1,5 +1,6 @@
 ﻿using MahadevHWBillingApp.Helper;
 using MahadevHWBillingApp.Models;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 
@@ -54,30 +55,47 @@ namespace MahadevHWBillingApp.Controllers
             return Json(invoice, JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult GetBillCredit(string fromDate, string toDate, int customerId)
+        public JsonResult GetRecordPayment(string fromDate, string toDate, int customerId)
         {
-            var billCreditDetails = Helper.Dapper.Get<BillCreditDetailDto>($"Select * From BillCreditDetails Where CustomerId = {customerId}");
-            var saleDetails = Helper.Dapper.Get<RecordPaymentSaleDto>($"Select Invoice, FormatDate, TotalAmount Amount From Sales Where CustomerId = {customerId}");
-            var data = new { sales = saleDetails, recordPayments = billCreditDetails, sum = saleDetails.Sum(e => e.Amount) };
-            return Json(data, JsonRequestBehavior.AllowGet);
+            try
+            {
+                fromDate = fromDate.ToCustomFormat();
+                toDate = toDate.ToCustomFormat();
+                var recordPayments = Helper.Dapper.Get<RecordPayment>($@"Select * From RecordPayments Where CustomerId = {customerId}
+            And Date >= '{fromDate}' AND Date <= '{toDate}' Order By Date");
+                var bills = Helper.Dapper.Get<RecordPaymentSaleDto>($@"Select TotalAmount, Invoice, Date, CustomerId From sales Where CustomerId = {customerId} And Date >= '{fromDate}' AND Date <= '{toDate}' Order By Date");
+
+                if (!bills.Any())
+                    return Json(new { data = new List<RecordPayment>(), amount = 0, balance = 0 }, JsonRequestBehavior.AllowGet);
+
+                var results = recordPayments.ToList().CalculateRunningBalance(bills.ToList());
+                var billTotalAmount = bills.Sum(e => e.TotalAmount);
+                var balanceAmount = billTotalAmount - recordPayments.Sum(e => e.Credit);
+                return Json(new { data = results, amount = billTotalAmount, balance = balanceAmount }, JsonRequestBehavior.AllowGet);
+            }
+            catch (System.Exception ex)
+            {
+                throw;
+            }
         }
 
         public JsonResult DeleteBillCredit(int id)
         {
-            var data = Helper.Dapper.Get<BillCreditDetailDto>($"Delete From BillCreditDetails Where Id = {id}");
+            var data = Helper.Dapper.Get<RecordPayment>($"Delete From RecordPayments Where Id = {id}");
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
-        public JsonResult SaveBillCredit(BillCreditDetailDto data)
+        public JsonResult SaveRecordPayment(RecordPayment data)
         {
-            var billCredit = new BillCreditDetail
+            var RecordPayment = new RecordPayment
             {
-                Amount = data.Amount,
+                Credit = data.Credit,
                 Date = data.UIDateFormat.ToCustomDateTimeFormat(),
-                CustomerId = data.CustomerId
+                CustomerId = data.CustomerId,
+                Particulars = data.Particulars
             };
-            _mahadevHwContext.BillCreditDetails.Add(billCredit);
+            _mahadevHwContext.RecordPayments.Add(RecordPayment);
             _mahadevHwContext.SaveChanges();
             return Json("Bill credit added succesfully");
         }

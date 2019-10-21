@@ -32,4 +32,13 @@ namespace MahadevHWBillingApp.Models
         public DateTime Date { get; set; }
         public string FormatDate => Date.ToString("dd-MM-yyyy");
     }
+    public class RecordPaymentSaleDto
+    {
+        public decimal TotalAmount { get; set; }
+        public string Invoice { get; set; }
+        public DateTime Date { get; set; }
+        public int CustomerId { get; set; }
+        public string FormatDate => Date.ToString("dd-MM-yyyy");
+    }
+
 }
