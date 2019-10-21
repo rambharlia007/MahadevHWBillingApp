@@ -281,6 +281,7 @@
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\DataController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
+    <Compile Include="Controllers\EstimateController.cs" />
     <Compile Include="Controllers\ItemController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\PurchaseController.cs" />
@@ -306,7 +307,9 @@
     <Compile Include="Models\Permission.cs" />
     <Compile Include="Models\Profile.cs" />
     <Compile Include="Models\Purchase.cs" />
+    <Compile Include="Models\Estimate.cs" />
     <Compile Include="Models\Sale.cs" />
+    <Compile Include="Models\EstimateItem.cs" />
     <Compile Include="Models\SaleItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -426,6 +429,7 @@
     <Content Include="Views\Billing\EmptyProduct.cshtml" />
     <Content Include="Views\Contact\List.cshtml" />
     <Content Include="Views\Sale\RecordPayment.cshtml" />
+    <Content Include="Views\Estimate\New.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
