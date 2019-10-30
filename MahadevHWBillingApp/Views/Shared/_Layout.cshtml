@@ -11,7 +11,7 @@
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/custom")
-   
+
 
     @RenderSection("scripts", required: false)
     <style>
@@ -22,72 +22,67 @@
         .nav-bg {
             background-color: #1f6b8a;
         }
-        .dropdown:hover > .dropdown-menu {
-            display: block;
+
+        .header-container, .body-container, .footer-container {
+            max-width: 1280px;
+            margin: 0 auto;
         }
-
-        /*Without this, clicking will make it sticky*/
-        .dropdown > .dropdown-custom-toggle:active {
-            pointer-events: none;
-        }
-
-
     </style>
 </head>
 
 <body style="background-color:#eee">
-    <div class="body-content container">
-        <div class="row ustify-content-md-center">
-            <nav class="navbar navbar-expand-lg navbar-dark fixed-top nav-bg" style="height:30px;">
-                <a class="navbar-brand" style="font-size:1.1rem; margin-left:10px;" href=@Url.Action("New","Dashboard")>@Model.BusinessName</a>
-                <div style="color:#ffffffb8; padding-left:40%; font-size:0.9rem;"> <strong>GSTIN:&nbsp;@Model.GSTIN &nbsp; &nbsp; Name: <strong class="user-name">@Model.Owner</strong> &nbsp; &nbsp;User:Tax Payer</strong></div>
-            </nav>
 
-            <nav class="navbar navbar-expand-lg navbar-dark header fixed-top nav-bg" style="height:30px; margin-top:30px; font-size:0.95rem;">
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top nav-bg header-container" style="height:30px;">
+        <a class="navbar-brand" style="font-size:1.1rem; margin-left:10px;" href=@Url.Action("New","Dashboard")>@Model.BusinessName</a>
+        <div style="color:#ffffffb8; padding-left:30%; font-size:0.9rem;"> <strong>GSTIN:&nbsp;@Model.GSTIN &nbsp; &nbsp; Name: <strong class="user-name">@Model.Owner</strong> &nbsp; &nbsp;User:Tax Payer</strong></div>
+    </nav>
 
-                <div class="collapse navbar-collapse" id="navbarColor01">
-                    <ul class="navbar-nav mr-auto">
-                        <li class="nav-item">
-                            <a class="nav-link nav-link-bill" href=@Url.Action("New", "Billing")>Generate Invoice</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link nav-link-item" href=@Url.Action("index", "Item")>Add Product</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link nav-link-sale" href=@Url.Action("List", "Sale")>Sales</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link nav-link-purchase" href=@Url.Action("List", "Purchase")>Purchase</a>
-                        </li>
-                    </ul>
-                    <ul class="navbar-nav mx-auto">
-                        <li class="nav-item">
-                            <a class="nav-link nav-link-record-payment" href=@Url.Action("RecordPayment", "Sale")>Record Payment</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link nav-link-estimate" href=@Url.Action("New", "Estimate")>Estimates</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link nav-link-report" href=@Url.Action("New", "Dashboard")>Report</a>
-                        </li>
-                    </ul>
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item">
-                            <a class="nav-link nav-link-contact" href=@Url.Action("List", "Contact")>Contacts</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link nav-link-profile" href=@Url.Action("New", "Profile")>Profile</a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-            @RenderBody()
+    <nav class="navbar navbar-expand-lg navbar-dark header fixed-top nav-bg header-container" style="height:30px; margin-top:30px; font-size:0.95rem;">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarColor01">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link nav-link-bill" href=@Url.Action("New", "Billing")>Generate Invoice</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-link-item" href=@Url.Action("index", "Item")>Add Product</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-link-sale" href=@Url.Action("List", "Sale")>Sales</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-link-purchase" href=@Url.Action("List", "Purchase")>Purchase</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item">
+                    <a class="nav-link nav-link-record-payment" href=@Url.Action("RecordPayment", "Sale")>Record Payment</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-link-estimate" href=@Url.Action("New", "Estimate")>Estimates</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-link-report" href=@Url.Action("New", "Dashboard")>Report</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link nav-link-contact" href=@Url.Action("List", "Contact")>Contacts</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-link-profile" href=@Url.Action("New", "Profile")>Profile</a>
+                </li>
+            </ul>
         </div>
+    </nav>
+
+    <div class="body-content body-container">
+        @RenderBody()
         <hr class="d-print-none" />
-        <footer class="d-print-none">
+        <footer class="d-print-none footer-container">
             <p>&copy; @DateTime.Now.Year - Ram Bharlia</p>
         </footer>
     </div>

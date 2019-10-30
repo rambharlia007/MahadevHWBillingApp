@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web;
 
 namespace MahadevHWBillingApp.Helper
 {
@@ -6,7 +7,18 @@ namespace MahadevHWBillingApp.Helper
     {
         public static string GetConnectionString()
         {
-            return @"Data Source=C:\SqlServerDataBase\DataBase\GSTBilling.db";
+
+            if (HttpContext.Current.Session != null && HttpContext.Current.Session["AccountId"] != null)
+            {
+                var accountId = HttpContext.Current.Session["AccountId"].ToString();
+                return $@"Data Source=C:\SqlServerDataBase\DataBase\GSTBillingAccount{accountId}.db";
+            }
+            return $@"Data Source=C:\SqlServerDataBase\DataBase\GSTBillingAccount1.db";
+        }
+
+        public static string GetCoreConnectionString()
+        {
+            return @"Data Source=C:\SqlServerDataBase\DataBase\GSTCore.db";
         }
         public static string Invoice(string data)
         {

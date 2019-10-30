@@ -283,6 +283,7 @@
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\EstimateController.cs" />
     <Compile Include="Controllers\ItemController.cs" />
+    <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\PurchaseController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
@@ -311,6 +312,7 @@
     <Compile Include="Models\Sale.cs" />
     <Compile Include="Models\EstimateItem.cs" />
     <Compile Include="Models\SaleItem.cs" />
+    <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -430,6 +432,9 @@
     <Content Include="Views\Contact\List.cshtml" />
     <Content Include="Views\Sale\RecordPayment.cshtml" />
     <Content Include="Views\Estimate\New.cshtml" />
+    <Content Include="Views\Account\New.cshtml" />
+    <Content Include="Views\Shared\_LoginLayout.cshtml" />
+    <Content Include="Views\Account\Register.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

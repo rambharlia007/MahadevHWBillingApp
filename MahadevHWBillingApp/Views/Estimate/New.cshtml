@@ -74,10 +74,10 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb" style="padding-bottom: 0px; margin-bottom: 0px; background-color: #f6f7f8 !important;">
                     <li class="breadcrumb-item"><i class="fa fa-home">&nbsp;</i><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Billing</li>
+                    <li class="breadcrumb-item active" aria-current="page">Estimate</li>
                 </ol>
             </nav>
-            <h4 style="padding-left: 15px;">Billing</h4>
+            <h4 style="padding-left: 15px;">Estimate</h4>
         </div>
         <div class="col-md-4">
             <button style="margin-top:25px; float:right;" type="button" class="btn btn-success btn-sm" v-if="!isPreview" v-on:click="showOrHidePreview(true)">Print Preview</button>
@@ -170,7 +170,7 @@
                 </div>
             </div>
         </div>
-
+        </div>
 
 
         @*Modal for success on save bill*@
@@ -191,7 +191,7 @@
 
         <div id="print-bill" class="card" v-show="isPreview" style="color: #6c757d !important; font-size: 0.90em; border:none">
             <div class="card-header text-center" style="border:none">
-                <strong class="text-center">Tax Invoice</strong>
+                <strong class="text-center">Estimate</strong>
                 <span class="pull-right">(ORIGINAL FOR RECIPIENT)</span>
             </div>
             <div class="card-body pt-0">
@@ -225,8 +225,6 @@
                                         <td class="text-center border-right border-top border-bottom">
                                             <strong>Total</strong>
                                         </td>
-                                        <td class="border-right border-top border-bottom"></td>
-                                        <td class="border-right border-top border-bottom"></td>
                                         <td class="text-right border-right border-top border-bottom">
                                             <strong>
                                                 {{TotalQuantity}}
@@ -377,11 +375,10 @@
                         }
                     });
 
-                    // might be new or edit based on Id.
                     var apiEndPoint = "/Estimate/Save";
                     if (validData.length) {
                         var finalData = {
-                            EstimateDetails: {
+                            Estimate: {
                                 TotalAmount: self.total,
                                 Invoice: self.Invoice,
                                 TempDate: self.Date,

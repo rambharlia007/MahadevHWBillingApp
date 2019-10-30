@@ -17,4 +17,11 @@ namespace MahadevHWBillingApp.Models
         public Sale SaleDetail { get; set; }
         public List<SaleItem> SaleItems { get; set; }
     }
+
+    public class EstimateBill
+    {
+        public Estimate Estimate { get; set; }
+        public List<EstimateItem> EstimateItems { get; set; }
+    }
+        
 }

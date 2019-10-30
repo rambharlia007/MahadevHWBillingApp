@@ -12,10 +12,9 @@ namespace MahadevHWBillingApp.Helper
 {
     public static class Dapper
     {
-        private static string _connectionString =  Generic.GetConnectionString();
         public static IEnumerable<T> Get<T>(string query) where T : class
         {
-            using (var con = new SQLiteConnection(_connectionString))
+            using (var con = new SQLiteConnection(Generic.GetConnectionString()))
             {
                 return con.Query<T>(query);
             }
@@ -23,7 +22,7 @@ namespace MahadevHWBillingApp.Helper
 
         public static IEnumerable<T> GetPrimitive<T>(string query)
         {
-            using (var con = new SQLiteConnection(_connectionString))
+            using (var con = new SQLiteConnection(Generic.GetConnectionString()))
             {
                 return con.Query<T>(query);
             }
@@ -31,7 +30,7 @@ namespace MahadevHWBillingApp.Helper
 
         public static Bill GetBillDetails(string query)
         {
-            using (var con = new SQLiteConnection(_connectionString))
+            using (var con = new SQLiteConnection(Generic.GetConnectionString()))
             {
                 var gridReader = con.QueryMultiple(query);
                 var result = new Bill
@@ -46,21 +45,21 @@ namespace MahadevHWBillingApp.Helper
 
         public static T GetById<T>(string query) where T : class
         {
-            using (var con = new SQLiteConnection(_connectionString))
+            using (var con = new SQLiteConnection(Generic.GetConnectionString()))
             {
                 return con.QueryFirst<T>(query);
             }
         }
-        public static int GetCount(string query) 
+        public static int GetCount(string query)
         {
-            using (var con = new SQLiteConnection(_connectionString))
+            using (var con = new SQLiteConnection(Generic.GetConnectionString()))
             {
                 return con.QueryFirst<int>(query);
             }
         }
         public static void Execute(string query)
         {
-            using (var con = new SQLiteConnection(_connectionString))
+            using (var con = new SQLiteConnection(Generic.GetConnectionString()))
             {
                 con.Execute(query);
             }

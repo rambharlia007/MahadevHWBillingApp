@@ -8,7 +8,7 @@ namespace MahadevHWBillingApp.Controllers
     public class BaseController : Controller
     {
         protected MahadevHWContext _mahadevHwContext;
-        protected static Profile _profile;
+        protected Profile _profile;
 
         public BaseController()
         {
@@ -25,7 +25,6 @@ namespace MahadevHWBillingApp.Controllers
                     Address = "101A Kr puram",
                     IsEligible = 0
                 };
-
             }
             catch (Exception ex)
             {
