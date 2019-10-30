@@ -10,7 +10,6 @@ namespace MahadevHWBillingApp.Controllers
 {
     public class AdminController : BaseController
     {
-        private string apiKey = "hdst58Mb2orw9J+oeJpifxNEu92maDyhfLYhzepxgoc=";
         public ActionResult New()
         {
             return View(_profile);
@@ -20,7 +19,7 @@ namespace MahadevHWBillingApp.Controllers
             var computerName = System.Net.Dns.GetHostName();
             var validKey = EncryptDecryptData.Encrypt(permission.Key);
 
-            if (!validKey.Equals(apiKey))
+            if (!validKey.Equals(Keys.MasterPassword))
                 return Json("Invalid key", JsonRequestBehavior.AllowGet);
 
             var profile = new Profile()
@@ -53,7 +52,7 @@ namespace MahadevHWBillingApp.Controllers
         public JsonResult Revoke(Permission permission)
         {
             var validKey = EncryptDecryptData.Encrypt(permission.Key);
-            if (!validKey.Equals(apiKey)) return Json("Invalid key", JsonRequestBehavior.AllowGet);
+            if (!validKey.Equals(Keys.MasterPassword)) return Json("Invalid key", JsonRequestBehavior.AllowGet);
             var profile = _mahadevHwContext.Profiles.First();
             profile.IsEligible = 0;
             _profile = profile;
