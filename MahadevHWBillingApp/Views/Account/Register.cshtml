@@ -1,127 +1,23 @@
 ﻿
 @{
-    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 <style>
-    #logreg-forms {
-        width: 412px;
-        margin: 10vh auto;
-        background-color: #f3f3f3;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-        transition: all 0.3s cubic-bezier(.25,.8,.25,1);
-    }
-
-        #logreg-forms form {
-            width: 100%;
-            max-width: 410px;
-            padding: 15px;
-            margin: auto;
-        }
-
-        #logreg-forms .form-control {
-            position: relative;
-            box-sizing: border-box;
-            height: auto;
-            padding: 10px;
-            font-size: 16px;
-        }
-
-            #logreg-forms .form-control:focus {
-                z-index: 2;
-            }
-
-        #logreg-forms .form-signin input[type="email"] {
-            margin-bottom: -1px;
-            border-bottom-right-radius: 0;
-            border-bottom-left-radius: 0;
-        }
-
-        #logreg-forms .form-signin input[type="password"] {
-            border-top-left-radius: 0;
-            border-top-right-radius: 0;
-        }
-
-        #logreg-forms .social-login {
-            width: 390px;
-            margin: 0 auto;
-            margin-bottom: 14px;
-        }
-
-        #logreg-forms .social-btn {
-            font-weight: 100;
-            color: white;
-            width: 190px;
-            font-size: 0.9rem;
-        }
-
-        #logreg-forms a {
-            display: block;
-            padding-top: 10px;
-            color: lightseagreen;
-        }
-
-    #logreg-form .lines {
-        width: 200px;
-        border: 1px solid red;
-    }
-
-
-    #logreg-forms button[type="submit"] {
-        margin-top: 10px;
-    }
-
-    #logreg-forms .facebook-btn {
-        background-color: #3C589C;
-    }
-
-    #logreg-forms .google-btn {
-        background-color: #DF4B3B;
-    }
-
-    #logreg-forms .form-reset {
-        display: none;
-    }
-
-    #logreg-forms .form-signup .social-btn {
-        width: 210px;
-    }
-
-    #logreg-forms .form-signup input {
-        margin-bottom: 2px;
-    }
-
-    .form-signup .social-login {
-        width: 210px !important;
-        margin: 0 auto;
-    }
-
-    @@media screen and (max-width:500px) {
-        #logreg-forms {
-            width: 300px;
-        }
-
-            #logreg-forms .social-login {
-                width: 200px;
-                margin: 0 auto;
-                margin-bottom: 10px;
-            }
-
-            #logreg-forms .social-btn {
-                font-size: 1.3rem;
-                font-weight: 100;
-                color: white;
-                width: 200px;
-                height: 56px;
-            }
-
-                #logreg-forms .social-btn:nth-child(1) {
-                    margin-bottom: 5px;
-                }
-    }
+   
 </style>
 
-<div id="logreg-forms">
-
+<div id="app">
+    <div class="row" style="background-color: #f6f7f8 !important;">
+        <div class="col-md-6">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" style="padding-bottom: 0px; margin-bottom: 0px; background-color: #f6f7f8 !important;">
+                    <li class="breadcrumb-item"><i class="fa fa-home">&nbsp;</i><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Admin</li>
+                </ol>
+            </nav>
+            <h4 style="padding-left: 15px;">Accounts</h4>
+        </div>
+    </div>
     <div style="margin-top:20px;">
         <div class="alert alert-success alert-dismissible fade show" role="alert" v-cloak v-show="alertMessage" style="margin-top: 20px;">
             {{alertMessage}}
@@ -138,16 +34,14 @@
         </div>
     </div>
 
-    <div class="card justify-content-center">
-        <div class="card-body">
             <div class="row">
-                <div class="col-md-12">
-                    <button type="button" class="btn btn-success btn-sm" v-on:click="openModalForRegisterUser()">Register User</button>
+                <div class="col-md-12 pb-3">
+                    <button type="button" class="btn btn-success btn-sm" v-on:click="openModalForRegisterUser()">Add New Account</button>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-12 pt-3" style="background-color:white;">
                     <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
                         <tr>
-                            <th class="text-center">User</th>
+                            <th class="text-center">Account Name</th>
                             <th class="text-center">Account Type</th>
                             <th class="text-center">Password</th>
                         </tr>
@@ -159,58 +53,51 @@
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
 
     <div class="modal" id="myModal">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
 
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <h4 class="modal-title">Register User</h4>
+                    <h4 class="modal-title">Add New Account</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
 
                 <!-- Modal body -->
                 <div class="modal-body">
                     <div class="form-group row">
-                        <label class="col-md-2">Name</label>
-                        <div class="col-md-10">
-                            <input type="text" class="form-control" v-model="User.Name">
+                        <label class="col-md-4">Name</label>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control form-control-sm" v-model="User.Name">
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-md-2">Password</label>
-                        <div class="col-md-10">
-                            <input type="password" class="form-control" v-model="User.Password">
+                        <label class="col-md-4">Password</label>
+                        <div class="col-md-6">
+                            <input type="password" class="form-control form-control-sm" v-model="User.Password">
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-md-2">Confirm Password</label>
-                        <div class="col-md-10">
-                            <input type="password" class="form-control" v-model="User.ConfirmPassword">
+                        <label class="col-md-4">Confirm Password</label>
+                        <div class="col-md-6">
+                            <input type="password" class="form-control form-control-sm" v-model="User.ConfirmPassword">
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-md-2">Account Type</label>
-                        <div class="col-md-10">
-                            <select class="form-control" v-model="User.AccountType">
+                        <label class="col-md-4">Account Type</label>
+                        <div class="col-md-6">
+                            <select class="form-control form-control-sm" v-model="User.AccountType">
                                 <option value="TaxAccount">Tax Account</option>
                                 <option value="NonTaxAccount">Non Tax Account</option>
                             </select>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <div class="col-sm-10 offset-2">
-                            <button class="btn btn-success btn-sm" v-on:click="register()">Register</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Modal footer -->
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success btn-sm" data-dismiss="modal" v-on:click="saveEditItem()">Save</button>
+                    <button type="button" class="btn btn-success btn-sm" data-dismiss="modal" v-on:click="register()">Register</button>
                 </div>
             </div>
         </div>
@@ -232,7 +119,7 @@
             users: []
         }
         new Vue({
-            el: '#logreg-forms',
+            el: '#app',
             data: obj,
             methods: {
                 openModalForRegisterUser: function () {

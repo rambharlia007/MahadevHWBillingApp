@@ -7,6 +7,8 @@
         public string Password { get; set; }
         public int AccountId { get; set; }
         public string AccountType { get; set; }
+        public string BusinessName { get; set; }
+        public string OwnerName { get; set; }
     }
 
     public class AdminUser: User

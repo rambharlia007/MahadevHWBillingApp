@@ -13,6 +13,11 @@ namespace MahadevHWBillingApp.Controllers
         }
         public ActionResult New()
         {
+            var adminAccount = _coreContext.Users.Where(e => e.AccountType.Equals(AccountType.Admin)).FirstOrDefault();
+            if (adminAccount == null)
+                return RedirectToAction("RegisterAdmin", "Account");
+
+            ViewBag.BusinessName = adminAccount.BusinessName;
             return View();
         }
 
@@ -38,7 +43,7 @@ namespace MahadevHWBillingApp.Controllers
                     return Json(new { Message = "User does not exists, Please register" });
                 else if (EncryptDecryptData.Decrypt(currentUser.Password) == user.Password)
                 {
-                    Session["AccountType"] = currentUser.AccountId;
+                    Session["AccountType"] = currentUser.AccountType;
                     Session["AccountId"] = currentUser.AccountId;
 
                     if (currentUser.AccountType.Equals(AccountType.Admin))
@@ -69,7 +74,7 @@ namespace MahadevHWBillingApp.Controllers
             return Json(new { Message = "Account registered successfully." });
         }
         [HttpPost]
-        public ActionResult Register(AdminUser user)
+        public ActionResult RegisterAdmin(AdminUser user)
         {
             if (!EncryptDecryptData.Encrypt(user.MasterPassword).Equals(Keys.MasterPassword))
                 return Json(new { Status = "Failure", Message = "Master key is not correct" });
@@ -79,9 +84,16 @@ namespace MahadevHWBillingApp.Controllers
                 return Json(new { Status = "Failure", Message = "Admin already exists" });
 
             user.Password = EncryptDecryptData.Encrypt(user.Password);
+            user.AccountType = AccountType.Admin;
             _coreContext.Users.Add(user);
             _coreContext.SaveChanges();
             return Json(new { Status = "Success", Link = "/Account/New" });
+        }
+
+        public JsonResult Users()
+        {
+            var result = _coreContext.Users.Where(e => !e.AccountType.Equals(AccountType.Admin));
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
     }
 }
