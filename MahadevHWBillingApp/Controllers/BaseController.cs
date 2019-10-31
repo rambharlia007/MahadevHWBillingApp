@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using MahadevHWBillingApp.Models;
 
 namespace MahadevHWBillingApp.Controllers
@@ -9,36 +7,13 @@ namespace MahadevHWBillingApp.Controllers
     {
         protected MahadevHWContext _mahadevHwContext;
         protected Profile _profile;
+        protected User _adminUser;
 
         public BaseController()
         {
-            try
-            {
-                _mahadevHwContext = new MahadevHWContext();
-                _profile = _mahadevHwContext.Profiles.FirstOrDefault() ?? new Profile()
-                {
-                    BusinessName = "Demo Business",
-                    Owner = "Demo User",
-                    MobileNumber = "4242553252",
-                    GSTIN = "2552552325",
-                    Email = "test@gmail.com",
-                    Address = "101A Kr puram",
-                    IsEligible = 0
-                };
-            }
-            catch (Exception ex)
-            {
-                _profile = new Profile()
-                {
-                    BusinessName = "Demo Business",
-                    Owner = "Demo User",
-                    MobileNumber = "4242553252",
-                    GSTIN = "2552552325",
-                    Email = "test@gmail.com",
-                    Address = "101A Kr puram",
-                    IsEligible = 0,
-                };
-            }
+            _mahadevHwContext = new MahadevHWContext();
+            _profile = Session["Profile"] as Profile;
+            _adminUser = Session["AdminUser"] as User;
         }
     }
 }

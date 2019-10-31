@@ -16,9 +16,9 @@ namespace MahadevHWBillingApp.Controllers
         {
             try
             {
-                if (_profile.IsEligible == 0)
+                if (_adminUser.IsEligible == 0)
                     return RedirectToAction("Admin", "Error");
-                else if (_profile.IsEligible == 1 && _profile.IsFreeTrial == 2)
+                else if (_adminUser.IsEligible == 1 && _adminUser.IsFreeTrial == 2)
                 {
                     return RedirectToAction("FreeTrial", "Error");
                 }

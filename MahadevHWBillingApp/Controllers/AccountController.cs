@@ -1,4 +1,5 @@
 ﻿using MahadevHWBillingApp.Models;
+using System;
 using System.Linq;
 using System.Web.Mvc;
 
@@ -11,7 +12,7 @@ namespace MahadevHWBillingApp.Controllers
         {
             _coreContext = new CoreContext();
         }
-        public ActionResult New()
+        public ActionResult Login()
         {
             var adminAccount = _coreContext.Users.Where(e => e.AccountType.Equals(AccountType.Admin)).FirstOrDefault();
             if (adminAccount == null)
@@ -25,7 +26,7 @@ namespace MahadevHWBillingApp.Controllers
         {
             if (Session != null && Session["AccountType"].ToString().Equals(AccountType.Admin))
                 return View();
-            return RedirectToAction("New", "Account");
+            return RedirectToAction("Login", "Account");
         }
 
         public ActionResult RegisterAdmin()
@@ -38,7 +39,9 @@ namespace MahadevHWBillingApp.Controllers
         {
             try
             {
-                var currentUser = _coreContext.Users.Where(e => e.Name == user.Name).SingleOrDefault();
+                var users = _coreContext.Users.ToList();
+                var currentUser = users.Where(e => e.Name == user.Name).SingleOrDefault();
+                
                 if (currentUser == null)
                     return Json(new { Message = "User does not exists, Please register" });
                 else if (EncryptDecryptData.Decrypt(currentUser.Password) == user.Password)
@@ -48,6 +51,17 @@ namespace MahadevHWBillingApp.Controllers
 
                     if (currentUser.AccountType.Equals(AccountType.Admin))
                         return Json(new { Status = "Success", Link = "/Account/Register" });
+
+                    var adminUser = users.Where(e => e.AccountType.Equals(AccountType.Admin));
+                    Session["AdminUser"] = adminUser;
+                    using (var accountContext = new MahadevHWContext())
+                    {
+                        Session["Profile"] = Models.Profile.GetDummyProfile();
+                        var profile = accountContext.Profiles.FirstOrDefault();
+                        if (profile != null)
+                            Session["Profile"] = profile;
+                    }
+
                     return Json(new { Status = "Success", Link = "/Billing/New" });
                 }
                 else
@@ -83,11 +97,14 @@ namespace MahadevHWBillingApp.Controllers
             if (isAdminExist)
                 return Json(new { Status = "Failure", Message = "Admin already exists" });
 
+            var computerName = System.Net.Dns.GetHostName();
             user.Password = EncryptDecryptData.Encrypt(user.Password);
             user.AccountType = AccountType.Admin;
+            user.Key = EncryptDecryptData.Encrypt(DateTime.Now.Date.AddDays(90).ToString("dd-MM-yyyy"));
+            user.K1 = EncryptDecryptData.Encrypt(computerName);
             _coreContext.Users.Add(user);
             _coreContext.SaveChanges();
-            return Json(new { Status = "Success", Link = "/Account/New" });
+            return Json(new { Status = "Success", Link = "/Account/Login" });
         }
 
         public JsonResult Users()
