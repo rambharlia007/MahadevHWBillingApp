@@ -1,4 +1,5 @@
-﻿using MahadevHWBillingApp.Helper;
+﻿using MahadevHWBillingApp.Filters;
+using MahadevHWBillingApp.Helper;
 using MahadevHWBillingApp.Models;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ using System.Web.Mvc;
 
 namespace MahadevHWBillingApp.Controllers
 {
+    [CustomSession]
     public class EstimateController : BaseController
     {
         public ActionResult New(int id = 0)

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 using EPPlusEnumerable;
-using Microsoft.Extensions.Logging.Internal;
+//using Microsoft.Extensions.Logging.Internal;
 
 namespace MahadevHWBillingApp.Models
 {
@@ -24,5 +24,11 @@ namespace MahadevHWBillingApp.Models
         public DateTime Date { get; set; }
 
         public string FormatDate => Date.ToString("dd-MM-yyyy");
+    }
+
+    public class PurchaseModel 
+    {
+        public Purchase Purchase { get; set; }
+        public List<PurchaseGSTDetail> GSTModelData { get; set; }
     }
 }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using MahadevHWBillingApp.Helper;
-
-namespace MahadevHWBillingApp.Models
+﻿namespace MahadevHWBillingApp.Models
 {
     public class Profile
     {
@@ -14,6 +9,7 @@ namespace MahadevHWBillingApp.Models
         public string GSTIN { get; set; }
         public string MobileNumber { get; set; }
         public string Address { get; set; }
+        public bool EnableStockCount { get; set; }
         public static Profile GetDummyProfile()
         {
             return new Profile()

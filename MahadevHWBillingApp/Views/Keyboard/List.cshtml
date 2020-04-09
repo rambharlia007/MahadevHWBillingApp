@@ -1,0 +1,117 @@
+﻿<style>
+    .vam {
+        vertical-align: middle !important;
+    }
+    .scroll {
+        display: block;
+        height: 300PX;
+        overflow-y: scroll;
+    }
+    .w100{
+        width:100px !important;
+        max-width: !important;
+    }
+</style>
+<div id="app">
+    <div class="row" style="background-color: #f6f7f8 !important;">
+        <div class="col-md-6">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" style="padding-bottom: 0px; margin-bottom: 0px; background-color: #f6f7f8 !important;">
+                    <li class="breadcrumb-item"><i class="fa fa-home">&nbsp;</i><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Keyboard shortcut</li>
+                </ol>
+            </nav>
+            <h4 style="padding-left: 15px;">Keyboard shortcuts</h4>
+        </div>
+    </div>
+    <div v-cloak style="margin-top:20px;">
+        <div class="alert alert-success alert-dismissible fade show" role="alert" v-cloak v-show="alertMessage" style="margin-top: 20px;">
+            {{alertMessage}}
+            <button type="button" class="close" v-on:click="closeAlertMessage('alertMessage')" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <div v-cloak class="alert alert-danger alert-dismissible fade show" role="alert" v-show="alertFailureMessage" style="margin-top: 20px;">
+            {{alertFailureMessage}}
+            <button type="button" class="close" v-on:click="closeAlertMessage('alertFailureMessage')" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 pt-3" style="background-color:white;">
+            <table style="font-size: 0.85em; color: #6c757d !important; margin-bottom:0px;" class="table table-bordered table-sm">
+                <tr>
+                    <th class="text-center w100">Key</th>
+                    <th class="text-center w100">Page</th>
+                    @*<th class="text-center w100" style="max-width:100px">Edit shortcut key</th>*@
+                </tr>
+            </table>
+            <div class="scroll">
+                <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
+                    <tr v-for="(shortcut,index) in shortcuts">
+                        <td class="text-center vam w100">{{shortcut.Key}}</td>
+                        <td class="text-center vam w100">{{shortcut.Name}}</td>
+                        @*<td class="text-cente w100" style="max-width:100px">
+                            <input type="text" class="form-control" v-model="shortcut.NewKey">
+                        </td>*@
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    $(document).ready(function () {
+        var obj = {
+            alertFailureMessage: "",
+            alertMessage: "",
+            shortcuts: []
+        }
+        new Vue({
+            el: '#app',
+            data: obj,
+            methods: {
+                save: function (e) {
+                    var self = this;
+                    if (self.User.Password && self.User.Password !== self.User.ConfirmPassword) {
+                        self.alertFailureMessage = "Passoword not mactching";
+                        return;
+                    }
+
+                    var endPoint = "/Account/Register";
+                    $.post(endPoint,
+                        self.User,
+                        function (res) {
+                            self.alertMessage = res.Message;
+                            self.getUsers();
+                        }).fail(function (res) {
+                            self.alertFailureMessage = res.Message;
+                        });
+                },
+                closeAlertMessage: function (property) {
+                    // set alert message to empty
+                    this[property] = "";
+                },
+                get: function () {
+                    var self = this;
+                    $.get("/Keyboard/getShorcutKeys", function (res) {
+                        res.forEach(function (value) {
+                            value.NewKey = value.Key;
+                            self.shortcuts.push(value);
+                        });
+                    })
+                }
+            },
+            mounted() {
+                $(".nav-link-shortcut").addClass("active");
+                this.get();
+            }
+        });
+    });
+</script>

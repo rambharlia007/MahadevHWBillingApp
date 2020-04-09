@@ -4,10 +4,12 @@ using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using MahadevHWBillingApp.Filters;
 using MahadevHWBillingApp.Models;
 
 namespace MahadevHWBillingApp.Controllers
 {
+    [CustomSession]
     public class AdminController : BaseController
     {
         public ActionResult New()

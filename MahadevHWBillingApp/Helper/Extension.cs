@@ -13,10 +13,8 @@ namespace MahadevHWBillingApp.Helper
         public decimal SGST { get; set; }
         public decimal Amount { get; set; }
 
-        public decimal SubAmount
-        {
-            get { return Amount - CGST - SGST; }
-        }
+        public decimal SubAmount { get; set; }
+       
 
         public decimal GST
         {
@@ -95,6 +93,7 @@ namespace MahadevHWBillingApp.Helper
                 footer.CGST += data.TotalCGSTAmount;
                 footer.SGST += data.TotalSGSTAmount;
                 footer.Amount += data.TotalAmount;
+                footer.SubAmount += data.SubAmount;
             });
             return footer;
         }
@@ -107,6 +106,7 @@ namespace MahadevHWBillingApp.Helper
                 footer.CGST += data.TotalCGSTAmount;
                 footer.SGST += data.TotalSGSTAmount;
                 footer.Amount += data.TotalAmount;
+                footer.SubAmount += data.SubTotal;
             });
             return footer;
         }
@@ -119,6 +119,7 @@ namespace MahadevHWBillingApp.Helper
                 footer.CGST += data.TotalCGSTAmount;
                 footer.SGST += data.TotalSGSTAmount;
                 footer.Amount += data.TotalAmount;
+                footer.SubAmount += data.SubTotal;
             });
             return footer;
         }

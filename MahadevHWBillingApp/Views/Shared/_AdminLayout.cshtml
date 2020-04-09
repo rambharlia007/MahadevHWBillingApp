@@ -3,14 +3,13 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Register</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/custom")
-
 
     @RenderSection("scripts", required: false)
     <style>
@@ -22,6 +21,43 @@
             background-color: #1f6b8a;
         }
 
+        h4 {
+            color: #1f6b8a;
+            font-weight: 500;
+            font-size: medium;
+        }
+        .form-control {
+            border-radius: 0 !important;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+        input {
+            padding-left: 10px !important
+        }
+
+        .custom-alert {
+            color: red;
+            font-size:0.7em;
+        }
+
+        .correct {
+            background-image: url(../../Images/correct.png);
+            background-repeat: no-repeat;
+            background-position: right;
+            border-color: #1ae248;
+        }
+
+        .btn:active,
+        .btn:focus,
+        .btn.active,
+        .btn:active:focus {
+            background-image: none;
+            outline: 0;
+            -webkit-box-shadow: none;
+            box-shadow: none;
+        }
         /*.header-container, .body-container, .footer-container {
             max-width: 1280px;
             margin: 0 auto;
@@ -31,11 +67,17 @@
 
 <body style="background-color:#eee">
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top nav-bg">
-        <a class="navbar-brand" style="font-size:1.1rem; margin-left:10px;" )>GST App</a>
-        <div style="color:#ffffffb8; padding-left:80%; font-size:0.9rem;"> Welcome: <strong>Admin</strong></div>
+        <a class="navbar-brand" style="font-size:1.1rem; margin-left:10px;" )>@ViewBag.BusinessName</a>
+        <div style="color:#ffffffb8; padding-left:50%; font-size:0.9rem;"> Welcome: <strong>@ViewBag.UserName</strong></div>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link nav-link-profile" href=@Url.Action("Logout", "Account")>Logout</a>
+            </li>
+        </ul>
     </nav>
     <div class="body-content body-container">
         @RenderBody()
+        @Scripts.Render("~/bundles/validation")
         <hr class="d-print-none" />
         <footer class="d-print-none footer-container">
             <p>&copy; @DateTime.Now.Year - Ram Bharlia</p>

@@ -7,56 +7,76 @@
     .pointer {
         cursor: pointer;
     }
+
     .grid-edit {
         text-decoration: underline;
         color: #158cba;
     }
+
     .hide {
+        display: none;
+    }
+
+    .collapse {
         display: none;
     }
 
     [v-cloak] {
         display: none;
     }
+
     .modal-form-header {
         padding-top: 10px !important;
         padding-bottom: 10px !important;
         background-color: rgb(238, 238, 238) !important;
         margin-bottom: 10px !important;
     }
+
     .text-center {
         text-align: center
     }
+
     .table-head, .table-body .table-row {
         display: table;
         width: 100%;
         table-layout: fixed;
     }
-    .jq-dte-day{
-        width:30px !important;
+
+    .jq-dte-day {
+        width: 30px !important;
     }
+
     .jq-dte-month {
         width: 30px !important;
     }
+
     .jq-dte-year {
-        width: 35px !important;
+        width: 45px !important;
     }
+
     span.jq-dte {
         width: 125px;
         border: 1px solid #ced4da;
         padding: 0px;
         margin: 0px;
+        text-align: left !important;
     }
+
+        span.jq-dte input {
+            text-align: left !important;
+        }
+
     .go-btn {
         color: black;
         background-color: #fff;
         margin-left: 50px;
         border: 1px solid #ced4da;
     }
+
     @@media only screen and (min-width: 768px) {
         .table-body {
             display: block;
-            height: 250PX;
+            height: 400px;
             overflow-y: scroll;
         }
     }
@@ -64,7 +84,7 @@
     @@media only screen and (min-width: 992px) {
         .table-body {
             display: block;
-            height: 200px;
+            height: 400px;
             overflow-y: scroll;
         }
     }
@@ -108,16 +128,16 @@
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
-        
-        
+
+
         <div class="col-md-6" style="margin-top: 10px; margin-bottom: 10px;" v-cloak>
             <span>From &nbsp;</span>
             <input type="text" v-model="purchase.Date" id="from-date" class="form-control form-control-sm date-range">
             <span style="padding-left: 50px;">To &nbsp;</span>
-            <input  type="text" v-model="purchase.Date" id="to-date" class="form-control form-control-sm date-range">
-        </div>  
+            <input type="text" v-model="purchase.Date" id="to-date" class="form-control form-control-sm date-range">
+        </div>
 
-        <div class="card">
+        <div class="card grid-data">
             <div class="card-body" style="font-size: 14px;">
                 <div class="table-responsive-sm">
                     <table id="product-table"
@@ -161,66 +181,79 @@
                     <!-- Modal Header -->
                     <div class="modal-header">
                         <h4 class="modal-title">Edit Purchase</h4>
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <button type="button" class="close" v-on:click="closeModal('#edit-purchase-modal')">&times;</button>
                     </div>
 
                     <!-- Modal body -->
                     <div class="modal-body">
-                        <form>
-                            <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Date</label>
-                                <div class="col-sm-10">
-                                    <input type="text" id="purchase-edit-date-in" class="form-control purchase-edit-date">
+                        <div class="card" style="margin-top:10px;">
+                            <div class="card-header">
+                                Edit Purchase Bill Entry
+                            </div>
+                            <div class="card-body">
+                                <div>
+                                    <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
+                                        <tr>
+                                            <th class="text-center" style="width: 140px">Date</th>
+                                            <th class="text-center" style="width: 150px;">Invoice</th>
+                                            <th class="text-center" style="width: 150px;">Distributor</th>
+                                            <th class="text-center" style="width: 150px;">Dist. GSTIN</th>
+                                            <th class="text-center">SGST Amount</th>
+                                            <th class="text-center">CGST Amount</th>
+                                            <th class="text-center">Sub Amount</th>
+                                            <th class="text-center">Total Amount</th>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 140px"> <input type="text" cv="required" v-model="purchase.Date" class="form-control form-control-sm purchase-date"></td>
+                                            <td style="width: 150px;"> <input type="text" cv="required" v-model="purchase.Invoice" class="form-control form-control-sm"></td>
+                                            <td style="width: 150px;"> <input type="text" cv="required" v-model="purchase.DistributorName" class="form-control form-control-sm"></td>
+                                            <td style="width: 150px;"> <input type="text" cv="gstin" v-model="purchase.DistributorGSTIN" class="form-control form-control-sm"></td>
+                                            <td> <input type="number" v-model="purchase.TotalCGSTAmount" v-on:keyup="calculateTotalAmount(-1)" class="form-control form-control-sm"></td>
+                                            <td> <input type="number" v-model="purchase.TotalSGSTAmount" v-on:keyup="calculateTotalAmount(-1)" class="form-control form-control-sm"></td>
+                                            <td> <input type="number" v-model="purchase.SubAmount" v-on:keyup="calculateTotalAmount(-1)" class="form-control form-control-sm"></td>
+                                            <td> <input type="number" readonly v-model="purchase.TotalAmount" class="form-control form-control-sm"></td>
+                                        </tr>
+                                    </table>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
+                                                <tr>
+                                                    <th class="text-center" colspan="6">Central GST</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Percentage (%)</th>
+                                                    <td v-for="(gstData,gstIndex) in purchase.GSTModelData"><input type="number" v-model="gstData.CGST" class="form-control form-control-sm"></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Amount</th>
+                                                    <td v-for="(gstData,gstIndex) in purchase.GSTModelData"><input type="number" v-on:keyup="calculateTotalAmount(-1)" v-model="gstData.CGSTAmount" class="form-control form-control-sm"></td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
+                                                <tr>
+                                                    <th class="text-center" colspan="6">State GST</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Percentage</th>
+                                                    <td v-for="(gstData,gstIndex) in purchase.GSTModelData"><input type="number" v-model="gstData.SGST" class="form-control form-control-sm"></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Amount</th>
+                                                    <td v-for="(gstData,gstIndex) in purchase.GSTModelData"><input type="number" v-on:keyup="calculateTotalAmount(-1)" v-model="gstData.SGSTAmount" class="form-control form-control-sm"></td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Invoice</label>
-                                <div class="col-sm-10">
-                                    <input v-model="purchase.Invoice" type="text" class="form-control">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Business</label>
-                                <div class="col-sm-10">
-                                    <input v-model="purchase.DistributorName" type="text" class="form-control">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Business</label>
-                                <div class="col-sm-10">
-                                    <input v-model="purchase.DistributorGSTIN" type="text" class="form-control">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">SGST Amount</label>
-                                <div class="col-sm-10">
-                                    <input v-model="purchase.TotalSGSTAmount" v-on:keyup="calculateTotalAmountForEdit()" type="number" class="form-control">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">CGST Amount</label>
-                                <div class="col-sm-10">
-                                    <input v-model="purchase.TotalCGSTAmount" v-on:keyup="calculateTotalAmountForEdit()" type="number" class="form-control">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Total Amount</label>
-                                <div class="col-sm-10">
-                                    <input v-model="purchase.SubAmount" v-on:keyup="calculateTotalAmountForEdit()" type="number" class="form-control">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Total Amount</label>
-                                <div class="col-sm-10">
-                                    <input readonly v-model="purchase.TotalAmount" type="number" class="form-control">
-                                </div>
-                            </div>
-                        </form>
+                        </div>
                     </div>
 
                     <!-- Modal footer -->
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal" v-on:click="saveEditPurchase()">Save</button>
+                        <button type="button" class="btn btn-success btn-sm" v-on:click="saveEditPurchase()">Save</button>
                     </div>
                 </div>
             </div>
@@ -233,65 +266,121 @@
                     <!-- Modal Header -->
                     <div class="modal-header">
                         <h4 class="modal-title">Add Purchase</h4>
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <button type="button" class="close" v-on:click="closeModal('#add-purchase')">&times;</button>
                     </div>
 
                     <!-- Modal body -->
                     <div class="modal-body" style="padding-top: 0px;">
-                        <table class="table text-secondary" style="font-size: 14px;">
-                            <thead class="thead-light table-head">
-                                <tr class="table-row">
-                                    <th class="text-center pr-0" style="width: 35px" scope="col">#</th>
-                                    <th class="text-center pr-0" style="width: 140px" scope="col">Date</th>
-                                    <th class="text-center pr-0" style="width: 150px;" scope="col">Invoice</th>
-                                    <th class="text-center pr-0" style="width: 150px;">Distributor</th>
-                                    <th class="text-center pr-0" style="width: 150px;">Dist. GSTIN</th>
-                                    <th class="text-center pr-0" scope="col">SGST Amount</th>
-                                    <th class="text-center pr-0" scope="col">CGST Amount</th>
-                                    <th class="text-center pr-0" scope="col">Sub Amount</th>
-                                    <th class="text-center pr-0" scope="col">Total Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody class="table-body">
-                                    <tr class="table-row" v-for="(purchase,index) in newPurchases">
-                                        <td class="pr-0" style="width: 35px">{{index+1}}</td>
-                                        <td class="pr-0" style="width: 140px" v-bind:["data-id"]="index"> <input type="text" v-model="purchase.Date" class="form-control form-control-sm purchase-date"></td>
-                                        <td class="pr-0" style="width: 150px;"> <input type="text" v-model="purchase.Invoice" class="form-control form-control-sm"></td>
-                                        <td class="pr-0" style="width: 150px;"> <input type="text" v-model="purchase.DistributorName" class="form-control form-control-sm"></td>
-                                        <td class="pr-0" style="width: 150px;"> <input type="text" v-model="purchase.DistributorGSTIN" class="form-control form-control-sm"></td>
-                                        <td class="pr-0"> <input type="number" v-model="purchase.TotalCGSTAmount" v-on:keyup="calculateTotalAmount(index)" class="form-control form-control-sm"></td>
-                                        <td class="pr-0"> <input type="number" v-model="purchase.TotalSGSTAmount" v-on:keyup="calculateTotalAmount(index)" class="form-control form-control-sm"></td>
-                                        <td class="pr-0"> <input type="number" v-model="purchase.SubAmount" v-on:keyup="calculateTotalAmount(index)" class="form-control form-control-sm"></td>
-                                        <td class="pr-0"> <input type="number" readonly v-model="purchase.TotalAmount" class="form-control form-control-sm"></td>
-                                    </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                        <div class="table-body">
+                            <div class="card" v-for="(purchase,index) in newPurchases" style="margin-top:10px;">
+                                <div class="card-header" style="cursor:pointer" v-on:click="toggle(index)">
+                                    Purchase Bill Entry - {{index+1}}
+                                </div>
+                                <div class="card-body">
+                                    <div>
+                                        <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
+                                            <tr>
+                                                <th class="text-center" style="width: 140px">Date</th>
+                                                <th class="text-center" style="width: 150px;">Invoice</th>
+                                                <th class="text-center" style="width: 150px;">Distributor</th>
+                                                <th class="text-center" style="width: 150px;">Dist. GSTIN</th>
+                                                <th class="text-center">SGST Amount</th>
+                                                <th class="text-center">CGST Amount</th>
+                                                <th class="text-center">Sub Amount</th>
+                                                <th class="text-center">Total Amount</th>
+                                            </tr>
+                                            <tr>
+                                                <td style="width: 140px" v-bind:["data-id"]="index"> <input type="text" cv="date" v-model="purchase.Date" class="form-control form-control-sm purchase-date"></td>
+                                                <td style="width: 150px;"> <input type="text" cv="required" v-model="purchase.Invoice" class="form-control form-control-sm"></td>
+                                                <td style="width: 150px;"> <select v-bind:id="'dist-sel-'+index" :data-id="index" class="dist-select-2 js-example-basic-single js-states form-control"></select> </td>
+                                                <td style="width: 150px;"> <input type="text" cv="gstin" v-model="purchase.DistributorGSTIN" class="form-control form-control-sm"></td>
+                                                <td> <input type="number" readonly v-model="purchase.TotalCGSTAmount" class="form-control form-control-sm"></td>
+                                                <td> <input type="number" readonly v-model="purchase.TotalSGSTAmount" class="form-control form-control-sm"></td>
+                                                <td> <input type="number" cv="required" v-model="purchase.SubAmount" v-on:keyup="calculateTotalAmount(index)" class="form-control form-control-sm"></td>
+                                                <td> <input type="number" readonly v-model="purchase.TotalAmount" class="form-control form-control-sm"></td>
+                                            </tr>
+                                        </table>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
+                                                    <tr>
+                                                        <th class="text-center" colspan="10">Central GST</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Percentage (%)</th>
+                                                        <td v-for="(gstData,gstIndex) in purchase.GSTModelData"><input type="number" cv="required" v-model="gstData.CGST" class="form-control form-control-sm"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Amount</th>
+                                                        <td v-for="(gstData,gstIndex) in purchase.GSTModelData"><input type="number" cv="required" v-on:keyup="calculateTotalAmount(index, gstIndex)" v-model="gstData.CGSTAmount" class="form-control form-control-sm"></td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
+                                                    <tr>
+                                                        <th class="text-center" colspan="10">State GST</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Percentage (%)</th>
+                                                        <td v-for="(gstData,gstIndex) in purchase.GSTModelData"><input type="number" v-model="gstData.SGST" class="form-control form-control-sm"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Amount</th>
+                                                        <td v-for="(gstData,gstIndex) in purchase.GSTModelData"><input type="number" v-on:keyup="calculateTotalAmount(index, gstIndex)" v-model="gstData.SGSTAmount" class="form-control form-control-sm"></td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <button type="button" class="btn btn-success btn-sm" v-on:click="addEmptyGSTModal(index)">Add new tax slab</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-success btn-sm" style="margin:10px 0px 10px 0px" v-on:click="addEmptyPurchase()">Add new bill</button>
+                        </div>
 
-                    <!-- Modal footer -->
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal" v-on:click="saveNewPurchase()">Submit</button>
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-success btn-sm" v-on:click="saveNewPurchase()">Submit</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-
+    <script src="~/Scripts/gridSummary.js"></script>
+    <script>
     $(document).ready(function() {
+
+        function getPurchaseGSTModel() {
+            var gstModel = []
+            for (var i = 0; i < 1; i++) {
+                gstModel.push({
+                    SGST: "",
+                    CGST: "",
+                    SGSTAmount: "",
+                    CGSTAmount: "",
+                })
+            }
+            return gstModel;
+        }
 
         function addEmptyPurchaseObject() {
             var tempPurchase = [];
-            for (var i = 0; i < 30; i++) {
+            for (var i = 0; i < 1; i++) {
                 tempPurchase.push({
                     BusinessName: "",
                     TotalAmount: "",
                     TotalCGSTAmount: "",
                     TotalSGSTAmount: "",
                     Date: "",
-                    Invoice: ""
+                    Invoice: "",
+                    DistributorGSTIN: "",
+                    DistributorName : "",
+                    GSTModelData: getPurchaseGSTModel()
                 });
             }
             return tempPurchase;
@@ -322,6 +411,34 @@
             el: '#app',
             data: obj,
             methods: {
+                addEmptyPurchase: function () {
+                    var self = this;
+                    var emptyObj = addEmptyPurchaseObject()[0]
+                    self.newPurchases.push(emptyObj);
+                    var height = 310 * this.newPurchases.length;
+                    setTimeout(function () {
+                        $(".table-body").scrollTop(height)
+                        validation[0].register();
+                        self.bindAddPurchaseDateComponent();
+                        self.initSelect2();
+                        validation[0].collapse();
+                    }, 0)
+                },
+                toggle: function (index) {
+                    validation[0].cardToggle(index);
+                },
+                addEmptyGSTModal: function (index) {
+                    this.newPurchases[index].GSTModelData.push(getPurchaseGSTModel()[0]);
+                    setTimeout(function () {
+                        validation[0].register();
+                    }, 0)
+                },
+                closeModal: function (id) {
+                    this.newPurchases = addEmptyPurchaseObject();
+                    validation[0].removeErrorMessage();
+                    validation[0].removeCardCollapse();
+                    $(id).modal("hide");
+                },
                 getValidateNumber: function (value) {
                     var parseData = parseFloat(value);
                     if (Number.isNaN(parseData))
@@ -329,10 +446,24 @@
                     else
                         return parseData;
                 },
-                calculateTotalAmount: function (index) {
-                    var currentPurchaseData = this.newPurchases[index];
+                calculateTotalAmount: function (index, gstIndex) {
+                    var self = this;
+                    var currentPurchaseData;
+                    if (index === -1)
+                        currentPurchaseData = self.purchase;
+                    else
+                        currentPurchaseData = this.newPurchases[index];
+
+                    var totalSGSTAmount = 0;
+                    currentPurchaseData.GSTModelData.forEach(function (data, index) {
+                        if (parseInt(data.CGST)) {
+                            data.SGST = data.CGST;
+                            data.SGSTAmount = self.getValidateNumber(data.CGSTAmount);
+                            totalSGSTAmount += data.SGSTAmount;
+                        }
+                    })
+                    currentPurchaseData.TotalSGSTAmount = currentPurchaseData.TotalCGSTAmount = totalSGSTAmount;
                     this.commonTotalAmountCalculation(currentPurchaseData)
-                   
                 },
                 calculateTotalAmountForEdit: function () {
                     this.commonTotalAmountCalculation(this.purchase);
@@ -341,7 +472,7 @@
                     var self = this;
                     var getValidateNumber = self.getValidateNumber;
                     currentPurchaseData.TotalAmount = Math.round((getValidateNumber(currentPurchaseData.TotalSGSTAmount) + getValidateNumber(currentPurchaseData.TotalCGSTAmount) + getValidateNumber(currentPurchaseData.SubAmount))
-                        * 100) / 100; 
+                        * 100) / 100;
                 },
                 deleteItem: function(id) {
                     var self = this;
@@ -354,44 +485,84 @@
                         self.alertFailureMessage = "Internal server error";
                     });
                 },
-                openModalForAddPurchase: function() {
+                openModalForAddPurchase: function () {
+                    var self = this;
+                    self.initSelect2();
                     $("#add-purchase").modal("show");
                 },
                 displayFormat: function (data) {
                     return Number(data).toLocaleString(undefined, { minimumFractionDigits: 2 })
                 },
-                saveNewPurchase: function() {
+                initSelect2: function () {
                     var self = this;
-                    var validData = [];
-                    self.newPurchases.forEach((data) => {
-                        if (data.Invoice &&
-                            data.DistributorName &&
-                            data.DistributorGSTIN &&
-                            data.TotalCGSTAmount &&
-                            data.TotalSGSTAmount &&
-                            data.SubAmount &&
-                            data.TotalAmount) {
-                            data.TempDate = data.TempDate;
-                            validData.push(data);
-                        }
+                    $(".dist-select-2").select2({
+                        ajax: {
+                            url: "/contact/search",
+                            dataType: 'json',
+                            delay: 250,
+                            data: function (params) {
+                                return {
+                                    q: params.term,
+                                    page: params.page
+                                };
+                            },
+                            processResults: function (data, params) {
+                                var distributors = [];
+                                data.forEach((distributor) => {
+                                    distributors.push({
+                                        id: distributor.Id,
+                                        text: distributor.Name,
+                                        GSTIN: distributor.GSTIN,
+                                    });
+                                });
+
+                                return {
+                                    results: distributors
+                                };
+                            },
+                            cache: true
+                        },
+                        placeholder: 'Search for a Distributor',
+                        minimumInputLength: 1
                     });
 
-                    if (validData.length) {
+                    $('.dist-select-2').on('select2:select',
+                        function (e) {
+                            var index = parseInt($(this).attr('data-id'));
+                            var data = e.params.data;
+                            self.newPurchases[index].DistributorGSTIN = data.GSTIN;
+                        });
+                },
+                saveNewPurchase: function() {
+                    var self = this;
+                   
+                    var isNotValid = validation[0].isTableDataValid("add-purchase") > 0;
+
+
+                    if (isNotValid) {
+                        validation[0].alertCollapseCardError("#add-purchase");
+                        return; 
+                    }
+                    else {
+                        var validData = [];
+                        self.newPurchases.forEach((data) => {
+                            var validGstModelData = [];
+                            validData.push({ Purchase: data, GSTModelData: data.GSTModelData });
+                        });
                         $.ajax({
                             type: 'POST',
                             url: '@Url.Action("Add", "purchase")',
                             data: JSON.stringify(validData),
                             dataType: 'json',
                             contentType: 'application/json; charset=utf-8',
-                            success: function() {
+                            success: function () {
                                 self.alertMessage =
-                                    `${validData.length} purchase Added succesfully.`;
+                                    `Purchase added succesfully.`;
                                 self.newPurchases = addEmptyPurchaseObject();
+                                self.closeModal("#add-purchase");
                                 self.tableReload();
                             }
                         });
-                    } else {
-                        self.alertFailureMessage = "30 off 30 invalid Purchase record were found";
                     }
                 },
                 saveEditPurchase: function() {
@@ -420,11 +591,12 @@
                 getPurchaseById: function(id) {
                     var self = this;
                     $.get(`/purchase/GetDataById/${id}`,
-                        function(data, status) {
-                            self.purchase = data;
+                        function (data, status) {
+                            self.purchase = data.Purchase;
+                            self.purchase.GSTModelData = data.GSTModelData;
                             $("#edit-purchase-modal").modal("show");
                             self.purchase.TempDate = data.FormatDate;
-                            self.setInitialDateComponent(".purchase-edit-date", data.FormatDate);
+                            self.setInitialDateComponent(".purchase-edit-date", data.Purchase.FormatDate);
                         }).fail(function() {
                         self.alertFailureMessage = "Internal server error";
                     });
@@ -440,6 +612,7 @@
                         var id = $(this).attr("data-id");
                         self.deleteItem(id);
                     });
+                    getGridSummary(self.fromDate, self.toDate, "Purchase", "product-table");
                 },
                 closeAlertMessage: function(property) {
                     // set alert message to empty
@@ -448,6 +621,8 @@
                 getTableData: function() {
                     var self = this;
                     self.tableRef = $("#product-table").DataTable({
+                        "scrollY": "180px",
+                        "paging": false,
                         ajax: {
                             url: `/Purchase/GetData?fromDate=${self.fromDate}&toDate=${self.toDate}`,
                             type: "GET",
@@ -517,13 +692,13 @@
                                     inrSymbol + self.displayFormat(self.footerTotal.SGST)
                                 );
                                 $(api.column(5).footer()).html(
-                                    inrSymbol + self.displayFormat(self.footerTotal.CGST) 
+                                    inrSymbol + self.displayFormat(self.footerTotal.CGST)
                                 );
                                 $(api.column(6).footer()).html(
-                                    inrSymbol + self.displayFormat(self.footerTotal.SubAmount) 
+                                    inrSymbol + self.displayFormat(self.footerTotal.SubAmount)
                                 );
                                 $(api.column(7).footer()).html(
-                                    inrSymbol + self.displayFormat(self.footerTotal.Amount) 
+                                    inrSymbol + self.displayFormat(self.footerTotal.Amount)
                                 );
                             }
                         }
@@ -546,6 +721,18 @@
                     var self = this;
                     self.tableRef.ajax.url(`/Purchase/GetData?fromDate=${self.fromDate}&toDate=${self.toDate}`)
                         .load(self.bindTableClickEvents);
+                },
+                bindAddPurchaseDateComponent: function () {
+                    var self = this;
+                    $('.purchase-date').datetextentry({
+                        field_order: 'DMY',
+                        on_change: function (date_str) {
+                            if (date_str) {
+                                var id = parseInt($(this)[0].$element.parent().parent().attr("data-id"));
+                                self.newPurchases[id].TempDate = self.getFormatedDate(date_str);;
+                            }
+                        }
+                    });
                 }
             },
             mounted() {
@@ -560,18 +747,12 @@
                         }
                     }
                 });
-                $('.purchase-date').datetextentry({
-                    field_order: 'DMY',
-                    on_change: function(date_str) {
-                        if (date_str) {
-                            var id = parseInt($(this)[0].$element.parent().parent().attr("data-id"));
-                            self.newPurchases[id].TempDate = self.getFormatedDate(date_str);;
-                        }
-                    }
-                });
+
+                self.bindAddPurchaseDateComponent();
+
                 $('.date-range').datetextentry({
                     field_order: 'DMY',
-                    on_change: function(date_str) {
+                    on_change: function (date_str) {
                         if (date_str) {
                             var value = $(this)[0].$element.attr("id");
                             if (value === "to-date") {
@@ -593,9 +774,8 @@
 
                 self.setInitialDateComponent("#from-date", self.fromDate);
                 self.setInitialDateComponent("#to-date", self.toDate);
+                validation[0].register();
             }
         });
     });
-
-
-</script>
+    </script>

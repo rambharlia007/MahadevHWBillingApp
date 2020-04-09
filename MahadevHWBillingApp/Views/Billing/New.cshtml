@@ -3,34 +3,62 @@
 }
 
 @model MahadevHWBillingApp.Models.Profile
-
+@*<link href="~/Content/paper.css" rel="stylesheet" />*@
 <style>
-    /*@@page {
-        size: 210mm 147mm;
-        width: 210mm;
-        height: 147mm;
-        margin:0;
-    }*/
+
+    tr .show-on-hover {
+        visibility:hidden;
+    }
+
+    .bill-grid td {
+        vertical-align: middle !important;
+        padding:5px !important
+    }
+
+    .bill-grid th {
+        vertical-align: middle !important;
+        padding: 5px !important
+    }
+
+    tr:hover .show-on-hover {
+        visibility: visible;
+    }
+
+    li:hover {
+        z-index: 2;
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+    }
 
     .table-sm td, .table-sm th {
         padding: 0.15rem !important;
     }
+
     .pointer {
         cursor: pointer;
     }
-    
+
+    .border {
+        border: 3px solid black !important;
+    }
     .border-right {
-        border-right: 1px solid #eee !important;
+        border-right: 2px solid black !important;
     }
+
     .border-top {
-        border-top: 1px solid #eee !important;
+        border-top: 2px solid black !important;
     }
+
     .border-bottom {
-        border-bottom: 1px solid #eee !important;
+        border-bottom: 2px solid black !important;
     }
+
     .border-left {
-        border-left: 1px solid #eee !important;
+        border-left: 2px solid black !important;
     }
+
+    
     .hide {
         display: none;
     }
@@ -42,11 +70,30 @@
     .bg-grey {
         background-color: #eee;
     }
+
     .table-head, .table-body .table-row {
         display: table;
         width: 100%;
         table-layout: fixed;
     }
+
+    .A4pb {
+        padding-bottom: 30px !important;
+    }
+
+    .A4h {
+        height: 1085px;
+    }
+
+    .A4w45 {
+        width: 45px;
+    }
+
+    .A4w400 {
+        width: 550px;
+    }
+
+    
 
     @@media only screen and (min-width: 768px) {
         .table-body {
@@ -71,7 +118,37 @@
             overflow-y: scroll;
         }
     }
+
+    @@media print {
+        #print-bill div {
+            font-weight: bold !important;
+        }
+
+        #print-bill tr {
+            max-height: 25px !important;
+        }
+
+        #print-bill td {
+            padding-bottom: 0px !important;
+        }
+
+        #print-bill span {
+            font-weight: bold !important;
+        }
+
+        #print-bill td {
+            font-weight: bold !important;
+        }
+
+        #print-bill th {
+            font-weight: bolder !important;
+        }
+    }
+    @@page{
+        margin : 0;
+    }
 </style>
+
 
 <div id="app" v-cloak>
     <div class="row d-print-none" style="background-color: #f6f7f8 !important;">
@@ -86,13 +163,17 @@
         </div>
         <div class="col-md-4">
             <button style="margin-top:25px; float:right;" type="button" class="btn btn-success btn-sm" v-if="!isPreview" v-on:click="showOrHidePreview(true)">Print Preview</button>
+            <button style="margin-top:25px; margin-right:10px; float:right;" type="button" class="btn btn-success btn-sm" v-if="!isPreview" v-on:click="openBillSettingsModal()">
+                Bill settings
+                <i class="fa fa-cog" data-toggle="tooltip" title="Map Product sell price to bill column price or total"></i>
+            </button>
             <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-if="isPreview && !isPrintOnly" v-on:click="showOrHidePreview(false)">Edit Bill</button>
-            <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-if="isPreview" v-on:click="print(1)">Print (A4 Half sheet)</button>
+            @*<button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-if="isPreview" v-on:click="print(1)">Print (A4 Half sheet)</button>*@
             <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-if="isPreview" v-on:click="print(2)">Print (A4 Full sheet)</button>
-            <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-if="!isPrintOnly" v-on:click="save()">Save</button>
+            @*<button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-if="!isPrintOnly" v-on:click="save()">Save</button>*@
         </div>
     </div>
-    <div style="margin-top:20px;">
+    <div class="d-print-none" style="margin-top:20px;">
         <div class="alert alert-success alert-dismissible fade show" role="alert" v-cloak v-bind:class="{hide:!alertMessage}" style="margin-top: 20px;">
             {{alertMessage}}
             <button type="button" class="close" v-on:click="closeAlertMessage('alertMessage')" aria-label="Close">
@@ -107,40 +188,51 @@
             </button>
         </div>
 
-        <div class="card" v-show="!isPreview" style="font-size: 0.85em; color: #6c757d !important;" >
+        <div class="card" v-show="!isPreview" style="font-size: 0.85em; color: #6c757d !important;">
             <div class="card-body">
-                <table class="table text-secondary" style="font-size: 0.85em; color: #6c757d !important;" >
+                <table class="table text-secondary bill-grid" style="font-size: 0.85em; color: #6c757d !important;">
                     <thead class="thead-light table-head">
                         <tr class="table-row">
-                            <th style="width: 45px" scope="col">#</th>
-                            <th class="text-center" v-if="Id" scope="col"></th>
-                            <th class="text-center" style="width: 200px;" scope="col">Name</th>
+                            <th style="width: 15px; padding: 0px !important" scope="col">#</th>
+                            <th class="text-center" style="width: 240px;" scope="col">Name</th>
                             <th class="text-center" scope="col">HSN/SAC</th>
-                            <th class="text-center" scope="col">Price</th>
                             <th class="text-center" scope="col">Quantity</th>
+                            <th class="text-center" scope="col">Price</th>
                             <th class="text-center" scope="col">Disc %</th>
                             <th class="text-center" scope="col">GST %</th>
                             <th class="text-center" scope="col">CGST</th>
                             <th class="text-center" scope="col">SGST</th>
-                            <th class="text-center" scope="col">Total</th>
+                            <th class="text-center" scope="col">Sub total</th>
+                            <th class="text-center" scope="col">
+                                Total
+                                <i class="fa fa-info-circle fa-lg" style="position:absolute; top:30px; right:40px" data-toggle="tooltip" title="If Total value is given as the input. Price, CGST, SGST will be computed based on Tax slab, Discount slab and Total quantity."></i>
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="table-body">
                         <tr class="table-row" v-for="(item,index) in items">
-                            <td style="width: 45px">{{index+1}}</td>
-                            <td v-if="Id"><input type="text" readonly v-model="item.Name" class="form-control form-control-sm" /></td>
-                            <td style="width: 200px;">
-                                <select v-bind:id="'product-sel-'+index" :data-id="index" class="product-select-2 js-example-basic-single js-states form-control"></select>
+                            <td style="width: 15px; padding: 0px !important">{{index+1}}</td>
+                            <td style="width: 240px;">
+                                <div class="custom-select-rmb" style="position:relative !important">
+                                    <input type="text" :data-index="index" v-model="item.Name" class="form-control form-control-sm" placeholder="Search">
+                                    <ul class="list-group custom-select-border" style="position:absolute; z-index:1000; width:100%;"></ul>
+                                </div>
+                                @*<select v-if="!item.isEditName" v-bind:id="'product-sel-'+index" :data-id="index" class="product-select-2 js-example-basic-single js-states form-control"></select>
+                                <i class="fa fa-edit" style="cursor:pointer !important"></i>
+                                <input v-if="item.isEditName" type="text" v-model="item.Name" style="margin-top:5px; height:20px;" class="form-control form-control-sm">*@
                             </td>
                             <td> <input type="text" readonly v-model="item.HSN" class="form-control form-control-sm"></td>
-                            <td> <input type="text" v-model="item.Price" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
-                            <td> <input type="text" v-model="item.Quantity" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
-                            <td> <input type="text" v-model="item.Discount" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
-                            <td> <input type="text" v-model="item.GST" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
-                            <td> <input type="text" readonly v-model="item.TotalCGSTAmount" class="form-control form-control-sm"></td>
-                            <td> <input type="text" readonly v-model="item.TotalSGSTAmount" class="form-control form-control-sm"></td>
-                            @*<td> <input type="text" readonly v-model="item.TotalDiscount" class="form-control form-control-sm"></td>*@
-                            <td> <input type="text" readonly v-model="item.TotalAmount" class="form-control form-control-sm"></td>
+                            <td> <input type="number" v-model="item.Quantity" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
+                            <td> <input type="number" v-model="item.Price" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
+                            <td> <input type="number" v-model="item.Discount" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
+                            <td> <input type="number" v-model="item.GST" v-on:keyup="calculatePerItemAmount(index)" class="form-control form-control-sm"></td>
+                            <td> <input type="number" readonly v-model="item.TotalCGSTAmount" class="form-control form-control-sm"></td>
+                            <td> <input type="number" readonly v-model="item.TotalSGSTAmount" class="form-control form-control-sm"></td>
+                            <td> <input type="text" readonly v-model="item.SubTotal" class="form-control form-control-sm"></td>
+                            <td style="position:relative">
+                                <input type="number" v-model="item.TotalAmount" v-on:keyup="calculatePerItemAmount(index, false)" class="form-control form-control-sm">
+                                <i class="fa fa-trash fa-lg show-on-hover" v-on:click="deleteBillRow(index)" style="position:absolute; right:10px; top:15px; cursor:pointer"></i>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -176,11 +268,11 @@
                             </tr>
                             <tr>
                                 <th>GSTIN:</th>
-                                <td><input type="text" v-model="CustomerGSTIN" class="form-control form-control-sm"></td>
+                                <td><input type="text" customValidation="gstin" v-model="CustomerGSTIN" class="form-control form-control-sm"></td>
                             </tr>
                             <tr>
                                 <th>Phone Number:</th>
-                                <td><input type="text" v-model="CustomerMobileNumber" class="form-control form-control-sm"></td>
+                                <td><input type="text" customValidation="phone" v-model="CustomerMobileNumber" class="form-control form-control-sm"></td>
                             </tr>
                             <tr>
                                 <th>Address:</th>
@@ -293,11 +385,56 @@
                 </div>
             </div>
         </div>
-        
-    
-    
+    </div>
+
+    @*Modal for bill settings*@
+    <div class="modal d-print-none" id="bill-settings-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Bill Settings.</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info" role="alert">
+                        On selecting the product at the time billing, If GST is already included in the Product price 
+                        then map the Product columns to the Billing total column or else if GST is to be included on the 
+                        Product price then map the Product available columns to the Billing Price column
+                    </div>
+                    <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
+                        <tr>
+                            <th class="text-center">Product Columns</th>
+                            <th class="text-center" style="vertical-align:middle !important" rowspan="3">Map To</th>
+                            <th class="text-center">Bill Columns</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <select class="form-control form-control-sm" v-model="billSettings.ProductColumn">
+                                    <option value="Price">List Price</option>
+                                    <option value="DiscountPrice">Buy Price</option>
+                                    <option value="SellPrice">Sell Price</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select class="form-control form-control-sm" v-model="billSettings.BillColumn">
+                                    <option value="Price">Price </option>
+                                    <option value="TotalAmount">Total</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" v-on:click="updateBillSettings()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @*Modal for success on save bill*@
-    <div class="modal" id="success-modal" tabindex="-1" role="dialog">
+    <div class="modal d-print-none" id="success-modal" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -310,158 +447,126 @@
             </div>
         </div>
     </div>
-    
 
-    <div id="print-bill" class="card" v-show="isPreview" style="color: #6c757d !important; font-size: 0.90em; border:none">
-            <div class="card-header text-center" style="border:none">
-                <strong class="text-center">Tax Invoice</strong>
-                <span class="pull-right">(ORIGINAL FOR RECIPIENT)</span>
-            </div>
-            <div class="card-body pt-0">
-                <div class="row border-bottom border-left border-right border-top">
-                    <div class="col-sm-4 border-right border-bottom" style="padding-bottom: 30px;">
-                        <table style="width:100%" class="table-borderless">
-                            <tr>
-                                <th colspan=2>@Model.BusinessName</th>
-                            </tr>
-                            <tr>
-                                <td colspan=2>@Model.Address</td>
-                            </tr>
-                            <tr>
-                                <td>GSTIN/UIN:</td>
-                                <td>@Model.GSTIN</td>
-                            </tr>
-                            <tr>
-                                <td>Email:</td>
-                                <td>@Model.Email</td>
-                            </tr>
-                            <tr>
-                                <td>Phone:</td>
-                                <td>@Model.MobileNumber</td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="col-sm-4 border-right border-bottom">
-                        <table style="width: 100%" class="table-borderless">
-                            <tr>
-                                <td colspan=2>Buyer</td>
-                            </tr>
-                            <tr>
-                                <th colspan=2>{{CustomerName}}</th>
-                            </tr>
-                            <tr>
-                                <td colspan=2>{{CustomerAddress}}</td>
-                            </tr>
-                            <tr>
-                                <td>GSTIN/UIN:</td>
-                                <td>{{CustomerGSTIN}}</td>
-                            </tr>
-                            <tr>
-                                <td>Phone:</td>
-                                <td>{{CustomerMobileNumber}}</td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="col-sm-4 border-bottom">
-                        <table style="width:100%" class="table-borderless">
-                            <tr>
-                                <th>Date:</th>
-                                <td>{{Date}}</td>
-                            </tr>
-                            <tr>
-                                <th>Invoice:</th>
-                                <td>{{Invoice}}</td>
-                            </tr>
-                            <tr>
-                                <th>Dispatched Vehicle No.</th>
-                                <td>
-                                    {{DispatchVehicleNumber}}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Dispatched Reference(s):</th>
-                                <td>
-                                    {{DispatchReferenceName}}
-                                </td>
-                            </tr>
-                        </table>
+    <div id="print-bill" class="card" v-show="isPreview" style="border:none; margin-left:10px !important; margin-right:10px !important">
+        <div class="card-header text-center" style="border:none">
+            <strong class="text-center">Tax Invoice</strong>
+            <span class="pull-right">(ORIGINAL FOR RECIPIENT)</span>
+        </div>
+        <div class="card-body pt-0">
+            <div class="row">
+                <div class="col-sm-4 border-right border-top border-left border-bottom A4pb">
+                    <table style="width:100%" class="table-borderless">
+                        <tr>
+                            <th colspan=2>@Model.BusinessName</th>
+                        </tr>
+                        <tr>
+                            <th colspan=2>@Model.Address</th>
+                        </tr>
+                        <tr>
+                            <th>GSTIN/UIN:</th>
+                            <td>@Model.GSTIN</td>
+                        </tr>
+                        <tr>
+                            <th>Email:</th>
+                            <td>@Model.Email</td>
+                        </tr>
+                        <tr>
+                            <th>Phone:</th>
+                            <td>@Model.MobileNumber</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-sm-4 border-right border-top border-bottom">
+                    <table style="width: 100%" class="table-borderless">
+                        <tr>
+                            <td colspan=2>Buyer</td>
+                        </tr>
+                        <tr>
+                            <th colspan=2>{{CustomerName}}</th>
+                        </tr>
+                        <tr>
+                            <th colspan=2>{{CustomerAddress}}</th>
+                        </tr>
+                        <tr>
+                            <th>GSTIN/UIN:</th>
+                            <td>{{CustomerGSTIN}}</td>
+                        </tr>
+                        <tr>
+                            <th>Phone:</th>
+                            <td>{{CustomerMobileNumber}}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-sm-4 border-bottom border-right border-top">
+                    <table style="width:100%" class="table-borderless">
+                        <tr>
+                            <th>Date:</th>
+                            <td>{{Date}}</td>
+                        </tr>
+                        <tr>
+                            <th>Invoice:</th>
+                            <td>{{Invoice}}</td>
+                        </tr>
+                        <tr>
+                            <th>Dispatched Vehicle No.</th>
+                            <td>
+                                {{DispatchVehicleNumber}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Dispatched Reference(s):</th>
+                            <td>
+                                {{DispatchReferenceName}}
+                            </td>
+                        </tr>
+                    </table>
 
-                    </div>
-                    <div class="col-md-12 pr-0 pl-0">
-                        <div class="table-responsive-sm">
-                            <table style="color: #6c757d !important;" class="table table-custom table-borderless table-sm mb-0">
-                                <thead>
-                                    <tr>
-                                        <th class="border-left border-right border-top border-bottom text-center" scope="col" style="width: 45px;">#</th>
-                                        <th class="border-right border-top border-bottom text-center" scope="col" style="width: 400px;">Description of Goods</th>
-                                        <th class="border-right border-top border-bottom text-center" scope="col">HSN/SAC</th>
-                                        <th class="border-right border-top border-bottom text-center" scope="col">GST Rate</th>
-                                        @*<th scope="col">SGST Tax</th>
-                                <th scope="col">CGST Tax</th>*@
-                                        <th class="border-right border-top border-bottom text-center" scope="col">Quantity</th>
-                                        <th class="border-right border-top border-bottom text-center" scope="col">Rate</th>
-                                        <th class="border-right border-top border-bottom text-center" scope="col">per</th>
-                                        <th class="border-right border-top border-bottom text-center" scope="col">Disc %</th>
-                                        <th class="border-right border-bottom border-top text-center" scope="col">Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="(item,index) in items" v-if="item.Name">
-                                        <td class="text-center border-left border-right">{{index+1}}</td>
-                                        <td class="left strong border-right" style="width: 400px;">{{item.Name}}</td>
-                                        <td class="border-right text-center">{{item.HSN}}</td>
-                                        <td class="text-center border-right">{{displayFormat(item.GST)}}%</td>
-                                        @*<td class="center">{{displayFormat(item.TotalSGSTAmount)}}</td>
-                                <td class="center">{{displayFormat(item.TotalCGSTAmount)}}</td>*@
-                                        <td class="border-right">{{item.Quantity}}</td>
-                                        <td class="border-right">{{displayFormat(item.Price)}}</td>
-                                        <td class="border-right">{{item.MeasuringUnit}}</td>
-                                        <td class="border-right">{{displayFormat(item.Discount)}}</td>
-                                        <td class="text-right border-right">{{displayFormat(item.TotalAmount)}}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="border-left border-right"></td>
-                                        <td class="border-right"></td>
-                                        <td class="border-right"></td>
-                                        <td class="border-right"></td>
-                                        <td class="border-right"></td>
-                                        <td class="border-right"></td>
-                                        <td class="border-right"></td>
-                                        <td class="border-right"></td>
-                                        <td class="text-right border-right" style="border-top:1px solid #eee"><strong>{{displayFormat(subTotal)}}</strong></td>
-                                    </tr>
-                                    <template v-for="(value, propertyName) in taxSlot">
-                                        <tr>
-                                            <td class="center border-left border-right"></td>
-                                            <td class="text-center border-right">
-                                                <strong>Output &nbsp; SGST@@{{propertyName}}%</strong>
-                                            </td>
-                                            <td class="border-right"></td>
-                                            <td class="border-right"></td>
-                                            <td class="border-right"></td>
-                                            <td class="border-right"></td>
-                                            <td class="border-right"></td>
-                                            <td class="border-right"></td>
-                                            <td class="text-right border-right">{{displayFormat(value)}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="center border-left border-right"></td>
-                                            <td class="text-center border-right">
-                                                <strong>Output &nbsp; CGST@@{{propertyName}}%</strong>
-                                            </td>
-                                            <td class="border-right"></td>
-                                            <td class="border-right"></td>
-                                            <td class="border-right"></td>
-                                            <td class="border-right"></td>
-                                            <td class="border-right"></td>
-                                            <td class="border-right"></td>
-                                            <td class="text-right border-right">{{displayFormat(value)}}</td>
-                                        </tr>
-                                    </template>
-                                    <tr>
+                </div>
+                <div class="col-md-12 pr-0 pl-0">
+                    <div class="table-responsive-sm">
+                        <table class="table table-custom table-borderless table-sm mb-0 A4h">
+                            <thead>
+                                <tr style="height:23px;">
+                                    <th class="border-right border-bottom border-left text-center A4w45" scope="col">#</th>
+                                    <th class="border-right border-bottom text-center A4w400" scope="col">Description of Goods</th>
+                                    <th class="border-right border-bottom text-center" scope="col">HSN/SAC</th>
+                                    <th class="border-right border-bottom text-center" scope="col">GST Rate</th>
+                                    <th class="border-right border-bottom text-center" scope="col">Quantity</th>
+                                    <th class="border-right border-bottom text-center" scope="col">Rate</th>
+                                    <th class="border-right border-bottom text-center" scope="col">per</th>
+                                    <th class="border-right border-bottom text-center" scope="col">Disc %</th>
+                                    <th class="border-bottom text-center border-right" scope="col">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(item,index) in items" v-if="item.Name" style="height:23px;">
+                                    <td class="text-center border-left border-right A4w45">{{index+1}}</td>
+                                    <td class="left strong border-right A4w400" style="padding-left:10px !important;">{{item.Name}}</td>
+                                    <td class="border-right text-center">{{item.HSN}}</td>
+                                    <td class="text-center border-right">{{displayFormat(item.GST, true)}}</td>
+                                    <td class="border-right text-center">{{item.Quantity}} {{item.MeasuringUnit}}</td>
+                                    <td class="border-right text-center">{{displayFormat(item.Price)}}</td>
+                                    <td class="border-right text-center">{{item.MeasuringUnit}}</td>
+                                    <td class="border-right text-center">{{displayFormat(item.Discount, true)}}</td>
+                                    <td class="text-right text-center border-right">{{displayFormat(item.SubTotal)}}</td>
+                                </tr>
+                                <tr style="height:23px;">
+                                    <td class="border-right border-left"></td>
+                                    <td class="border-right"></td>
+                                    <td class="border-right"></td>
+                                    <td class="border-right"></td>
+                                    <td class="border-right"></td>
+                                    <td class="border-right"></td>
+                                    <td class="border-right"></td>
+                                    <td class="border-right"></td>
+                                    <td class="text-center border-right border-top"><strong>{{displayFormat(subTotal)}}</strong></td>
+                                </tr>
+                                <template v-for="(value, propertyName) in taxSlot">
+                                    <tr style="height:23px;">
                                         <td class="center border-left border-right"></td>
                                         <td class="text-center border-right">
-                                            <strong>Round Off</strong>
+                                            <strong>Output &nbsp; SGST@@{{propertyName}}%</strong>
                                         </td>
                                         <td class="border-right"></td>
                                         <td class="border-right"></td>
@@ -469,88 +574,133 @@
                                         <td class="border-right"></td>
                                         <td class="border-right"></td>
                                         <td class="border-right"></td>
-                                        <td class="text-right border-right">{{displayFormat(RoundOff)}}</td>
+                                        <td class="text-center border-right">{{displayFormat(value)}}</td>
                                     </tr>
-                                    <tr>
-                                        <td class="center border-left border-right border-top border-bottom"></td>
-                                        <td class="text-center border-right border-top border-bottom">
-                                            <strong>Total</strong>
+                                    <tr style="height:23px;">
+                                        <td class="center border-left border-right"></td>
+                                        <td class="text-center border-right">
+                                            <strong>Output &nbsp; CGST@@{{propertyName}}%</strong>
                                         </td>
-                                        <td class="border-right border-top border-bottom"></td>
-                                        <td class="border-right border-top border-bottom"></td>
-                                        <td class="text-right border-right border-top border-bottom">
-                                            <strong>
-                                                {{TotalQuantity}}
-                                            </strong>
-                                        </td>
-                                        <td class="border-right border-top border-bottom"></td>
-                                        <td class="border-right border-top border-bottom"></td>
-                                        <td class="border-right border-top border-bottom"></td>
-                                        <td class="text-right border-right border-top border-bottom">
-                                            <strong>
-                                                <i class="fa fa-inr"></i>
-                                                {{displayFormat(total)}}
-                                            </strong>
-                                        </td>
+                                        <td class="border-right"></td>
+                                        <td class="border-right"></td>
+                                        <td class="border-right"></td>
+                                        <td class="border-right"></td>
+                                        <td class="border-right"></td>
+                                        <td class="border-right"></td>
+                                        <td class="text-center border-right">{{displayFormat(value)}}</td>
                                     </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                                </template>
+                                <tr style="height:23px;">
+                                    <td class="center border-left border-right"></td>
+                                    <td class="text-center border-right">
+                                        <strong>Round Off</strong>
+                                    </td>
+                                    <td class="border-right"></td>
+                                    <td class="border-right"></td>
+                                    <td class="border-right"></td>
+                                    <td class="border-right"></td>
+                                    <td class="border-right"></td>
+                                    <td class="border-right"></td>
+                                    <td class="text-center border-right">{{displayFormat(RoundOff)}}</td>
+                                </tr>
+                                <tr v-for="(data) in emptyProductCount" style="height:23px;">
+                                    <td class="text-center border-left border-right A4w45"></td>
+                                    <td class="left strong border-right A4w400" style="padding-left:10px !important;"></td>
+                                    <td class="border-right text-center"></td>
+                                    <td class="text-center border-right"></td>
+                                    <td class="border-right text-center"></td>
+                                    <td class="border-right text-center"></td>
+                                    <td class="border-right text-center"></td>
+                                    <td class="border-right text-center"></td>
+                                    <td class="text-right text-center border-right"></td>
+                                </tr>
+                                <tr style="height:23px;">
+                                    <td class="center border-left border-right border-top border-bottom"></td>
+                                    <td class="text-center border-right border-top border-bottom">
+                                        <strong>Total</strong>
+                                    </td>
+                                    <td class="border-right border-top border-bottom"></td>
+                                    <td class="border-right border-top border-bottom"></td>
+                                    <td class="text-center border-right border-top border-bottom">
+                                        <strong>
+                                            {{TotalQuantity}}
+                                        </strong>
+                                    </td>
+                                    <td class="border-right border-top border-bottom"></td>
+                                    <td class="border-right border-top border-bottom"></td>
+                                    <td class="border-right border-top border-bottom"></td>
+                                    <td class="text-center border-top border-bottom border-right">
+                                        <strong>
+                                            <i class="fa fa-inr"></i>
+                                            {{displayFormat(total)}}
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="col-md-12 pt-2 pb-2 border-bottom">
-                        <span>
-                            Amount (in words) &nbsp;
-                            <strong>
-                                <i class="fa fa-inr"></i>
-                                {{TotalInWords}} Only
-                            </strong>
+                </div>
+                <div class="col-md-12 pt-2 pb-2 border-left border-bottom border-right border-bottom">
+                    <span>
+                        Amount (in words) &nbsp;
+                        <strong>
+                            <i class="fa fa-inr"></i>
+                            {{TotalInWords}} Only
+                        </strong>
+                    </span>
+                </div>
+                <div class="col-md-6 col-sm-6 border-left border-bottom">
+                    <div><strong>Declaration</strong></div>
+                    <div>
+                        We declare that this Invoice shows the actual price of the goods
+                        described and that all particulars are true and correct
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6 border-right border-bottom">
+                    <div><strong class="pull-right">for @Model.BusinessName</strong></div>
+                    <div style="padding-top: 35px;">
+                        <span class="pull-right">
+                            Authorised Signatory
                         </span>
                     </div>
-                    <div class="col-md-6 col-sm-6">
-                        <div><strong>Declaration</strong></div>
-                        <div>
-                            We declare that this Invoice shows the actual price of the goods
-                            described and that all particulars are true and correct
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-sm-6">
-                        <div><strong class="pull-right">for @Model.BusinessName</strong></div>
-                        <div style="padding-top: 35px;">
-                            <span class="pull-right">
-                                Authorised Signatory
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 offset-4">
-                    This is a Computer Generated Invoice.
                 </div>
             </div>
+            <div class="col-md-6 offset-4">
+                This is a Computer Generated Invoice.
+            </div>
+        </div>
     </div>
 </div>
-<script src="~/Scripts/NumberToWords.js"></script>
-<script>
-    $(document).ready(function() {
+    <script src="~/Scripts/NumberToWords.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            var getNewItemRow = function () {
+                var row = {
+                    Name: "",
+                    HSN: "",
+                    MeasuringUnit: "",
+                    Quantity: "",
+                    TotalCGSTAmount: "",
+                    TotalSGSTAmount: "",
+                    TotalAmount: "",
+                    SubTotal: "",
+                    Price: "",
+                    GST: "",
+                    CGST: "",
+                    SGST: "",
+                    Discount: "",
+                    TotalDiscount: "",
+                    ItemId: 0,
+                    SaleId: 0,
+                    Id: 0,
+                    isEditName: false
+                }
+                return row;
+            }
         var items = [];
-        for (var i = 0; i < 25; i++) {
-            items.push({
-                Name: "",
-                HSN: "",
-                MeasuringUnit: "",
-                Quantity: "",
-                TotalCGSTAmount: "",
-                TotalSGSTAmount: "",
-                TotalAmount: "",
-                Price: "",
-                GST: "",
-                CGST: "",
-                SGST: "",
-                Discount: "",
-                TotalDiscount: "",
-                ItemId: 0,
-                SaleId: 0,
-                Id: 0
-            });
+            for (var i = 0; i < 25; i++) {
+                items.push(getNewItemRow());
         }
 
         function getDate() {
@@ -580,7 +730,7 @@
             items: items,
             isPreview: false,
             isSelect2Rendered: true,
-            CustomerId:0,
+            CustomerId: 0,
             CustomerName: "",
             CustomerGSTIN: "",
             CustomerAddress: "",
@@ -592,58 +742,95 @@
             TotalInWords: "",
             Date: getDate(),
             RoundOff: "",
-            TotalQuantity:"",
+            TotalQuantity: "",
             isPrintOnly: false, // This property is set to true only if print is given from sales grid
             printPageSettings: "",
             customerType: "isExistingCustomer",
-            IsSaveNewCustomer: false
+            IsSaveNewCustomer: false,
+            IsA4: true,
+            emptyProductCount: [],
+            isComputeTaxOnTotal: true,
+            billSettings: {
+                productColumn: "",
+                billColumn:""
+            }
         }
         new Vue({
             el: '#app',
             data: obj,
             methods: {
-                calculatePerItemAmount: function(index) {
+                deleteBillRow: function (index) {
+                    var isconf = confirm("Are you sure you want to remove the item from the bill ?");
+                    if (isconf === true) {
+                        this.items.splice(index, 1);
+                        this.items.push(getNewItemRow());
+                        this.initSelect2();
+                    }
+                },
+                openBillSettingsModal: function () {
+                    $("#bill-settings-modal").modal({ backdrop: 'static', keyboard: false, show: true });
+                },
+                calculatePerItemAmount: function (index, isComputeTaxOnProductPrice = true) {
+                    var self = this;
                     var ref = this.items[index];
                     var taxInPercentage = this.roundOffTwoPlace(ref.GST / 2);
                     ref.CGST = taxInPercentage;
                     ref.SGST = taxInPercentage;
-                    var totalAmountWithNoDiscount = Math.round((ref.Price * ref.Quantity) * 100) / 100;
-                    var discountPrice = ref.Discount
-                        ? totalAmountWithNoDiscount - (ref.Price * ref.Quantity * ref.Discount) / 100
-                        : totalAmountWithNoDiscount;
-                    ref.TotalAmount = Math.round(discountPrice * 100) / 100;
-                    ref.TotalDiscount = Math.round((totalAmountWithNoDiscount - discountPrice) * 100) / 100;
-                    var tax = Math.round(((ref.TotalAmount * taxInPercentage) / 100) * 100) / 100;
-                    ref.TotalCGSTAmount = tax;
-                    ref.TotalSGSTAmount = tax;
+                    if (isComputeTaxOnProductPrice) {
+                        var totalAmountWithNoDiscount = Math.round((ref.Price * ref.Quantity) * 100) / 100;
+                        var discountPrice = ref.Discount
+                            ? totalAmountWithNoDiscount - (ref.Price * ref.Quantity * ref.Discount) / 100
+                            : totalAmountWithNoDiscount;
+                        ref.SubTotal = Math.round(discountPrice * 100) / 100;
+                        ref.TotalDiscount = Math.round((totalAmountWithNoDiscount - discountPrice) * 100) / 100;
+                        var tax = Math.round(((ref.SubTotal * taxInPercentage) / 100) * 100) / 100;
+                        ref.TotalCGSTAmount = tax;
+                        ref.TotalSGSTAmount = tax;
+                        ref.TotalAmount = Math.round((discountPrice + 2 * tax) * 100) / 100;
+                    }
+                    else {
+                        // reverse tax computation is computed on total price
+                        var gstDividentValue = 100 + self.roundOffTwoPlace(ref.GST);
+                        var subTotal = ((ref.TotalAmount * 100) / gstDividentValue);
+                        var taxAmount = self.roundOffTwoPlace((ref.TotalAmount - subTotal) / 2);
+                        ref.SubTotal = self.roundOffTwoPlace(subTotal);
+                        ref.TotalCGSTAmount = taxAmount;
+                        ref.TotalSGSTAmount = taxAmount;
+                        if (ref.Discount) {
+                            var discountDividentValue = 100 - ref.Discount;
+                            var priceValue = ((subTotal * 100) / discountDividentValue);
+                            ref.Price = self.roundOffTwoPlace(priceValue / ref.Quantity);
+                        } else {
+                            ref.Price = self.roundOffTwoPlace(subTotal / ref.Quantity);
+                        }
+                    }
                 },
                 closeAlertMessage: function(property) {
                     this[property] = "";
                 },
-                displayFormat: function (data) {
-                    return Number(data).toLocaleString(undefined, { minimumFractionDigits: 2 })
+                displayFormat: function (data, isPercent = false) {
+                    var formatNumber = Number(data).toLocaleString(undefined, { minimumFractionDigits: 2 })
+                    if (formatNumber && isPercent) {
+                        var split = formatNumber.split(".");
+                        if (split[0] !== "0" && split[1][0].includes("0")) {
+                            return split[0] + "%";
+                        }
+                        else if (split[0] === "0") {
+                            return "";
+                        }
+                    }
+                    return formatNumber;
                 },
-                showOrHidePreview: function(value) {
+                showOrHidePreview: function (value) {
+                    this.getEmptyProductCount();
                     this.isPreview = value;
                     this.TotalInWords = convertNumberToWords(this.total);
                 },
-                print: function(id) {
+                print: function (id) {
                     this.isPreview = true;
-                    if (id === 2)
-                        this.printPageSettings.innerHTML = `@@page{
-                                                            size: 210mm 296mm;
-                                                            width: 210mm;
-                                                            height: 296mm;
-                                                            margin:0;
-                                                           }`;
-                    else
-                        this.printPageSettings.innerHTML = `@@page{
-                                                            size: 210mm 146mm;
-                                                            width: 210mm;
-                                                            height: 146mm;
-                                                            margin:0;
-                                                           }`;
-                    window.print();
+                    var conf = confirm("Are you sure you want to Print the bill")
+                    if (conf === true)
+                        window.print();
                 },
                 afterPrint: function () {
                     if (!this.isPrintOnly)
@@ -714,45 +901,61 @@
                         });
                     }
                 },
+                getEmptyProductCount: function () {
+                    var self = this;
+                    self.emptyProductCount = [];
+                    var totalTaxSlab = Object.keys(self.taxSlot).length - 1;
+                    var skipEmptyCount = totalTaxSlab * 2;
+                    self.items.forEach(function (data) {
+                        if (data.Name.trim().length === 0) {
+                            if (skipEmptyCount > 0) {
+                                skipEmptyCount--;
+                            }
+                            else
+                                self.emptyProductCount.push(1);
+                        }
+                    });
+                },
                 initSelect2: function () {
                     var self = this;
 
-                    $(".product-select-2").select2({
-                        ajax: {
-                            url: "/item/GetDataBySearch",
-                            dataType: 'json',
-                            delay: 250,
-                            data: function (params) {
-                                return {
-                                    q: params.term,
-                                    page: params.page
-                                };
-                            },
-                            processResults: function (data, params) {
-                                var products = [];
-                                data.forEach((product) => {
-                                    products.push({
-                                        id: product.Id,
-                                        text: product.Name,
-                                        Price: product.Price,
-                                        CGST: product.CGST,
-                                        SGST: product.SGST,
-                                        DiscountPrice: product.DiscountPrice,
-                                        Discount: product.Discount,
-                                        HSN: product.HSN,
-                                        MeasuringUnit: product.MeasuringUnit
-                                    });
-                                });
+                    //$(".product-select-2").select2({
+                    //    ajax: {
+                    //        url: "/item/GetDataBySearch",
+                    //        dataType: 'json',
+                    //        delay: 250,
+                    //        data: function (params) {
+                    //            return {
+                    //                q: params.term,
+                    //                page: params.page
+                    //            };
+                    //        },
+                    //        processResults: function (data, params) {
+                    //            var products = [];
+                    //            var productColumn = self.billSettings.ProductColumn;
+                    //            data.forEach((product) => {
+                    //                products.push({
+                    //                    id: product.Id,
+                    //                    text: product.Name,
+                    //                    Price: product[productColumn],
+                    //                    CGST: product.CGST,
+                    //                    SGST: product.SGST,
+                    //                    DiscountPrice: product.DiscountPrice,
+                    //                    Discount: product.Discount,
+                    //                    HSN: product.HSN,
+                    //                    MeasuringUnit: product.MeasuringUnit
+                    //                });
+                    //            });
 
-                                return {
-                                    results: products
-                                };
-                            },
-                            cache: true
-                        },
-                        placeholder: 'Search for a Product',
-                        minimumInputLength: 1
-                    });
+                    //            return {
+                    //                results: products
+                    //            };
+                    //        },
+                    //        cache: true
+                    //    },
+                    //    placeholder: 'Search for a Product',
+                    //    minimumInputLength: 1
+                    //});
 
 
                     $(".customer-select-2").select2({
@@ -799,13 +1002,15 @@
                             self.CustomerGSTIN = data.GSTIN;
                         });
 
-                    $('.product-select-2').on('select2:select',
-                        function(e) {
-                            var index = parseInt($(this).attr('data-id'));
-                            var data = e.params.data;
-                            self.items[index].ItemId = data.id;
-                            self.items[index].Name = data.text;
-                            self.items[index].Price = data.Price;
+
+                    var obj = {
+                        ele: ".custom-select-rmb", endPoint: "/item/GetDataBySearch", prop: "Name", callback: function (ele, value) {
+                            var billColumn = self.billSettings.BillColumn;
+                            var index = parseInt(ele.attr('data-index'));
+                            var data = JSON.parse(value);
+                            self.items[index].ItemId = data.Id;
+                            self.items[index].Name = data.Name;
+                            self.items[index][billColumn] = data.Price;
                             self.items[index].GST = data.CGST + data.SGST;
                             self.items[index].CGST = data.CGST;
                             self.items[index].SGST = data.SGST;
@@ -815,7 +1020,67 @@
                             self.items[index].HSN = data.HSN;
                             self.items[index].Id = 0;
                             self.items[index].MeasuringUnit = data.MeasuringUnit;
-                            self.calculatePerItemAmount(index);
+
+                            if (billColumn === "TotalAmount")
+                                self.calculatePerItemAmount(index, false);
+                            else
+                                self.calculatePerItemAmount(index);
+                        }
+                    };
+
+                    selectSearchEvent(obj);
+
+                    //$('.product-select-2').on('select2:select',
+                    //    function (e) {
+                    //        var billColumn = self.billSettings.BillColumn;
+                    //        var index = parseInt($(this).attr('data-id'));
+                    //        var data = e.params.data;
+                    //        self.items[index].ItemId = data.id;
+                    //        self.items[index].Name = data.text;
+                    //        self.items[index][billColumn] = data.Price;
+                    //        self.items[index].GST = data.CGST + data.SGST;
+                    //        self.items[index].CGST = data.CGST;
+                    //        self.items[index].SGST = data.SGST;
+                    //        self.items[index].Quantity = 1;
+                    //        self.items[index].Discount = data.Discount || 0;
+                    //        self.items[index].DiscountPrice = data.DiscountPrice;
+                    //        self.items[index].HSN = data.HSN;
+                    //        self.items[index].Id = 0;
+                    //        self.items[index].MeasuringUnit = data.MeasuringUnit;
+
+                    //        if (billColumn === "TotalAmount")
+                    //            self.calculatePerItemAmount(index, false);
+                    //        else
+                    //            self.calculatePerItemAmount(index);
+                    //    });
+                },
+                prefillSelect2Data: function (count) {
+                    var self = this;
+                    var ele = $(".product-select-2");
+                    for (var i = 0; i < count; i++) {
+                        var curr = $(ele[i]);
+                        // setting negative id so that on search of select works properly if value is overriden.
+                        var option = new Option(self.items[i].Name, "-2");
+                        curr.append(option).trigger('change');
+                    }
+                },
+                getBillSettings: function () {
+                    var self = this;
+                    $.get("/Billing/GetBillSettings", function (res) {
+                        if (res) {
+                            self.billSettings = res;
+                        }
+                    })
+                },
+                updateBillSettings: function () {
+                    var self = this;
+                    $.post("/Billing/UpdateBillSettings",
+                        self.billSettings,
+                        function (data) {
+                            $("#bill-settings-modal").modal("hide");
+                            self.alertMessage = "settings updated succesfully";
+                        }).fail(function () {
+                            self.alertFailureMessage = "Internal server error";
                         });
                 }
             },
@@ -834,8 +1099,8 @@
                 subTotal: function() {
                     var totalAmount = 0;
                     var totalItems = 0;
-                    this.items.forEach(function(item) {
-                        totalAmount += parseFloat(item.TotalAmount || 0);
+                    this.items.forEach(function (item) {
+                        totalAmount += parseFloat(item.SubTotal || 0);
                         totalItems += parseInt(item.Quantity || 0);
                     });
                     this.TotalQuantity = totalItems;
@@ -867,6 +1132,9 @@
                 var isPrint = url.includes("pid");
                 var id = parseInt(url.substring(url.lastIndexOf('/') + 1));
 
+
+                self.getBillSettings();
+
                 self.isPreview = isPrint;
                 self.isPrintOnly = isPrint;
                 // Edit functionality
@@ -889,13 +1157,19 @@
                             self.Date = data.SaleDetail.FormatDate;
                             self.Id = data.SaleDetail.Id;
 
+                            if (data.Customer.Name) {
+                                var option = new Option(data.Customer.Name, "-2");
+                                $(".customer-select-2").append(option).trigger('change');
+                            }
+
                             if (self.items.length) {
                                 data.SaleItems.forEach(function(data, index) {
                                     self.items[index].Name = data.Name;
                                     self.items[index].Quantity = data.Quantity;
                                     self.items[index].TotalCGSTAmount = data.TotalCGSTAmount;
                                     self.items[index].TotalSGSTAmount = data.TotalSGSTAmount;
-                                    self.items[index].TotalAmount = data.TotalAmount;
+                                    self.items[index].TotalAmount = data.TotalAmount; 
+                                    self.items[index].SubTotal = data.SubTotal; 
                                     self.items[index].Price = data.Price;
                                     self.items[index].CGST = data.CGST;
                                     self.items[index].SGST = data.SGST;
@@ -908,19 +1182,22 @@
                                     self.items[index].HSN = data.HSN;
                                     self.items[index].MeasuringUnit = data.MeasuringUnit;
                                 });
+                                self.prefillSelect2Data(data.SaleItems.length);
+                                self.getEmptyProductCount();
                             };
                         });
                 }
 
-                self.printPageSettings = document.createElement('style');
-                document.head.appendChild(self.printPageSettings);
-                self.printPageSettings.innerHTML = "";
+                //self.printPageSettings = document.createElement('style');
+                //document.head.appendChild(self.printPageSettings);
+                //self.printPageSettings.innerHTML = "";
 
                 self.initSelect2();
+                validation[0].register();
                 window.onafterprint = self.afterPrint;
             }
         });
     });
-</script>
-
+    </script>
+    <script src="~/Scripts/customValidation.js"></script>
 

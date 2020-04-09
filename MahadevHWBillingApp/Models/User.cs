@@ -1,66 +1,67 @@
 ﻿using MahadevHWBillingApp.Helper;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace MahadevHWBillingApp.Models
 {
-    public class User
+    public class User : Profile
     {
-        public int Id { get; set; }
+        public new int Id { get; set; }
         public string Name { get; set; }
         public string Password { get; set; }
         public int AccountId { get; set; }
         public string AccountType { get; set; }
-        public string BusinessName { get; set; }
-        public string OwnerName { get; set; }
 
 
         public int IsEligible { get; set; }
         public string Key { get; set; }
         public string K1 { get; set; }
         public string GrantedBy { get; set; }
-        public int IsFreeTrial
+
+        [NotMapped]
+        public int IsFreeTrial { get; set; }
+
+
+        public void CheckForAccountValidity()
         {
-            get
+            if (string.IsNullOrEmpty(Key) && string.IsNullOrEmpty(K1))
+                IsFreeTrial = 0;
+            else if (IsEligible != 1)
+                IsFreeTrial = 0;
+
+            var value = EncryptDecryptData.Decrypt(Key);
+            var K1Value = EncryptDecryptData.Decrypt(K1);
+            if (!K1Value.Equals(System.Net.Dns.GetHostName()))
             {
-                if (string.IsNullOrEmpty(Key) && string.IsNullOrEmpty(K1))
-                    return 0;
-                else if (IsEligible != 1)
-                    return 0;
-
-                var value = EncryptDecryptData.Decrypt(Key);
-                var K1Value = EncryptDecryptData.Decrypt(K1);
-                if (!K1Value.Equals(System.Net.Dns.GetHostName()))
+                using (var context = new CoreContext())
                 {
-                    using (var context = new CoreContext())
-                    {
-                        var admin = context.Users.Where(e => e.AccountType.Equals(Models.AccountType.Admin)).FirstOrDefault();
-                        admin.IsEligible = 0;
-                        context.SaveChanges();
-                    }
-                    return 0;
+                    var admin = context.Users.ToList().Where(e => e.AccountType.Equals(Models.AccountType.Admin)).FirstOrDefault();
+                    admin.IsEligible = 0;
+                    context.SaveChanges();
                 }
-
-                try
-                {
-                    var parseDate = value.Trim().ToCustomDateTimeFormat();
-                    if (DateTime.Now.Date > parseDate)
-                    {
-                        return 2;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    using (var context = new CoreContext())
-                    {
-                        var admin = context.Users.Where(e => e.AccountType.Equals(Models.AccountType.Admin)).FirstOrDefault();
-                        admin.IsEligible = 0;
-                        context.SaveChanges();
-                    }
-                    return 2;
-                }
-                return 0;
+                IsFreeTrial = 0;
             }
+
+            try
+            {
+                var parseDate = value.Trim().ToCustomDateTimeFormat();
+                if (DateTime.Now.Date > parseDate)
+                {
+                    IsFreeTrial = 2;
+                }
+            }
+            catch (Exception ex)
+            {
+                using (var context = new CoreContext())
+                {
+                    var admin = context.Users.ToList().Where(e => e.AccountType.Equals(Models.AccountType.Admin)).FirstOrDefault();
+                    admin.IsEligible = 0;
+                    context.SaveChanges();
+                }
+                IsFreeTrial = 2;
+            }
+            IsFreeTrial = 0;
         }
     }
 

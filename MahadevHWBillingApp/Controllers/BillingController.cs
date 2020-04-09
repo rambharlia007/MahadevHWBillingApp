@@ -8,22 +8,18 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using MahadevHWBillingApp.Helper;
+using MahadevHWBillingApp.Filters;
 
 namespace MahadevHWBillingApp.Controllers
 {
     [HandleError]
+    [CustomSession]
     public class BillingController : BaseController
     {
         // GET: Billing
         public ActionResult New(int id = 0)
         {
-            if (_adminUser.IsEligible == 0)
-                return RedirectToAction("Admin", "Error");
-            else if (_adminUser.IsEligible == 1 && _adminUser.IsFreeTrial == 2)
-            {
-                return RedirectToAction("FreeTrial", "Error");
-            }
-            else if (Helper.Dapper.GetCount(Query.GetItemCount) == 0)
+            if (Helper.Dapper.GetCount(Query.GetItemCount) == 0)
             {
                 return RedirectToAction("EmptyProduct", "Billing");
             }
@@ -53,21 +49,24 @@ namespace MahadevHWBillingApp.Controllers
                     _mahadevHwContext.Sales.Add(bill.SaleDetail);
                     _mahadevHwContext.SaveChanges();
 
+                    var isStockCount = _profile.EnableStockCount;
                     foreach (var saleItem in bill.SaleItems)
                     {
                         saleItem.SaleId = bill.SaleDetail.Id;
                         _mahadevHwContext.SaleItems.Add(saleItem);
 
-                        var editItem = _mahadevHwContext.Items.SingleOrDefault(e => e.Id == saleItem.ItemId);
-                        editItem.Quantity -= saleItem.Quantity;
-                        editItem.SoldQuantity += saleItem.Quantity;
+                        if (isStockCount)
+                        {
+                            var editItem = _mahadevHwContext.Items.SingleOrDefault(e => e.Id == saleItem.ItemId);
+                            editItem.Quantity -= saleItem.Quantity;
+                            editItem.SoldQuantity += saleItem.Quantity;
+                        }
                     }
 
                     _mahadevHwContext.SaveChanges();
 
                     transaction.Commit();
                     return Json(new { Message = "Save successfull" });
-
                 }
                 catch (Exception ex)
                 {
@@ -77,12 +76,29 @@ namespace MahadevHWBillingApp.Controllers
                 }
             }
         }
+
+        public JsonResult GetBillSettings()
+        {
+            var result = _mahadevHwContext.BillingSettings.FirstOrDefault();
+            var response = Json(result, JsonRequestBehavior.AllowGet);
+            return response;
+        }
+
+        [HttpPost]
+        public JsonResult UpdateBillSettings(BillingSetting billingSetting)
+        {
+            _mahadevHwContext.Entry(billingSetting).State = EntityState.Modified;
+            _mahadevHwContext.SaveChanges();
+            return Json("Item Edited");
+        }
+
         public JsonResult Edit(Bill bill)
         {
             using (var transaction = _mahadevHwContext.Database.BeginTransaction())
             {
                 try
                 {
+                    bill.SaleDetail.CustomerId = bill.Customer.Id;
                     bill.SaleDetail.Date = DateTime.ParseExact(bill.SaleDetail.TempDate, "dd-MM-yyyy",
                         CultureInfo.InvariantCulture);
                     var productQuantityTracks = Helper.Dapper.Get<ProductQuantityTrack>(Query.GetProductsByBill(bill.SaleDetail.Id));
@@ -114,8 +130,8 @@ namespace MahadevHWBillingApp.Controllers
                     var deletedSaleItemIds = saleItemIdsOfBillBeforeEdit.Except(saleItemIdsOfBillAfterEdit);
                     foreach(var id in deletedSaleItemIds)
                     {
-                        var deleteSaleItem = _mahadevHwContext.SaleItems.Where(e => e.Id == id).First();
-                        var productUpdate = _mahadevHwContext.Items.Where(e => e.Id == deleteSaleItem.ItemId).First();
+                        var deleteSaleItem = _mahadevHwContext.SaleItems.ToList().Where(e => e.Id == id).First();
+                        var productUpdate = _mahadevHwContext.Items.ToList().Where(e => e.Id == deleteSaleItem.ItemId).First();
                         productUpdate.Quantity += deleteSaleItem.Quantity;
                         productUpdate.SoldQuantity -= deleteSaleItem.Quantity;
                         _mahadevHwContext.SaleItems.Remove(deleteSaleItem);

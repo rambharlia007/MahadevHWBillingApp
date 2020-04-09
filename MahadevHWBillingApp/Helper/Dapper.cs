@@ -32,13 +32,16 @@ namespace MahadevHWBillingApp.Helper
         {
             using (var con = new SQLiteConnection(Generic.GetConnectionString()))
             {
+
                 var gridReader = con.QueryMultiple(query);
                 var result = new Bill
                 {
                     SaleDetail = gridReader.ReadSingle<Sale>(),
                     SaleItems = gridReader.Read<SaleItem>().ToList(),
-                    Customer = gridReader.ReadSingle<Contact>()
+                    Customer = gridReader.ReadSingleOrDefault<Contact>()
                 };
+                if (result.Customer == null)
+                    result.Customer = new Contact() { Name = "Cash", Id = 0 };
                 return result;
             }
         }

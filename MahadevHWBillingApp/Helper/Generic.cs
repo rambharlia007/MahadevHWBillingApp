@@ -11,14 +11,19 @@ namespace MahadevHWBillingApp.Helper
             if (HttpContext.Current.Session != null && HttpContext.Current.Session["AccountId"] != null)
             {
                 var accountId = HttpContext.Current.Session["AccountId"].ToString();
-                return $@"Data Source=C:\SqlServerDataBase\DataBase\GSTBillingAccount{accountId}.db";
+                var parsedId = int.Parse(accountId);
+                if (parsedId <= 0)
+                    return null;
+                 return $@"Data Source=C:\SqlServerDataBase\DataBase\GSTBillingAccount{accountId}.db";
+                //return $@"Data Source=localhost;Initial Catalog=GSTBillingAccount{accountId};Integrated Security=True";
             }
-            return $@"Data Source=C:\SqlServerDataBase\DataBase\GSTBillingAccount1.db";
+            return null;
         }
 
         public static string GetCoreConnectionString()
         {
-            return @"Data Source=C:\SqlServerDataBase\DataBase\GSTCore.db";
+              return @"Data Source=C:\SqlServerDataBase\DataBase\GSTCore.db";
+            //return @"Data Source=localhost;Initial Catalog=GSTCore;Integrated Security=True";
         }
         public static string Invoice(string data)
         {

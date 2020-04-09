@@ -1,4 +1,5 @@
-﻿using MahadevHWBillingApp.Models;
+﻿using MahadevHWBillingApp.Filters;
+using MahadevHWBillingApp.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ using System.Web.Mvc;
 
 namespace MahadevHWBillingApp.Controllers
 {
-    [HandleError]
+    [CustomSession]
     public class DataController : BaseController
     {
 
@@ -55,6 +56,17 @@ namespace MahadevHWBillingApp.Controllers
                 return Json(ex.ToString(), JsonRequestBehavior.AllowGet);
             }
         
+        }
+
+        public JsonResult DBUpdate()
+        {
+            Helper.Dapper.Execute(@"Create Table BillingSettings(
+                                    Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                                    ProductColumn varchar(255),
+                                    BillColumn varchar(255)
+                                    )");
+            Helper.Dapper.Execute(@"Insert into billingsettings(ProductColumn,BillColumn) values ('SellPrice', 'TotalAmount')");
+            return Json("Done", JsonRequestBehavior.AllowGet);
         }
         public JsonResult Sales()
         {

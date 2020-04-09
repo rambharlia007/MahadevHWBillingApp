@@ -4,7 +4,7 @@
 }
 <style>
 
-    input[type=text], input[type=password] {
+  input[type=text], input[type=password] {
   width: 100%;
   padding: 12px 20px;
   margin: 8px 0;
@@ -14,7 +14,7 @@
 }
 
 /* Set a style for all buttons */
-button {
+.login-button {
   background-color: #4CAF50;
   color: white;
   padding: 14px 20px;
@@ -84,7 +84,7 @@ span.psw {
                         <label class="mb-0"><b style="font-weight:400">Password</b></label>
                         <input type="password" style="height:35px;" class="mt-0" required v-model="User.Password">
 
-                        <button type="submit" v-on:click="login()">Login</button>
+                        <button class="login-button" type="submit" v-on:click="login()">Login</button>
                     </div>
                 </div>
             </div>

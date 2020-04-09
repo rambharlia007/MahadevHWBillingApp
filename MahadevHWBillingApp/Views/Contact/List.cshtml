@@ -27,7 +27,7 @@
     @@media only screen and (min-width: 768px) {
         .table-body {
             display: block;
-            height: 250PX;
+            max-height: 250PX;
             overflow-y: scroll;
         }
     }
@@ -35,7 +35,7 @@
     @@media only screen and (min-width: 992px) {
         .table-body {
             display: block;
-            height: 200px;
+            max-height: 200px;
             overflow-y: scroll;
         }
     }
@@ -164,7 +164,7 @@
                             <thead class="thead-light table-head">
                                 <tr class="table-row">
                                     <th style="width: 45px" scope="col">#</th>
-                                    <th style="width:150px !important" scope="col">Name</th>
+                                    <th scope="col">Name</th>
                                     <th scope="col">Type</th>
                                     <th scope="col">GSTIN</th>
                                     <th scope="col">Mobile Number</th>
@@ -174,23 +174,27 @@
                             <tbody class="table-body">
                                 <tr class="table-row" v-for="(contact,index) in newCustomers">
                                     <td style="width: 45px">{{index+1}}</td>
-                                    <td style="width:150px !important"> <input type="text" v-model="contact.Name" class="form-control form-control-sm"></td>
+                                    <td> <input type="text" cv="required" v-model="contact.Name" class="form-control form-control-sm"></td>
                                     <td>
-                                        <select class="form-control form-control-sm" v-model="contact.Type">
-                                            <option value="customer">customer</option>
+                                        <select class="form-control form-control-sm" v-model="contact.Type" v-on:change="removeErrorMessage(index)">
+                                            <option value="customer">Customer</option>
                                             <option value="vendor">Vendor</option>
                                         </select>
                                     </td>
-                                    <td> <input type="text" v-model="contact.GSTIN" class="form-control form-control-sm"></td>
+                                    <td>
+                                        <input type="text" v-if="contact.Type === '' || contact.Type === 'customer'" v-model="contact.GSTIN" class="form-control form-control-sm">
+                                        <input type="text" cv="gstin" v-if="contact.Type === 'vendor'" v-model="contact.GSTIN" class="form-control form-control-sm">
+                                    </td>
                                     <td> <input type="number" v-model="contact.MobileNumber" class="form-control form-control-sm"></td>
                                     <td> <textarea type="number" v-model="contact.Address" class="form-control form-control-sm"></textarea></td>
                                 </tr>
                             </tbody>
                         </table>
+                        <button type="button" class="btn btn-success btn-sm" v-on:click="addNewEmptyCustomer()">Add</button>
                     </div>
                     <!-- Modal footer -->
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal" v-on:click="saveNewCustomer()">Save</button>
+                        <button type="button" class="btn btn-success btn-sm" v-on:click="saveNewCustomer()">Save</button>
                     </div>
                 </div>
             </div>
@@ -204,7 +208,7 @@
 
         function addEmptyNewCustomers() {
             var result = [];
-            for (var i = 0; i < 20; i++) {
+            for (var i = 0; i < 1; i++) {
                 result.push({
                     Name: "",
                     GSTIN: "",
@@ -229,6 +233,18 @@
             el: '#app',
             data: obj,
             methods: {
+                removeErrorMessage: function (index) {
+                    if (this.newCustomers[index].Type === 'customer') {
+                        validation[0].removeErrorMessage();
+                    }
+                },
+                addNewEmptyCustomer: function () {
+                    var self = this;
+                    self.newCustomers.push(addEmptyNewCustomers()[0]);
+                    setTimeout(function () {
+                        validation[0].register();
+                    }, 100);
+                },
                 deleteCustomer: function(id) {
                     var self = this;
                     $.get("/contact/Remove?id=" + id,
@@ -244,23 +260,20 @@
                 },
                 saveNewCustomer: function() {
                     var self = this;
-                    var validData = [];
-                    self.newCustomers.forEach(function (data) {
-                        if (data.Name)
-                            validData.push(data);
-                    });
+                    validation[0].register();
+                    var isValid = validation[0].isTableDataValid("add-contact") === 0;
 
-                    if (validData.length) {
+                    if (isValid) {
                         $.ajax({
                             type: 'POST',
                             url: '@Url.Action("Add", "contact")',
-                            data: JSON.stringify(validData),
+                            data: JSON.stringify(self.newCustomers),
                             dataType: 'json',
                             contentType: 'application/json; charset=utf-8',
                             success: function() {
                                 self.alertMessage =
                                     `${validData.length} contact Added succesfully.`;
-                                self.newItems = addEmptyNewCustomers();
+                                self.newCustomers = addEmptyNewCustomers();
                                 self.tableRef.ajax.reload(self.bindTableClickEvents);
                             }
                         });

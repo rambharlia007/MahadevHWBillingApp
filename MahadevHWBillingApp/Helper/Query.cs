@@ -18,6 +18,11 @@ namespace MahadevHWBillingApp.Helper
             return $"Select * From Purchase Where Date >= '{from}' and Date <= '{to}' Order By Date DESC";
         }
 
+        public static string GetShorcutKeys()
+        {
+            return $"Select * from ShortcutKeys";
+        }
+
         public static string GetSale(string fromDate, string toDate, int customerId)
         {
             var from = fromDate.ToCustomFormat();
@@ -36,14 +41,17 @@ namespace MahadevHWBillingApp.Helper
                         C.GSTIN CustomerGSTIN,
                         C.Id CustomerId,
                         S.Invoice
-                        From Sales S Inner Join Contacts C on S.CustomerId = C.Id 
+                        From Sales S Left outer Join Contacts C on S.CustomerId = C.Id 
                         Where S.Date >= '{from}' and S.Date <= '{to}' {cond} Order By S.Id";
+        }
+
+        public static string GetPurchaseGSTDetailsById(int id)
+        {
+            return $"Select * From PurchaseGSTDetails Where PurchaseId = {id}";
         }
 
         public static string GetSaleExcelDownloadQuery(string fromDate, string toDate, List<decimal> gstSlots)
         {
-            
-
             var builder = new StringBuilder();
             var index = 1;
             foreach(var data in gstSlots)
@@ -67,8 +75,8 @@ namespace MahadevHWBillingApp.Helper
 	                        {builder.ToString()}
                         FROM (
 	                        SELECT S.BusinessName
-		                        ,S.CustomerName
-		                        ,S.CustomerGSTIN
+		                        ,C.Name AS CustomerName
+		                        ,C.GSTIN AS CustomerGSTIN
 		                        ,S.Invoice
 		                        ,S.DATE
 		                        ,S.SubTotal
@@ -76,12 +84,13 @@ namespace MahadevHWBillingApp.Helper
 		                        ,SI.SGST + SI.CGST TotalTaxSlot
 	                        FROM Sales S
 	                        INNER JOIN SaleItems SI ON S.Id = SI.SaleId
+                            LEFT OUTER JOIN Contacts C on C.Id = S.CustomerId
                         Where S.Date >= '{from}' and S.Date <= '{to}'
 	                        GROUP BY SI.SGST
 		                        ,SI.CGST
 		                        ,S.BusinessName
-		                        ,S.CustomerName
-		                        ,S.CustomerGSTIN
+		                        ,C.Name
+		                        ,C.GSTIN
 		                        ,S.Invoice
 		                        ,S.DATE
 	                        ) sourceData
@@ -101,6 +110,12 @@ namespace MahadevHWBillingApp.Helper
             var to = toDate.ToCustomFormat();
             return
                 $"Select DistributorName Name, DistributorGSTIN, SubAmount, TotalCGSTAmount CGST, TotalSGSTAmount SGST, Date, TotalAmount Amount, Invoice From Purchase Where Date >= '{from}' and Date <= '{to}' Order By Date";
+        }
+
+        public static string GetProductExcelDownload()
+        {
+            return @"Select Name, Price, CGST, SGST, Discount, Price, DiscountPrice, MeasuringUnit, Quantity, SoldQuantity, HSN 
+                                FROM Items";
         }
 
         public static string DeleteItem(IList<int> ids)

@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using MahadevHWBillingApp.Filters;
 using MahadevHWBillingApp.Helper;
 using MahadevHWBillingApp.Models;
 using Microsoft.Ajax.Utilities;
 
 namespace MahadevHWBillingApp.Controllers
 {
-    //[HandleError]
+    [CustomSession]
     public class DashboardController : BaseController
     {
         public ActionResult New()
@@ -40,9 +41,9 @@ namespace MahadevHWBillingApp.Controllers
                 var subDate = currentDate.AddMonths(-15);
                 var startDate = new DateTime(subDate.Year, subDate.Month, 1);
                 var endDate = currentDate.Date;
-                var sales = _mahadevHwContext.Sales.Where(e => e.Date >= startDate & e.Date <= endDate)
+                var sales = _mahadevHwContext.Sales.ToList().Where(e => e.Date >= startDate & e.Date <= endDate)
                     .OrderByDescending(e => e.Date).ToList();
-                var purchases = _mahadevHwContext.Purchase.Where(e => e.Date >= startDate & e.Date <= endDate)
+                var purchases = _mahadevHwContext.Purchase.ToList().Where(e => e.Date >= startDate & e.Date <= endDate)
                     .OrderByDescending(e => e.Date).ToList();
 
                 var saleData = new List<object>();

@@ -274,6 +274,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Constants\Constants.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\BillingController.cs" />
@@ -284,10 +285,12 @@
     <Compile Include="Controllers\EstimateController.cs" />
     <Compile Include="Controllers\ItemController.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\KeyboardController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\PurchaseController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Controllers\SaleController.cs" />
+    <Compile Include="Filters\CustomSession.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -297,9 +300,11 @@
     <Compile Include="Helper\Query.cs" />
     <Compile Include="Models\Bill.cs" />
     <Compile Include="Models\BillCreditDetail.cs" />
+    <Compile Include="Models\BillingSetting.cs" />
     <Compile Include="Models\Contact.cs" />
     <Compile Include="Models\EncryptDecryptData.cs" />
     <Compile Include="Models\ExcelAttribute.cs" />
+    <Compile Include="Models\Excel\ProductExcel.cs" />
     <Compile Include="Models\Excel\PurchaseExcel.cs" />
     <Compile Include="Models\Excel\SaleExcel.cs" />
     <Compile Include="Models\Item.cs" />
@@ -309,9 +314,11 @@
     <Compile Include="Models\Profile.cs" />
     <Compile Include="Models\Purchase.cs" />
     <Compile Include="Models\Estimate.cs" />
+    <Compile Include="Models\PurchaseGSTDetail.cs" />
     <Compile Include="Models\Sale.cs" />
     <Compile Include="Models\EstimateItem.cs" />
     <Compile Include="Models\SaleItem.cs" />
+    <Compile Include="Models\ShortcutKey.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -335,11 +342,14 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\correct.png" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\chart.bundle.min.js" />
+    <Content Include="Scripts\customSelect.js" />
+    <Content Include="Scripts\customValidation.js" />
     <Content Include="Scripts\dataTables.bootstrap4.min.js" />
     <Content Include="Scripts\esm\popper-utils.js" />
     <Content Include="Scripts\esm\popper-utils.min.js" />
@@ -366,6 +376,7 @@
     <Content Include="fonts\fontawesome-webfont.eot" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
+    <Content Include="Scripts\gridSummary.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />
     <Content Include="Scripts\jquery-3.3.1.slim.js" />
@@ -376,6 +387,7 @@
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\keyEvent.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\NumberToWords.js" />
     <Content Include="Scripts\popper-utils.js" />
@@ -437,6 +449,9 @@
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Account\RegisterAdmin.cshtml" />
     <Content Include="Views\Shared\_AdminLayout.cshtml" />
+    <Content Include="Views\Keyboard\List.cshtml" />
+    <Content Include="Views\Shared\ConfirmationModal.cshtml" />
+    <Content Include="Views\Billing\New - Copy.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

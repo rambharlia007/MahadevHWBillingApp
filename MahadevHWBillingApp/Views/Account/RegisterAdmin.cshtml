@@ -3,6 +3,11 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
+<style>
+    .form-control {
+        border-radius: 0 !important;
+    }
+</style>
 
 <div id="logreg-forms">
     <div class="row" style="background-color: #f6f7f8 !important;">
@@ -35,36 +40,38 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body" style="font-size:14px;">
-                    <div class="form-group row">
-                        <label class="col-md-3">Business Name</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" v-model="user.BusinessName">
+                    <form>
+                        <div class="form-group row">
+                            <label class="col-md-3">Business Name</label>
+                            <div class="col-md-9">
+                                <input type="text" cv="required" class="form-control" v-model="user.BusinessName">
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-md-3">User Name</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" v-model="user.Name">
+                        <div class="form-group row">
+                            <label class="col-md-3">User Name</label>
+                            <div class="col-md-9">
+                                <input type="text" cv="username" class="form-control" v-model="user.Name">
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-md-3">Password</label>
-                        <div class="col-md-9">
-                            <input type="password" class="form-control" v-model="user.Password">
+                        <div class="form-group row">
+                            <label class="col-md-3">Password</label>
+                            <div class="col-md-9">
+                                <input type="password" id="password" class="form-control" v-model="user.Password">
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-md-3">Confirm Password</label>
-                        <div class="col-md-9">
-                            <input type="password" class="form-control" v-model="user.ConfirmPassword">
+                        <div class="form-group row">
+                            <label class="col-md-3">Confirm Password</label>
+                            <div class="col-md-9">
+                                <input type="password" cv="confirmpassword" class="form-control" v-model="user.ConfirmPassword">
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-md-3">Master Password</label>
-                        <div class="col-md-9">
-                            <input type="password" class="form-control" v-model="user.MasterPassword">
+                        <div class="form-group row">
+                            <label class="col-md-3">Master Password</label>
+                            <div class="col-md-9">
+                                <input type="password" cv="required" class="form-control" v-model="user.MasterPassword">
+                            </div>
                         </div>
-                    </div>
+                    </form>
                     <div class="form-group row">
                         <div class="col-sm-9 offset-3">
                             <button class="btn btn-success btn-sm" v-on:click="register()">Register</button>
@@ -100,27 +107,29 @@
                 },
                 register: function (e) {
                     var self = this;
-                    if (self.user.Password && self.user.Password !== self.user.ConfirmPassword) {
-                        self.alertFailureMessage = "Password not mactching";
-                        return;
-                    }
+                    var isFormValid = validation[0].isFormDataValid();
+                    if (isFormValid == 0) {
+                        var endPoint = "/Account/RegisterAdmin";
 
-                    var endPoint = "/Account/RegisterAdmin";
-                    $.post(endPoint,
-                        self.user,
-                        function (res) {
-                            if (res.Status === "Success")
-                                window.location.href = res.Link;
-                            else
-                                self.alertMessage = res.Message;
-                        }).fail(function (res) {
-                            self.alertFailureMessage = res.Message;
-                        });
+                        $.post(endPoint,
+                            self.user,
+                            function (res) {
+                                if (res.Status === "Success")
+                                    window.location.href = res.Link;
+                                else
+                                    self.alertMessage = res.Message;
+                            }).fail(function (res) {
+                                self.alertFailureMessage = res.Message;
+                            });
+                    }
                 },
                 closeAlertMessage: function (property) {
                     // set alert message to empty
                     this[property] = "";
                 },
+            },
+            mounted() {
+                validation[0].register();
             }
         });
     });

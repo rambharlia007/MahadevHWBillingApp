@@ -1,4 +1,5 @@
-﻿using MahadevHWBillingApp.Helper;
+﻿using MahadevHWBillingApp.Filters;
+using MahadevHWBillingApp.Helper;
 using MahadevHWBillingApp.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Web.Mvc;
 
 namespace MahadevHWBillingApp.Controllers
 {
-    [HandleError]
+    [CustomSession]
     public class SaleController : BaseController
     {
         public ActionResult List()

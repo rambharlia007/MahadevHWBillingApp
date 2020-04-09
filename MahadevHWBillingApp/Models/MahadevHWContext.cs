@@ -16,6 +16,9 @@ namespace MahadevHWBillingApp.Models
         public DbSet<Estimate> Estimates { get; set; }
         public DbSet<EstimateItem> EstimateItems { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<PurchaseGSTDetail> PurchaseGSTDetails { get; set; }
+        public DbSet<ShortcutKey> ShortcutKeys { get; set; }    
+        public DbSet<BillingSetting> BillingSettings { get; set; }
 
         public MahadevHWContext()
         {
@@ -26,7 +29,9 @@ namespace MahadevHWBillingApp.Models
         protected override void OnConfiguring(DbContextOptionsBuilder builder)
         {
             ConnectionString = Generic.GetConnectionString();
-            builder.UseSqlite(ConnectionString);
+            if (ConnectionString != null)
+                builder.UseSqlite(ConnectionString);
+            //builder.UseSqlite(ConnectionString);
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -40,6 +45,8 @@ namespace MahadevHWBillingApp.Models
             builder.Entity<RecordPayment>();
             builder.Entity<Estimate>();
             builder.Entity<EstimateItem>();
+            builder.Entity<PurchaseGSTDetail>();
+            builder.Entity<ShortcutKey>();
             base.OnModelCreating(builder);
         }
     }
@@ -58,6 +65,7 @@ namespace MahadevHWBillingApp.Models
         protected override void OnConfiguring(DbContextOptionsBuilder builder)
         {
             builder.UseSqlite(Generic.GetCoreConnectionString());
+            //builder.UseSqlServer(Generic.GetCoreConnectionString());
         }
 
         protected override void OnModelCreating(ModelBuilder builder)

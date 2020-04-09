@@ -5,10 +5,11 @@ using System.Linq;
 using System.Web.Mvc;
 using MahadevHWBillingApp.Helper;
 using WebGrease.Css.Extensions;
+using MahadevHWBillingApp.Filters;
 
 namespace MahadevHWBillingApp.Controllers
 {
-    [HandleError]
+    [CustomSession]
     public class ItemController : BaseController
     {
         public ActionResult Index()
@@ -54,10 +55,11 @@ namespace MahadevHWBillingApp.Controllers
 
         public JsonResult GetDataById(int id)
         {
-            var items = Helper.Dapper.GetById<Item>(Query.GetItemById(id));
-            var response = Json(items, JsonRequestBehavior.AllowGet);
+            var keys = Helper.Dapper.GetById<Item>(Query.GetItemById(id));
+            var response = Json(keys, JsonRequestBehavior.AllowGet);
             return response;
         }
+
         [HttpPost]
         public JsonResult AddItems(List<Item> items)
         {
@@ -79,7 +81,7 @@ namespace MahadevHWBillingApp.Controllers
 
         public JsonResult RemoveItem(int id)
         {
-            var item =_mahadevHwContext.Items.Where(e => e.Id == id).First();
+            var item =_mahadevHwContext.Items.ToList().Where(e => e.Id == id).First();
             item.IsDelete = 1;
             _mahadevHwContext.SaveChanges();
             return Json("Item deleted", JsonRequestBehavior.AllowGet);

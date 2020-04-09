@@ -10,10 +10,11 @@ using System.Web.Mvc;
 using MahadevHWBillingApp.Models.Excel;
 using OfficeOpenXml.Table;
 using WebGrease.Css.Extensions;
+using MahadevHWBillingApp.Filters;
 
 namespace MahadevHWBillingApp.Controllers
 {
-    [HandleError]
+    [CustomSession]
     public class ReportController : BaseController
     {
         // GET: Report
@@ -94,6 +95,47 @@ namespace MahadevHWBillingApp.Controllers
 
             return File(excelPackage.GetAsByteArray(), "application/vnd.ms-excel",
                 $"Sale_{DateTime.Now.Date.Year}_{months.First()}_{months.Last()}.xlsx");
+        }
+
+        public ActionResult Product()
+        {
+            var data = Helper.Dapper.Get<ProductExcel>(
+                Helper.Query.GetProductExcelDownload());
+            var excelPackage = Spreadsheet.CreatePackage(data);
+
+            var properties = typeof(ProductExcel).GetProperties();
+
+            foreach (var sheet in excelPackage.Workbook.Worksheets)
+            {
+                var currentRow = sheet.Dimension.End.Row + 1;
+                sheet.Tables[0].TableStyle = TableStyles.None;
+                sheet.Name = "Products";
+                sheet.View.FreezePanes(1, sheet.Dimension.End.Column);
+
+                foreach (var property in properties)
+                {
+                    var attr = (ExcelAttribute[])property.GetCustomAttributes(typeof(ExcelAttribute), true);
+
+                    if (attr.Any())
+                    {
+                        var columnIndex = attr[0].ColumnIndex;
+                        if (!string.IsNullOrEmpty(attr[0].ColumnName))
+                        {
+                            sheet.Cells[$"{columnIndex}1"].Value = attr[0].ColumnName;
+                        }
+                    }
+                }
+
+                sheet.Cells[sheet.Dimension.Address].AutoFitColumns();
+
+                sheet.Cells[sheet.Dimension.Address].Style.HorizontalAlignment =
+                    OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+
+                sheet.PrinterSettings.RepeatRows = new ExcelAddress("1:1");
+            }
+
+            return File(excelPackage.GetAsByteArray(), "application/vnd.ms-excel",
+                $"Product_{DateTime.Now.Date.Year}.xlsx");
         }
 
         public ActionResult Purchase(string fromDate, string toDate)

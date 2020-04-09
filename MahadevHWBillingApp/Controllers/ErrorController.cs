@@ -1,8 +1,10 @@
-﻿using System;
+﻿using MahadevHWBillingApp.Filters;
+using System;
 using System.Web.Mvc;
 
 namespace MahadevHWBillingApp.Controllers
 {
+    [CustomErrorSession]
     public class ErrorController : BaseController
     {
         public ActionResult PageNotFound()

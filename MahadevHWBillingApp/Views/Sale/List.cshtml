@@ -61,7 +61,7 @@
     @@media only screen and (min-width: 768px) {
         .table-body {
             display: block;
-            height: 250PX;
+            height: 200PX;
             overflow-y: scroll;
         }
     }
@@ -119,9 +119,9 @@
             <input type="text" id="from-date" class="form-control form-control-sm date-range">
             <span style="padding-left: 50px;">To &nbsp;</span>
             <input type="text" id="to-date" class="form-control form-control-sm date-range">
-            <span style="padding-left:50px;">Customers: &nbsp;</span>
+            @*<span style="padding-left:50px;">Customers: &nbsp;</span>
             <select style="max-width:200px;" class="customer-select-2 js-example-basic-single js-states form-control"></select>
-            <button v-cloak type="button" class="btn btn-link btn-sm ml-4" v-on:click="downloadReport()">Generate Balance sheet (Customer)</button>
+            <button v-cloak type="button" class="btn btn-link btn-sm ml-4" v-on:click="downloadReport()">Generate Balance sheet (Customer)</button>*@
         </div>
 
 
@@ -217,7 +217,7 @@
         </div>
 
 
-        <div class="card">
+        <div class="card grid-data">
             <div class="card-body" style="font-size:14px;">
                 <table id="sale-table" class="table text-secondary" style="font-size:14px;">
                     <thead class="thead-light">
@@ -254,10 +254,9 @@
     </div>
 </div>
 
+<script src="~/Scripts/gridSummary.js"></script>
 <script>
-
     $(document).ready(function() {
-
         function GetDateRange() {
             var date = new Date();
             var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
@@ -291,18 +290,18 @@
             el: '#app',
             data: obj,
             methods: {
-                deleteItem: function(id) {
+                deleteItem: function (id) {
                     var self = this;
                     $.get("/sale/Remove?id=" + id,
-                        function() {
+                        function () {
                             self.alertMessage = "sale record deleted succesfully";
-                        }).fail(function() {
-                        self.alertFailureMessage = "Internal server error";
-                    });
+                        }).fail(function () {
+                            self.alertFailureMessage = "Internal server error";
+                        });
                 },
-                bindTableClickEvents: function() {
+                bindTableClickEvents: function () {
                     var self = this;
-                    $(".edit-sale").click(function(e) {
+                    $(".edit-sale").click(function (e) {
                         var id = $(this).attr("data-id");
                         window.location.href = `/Billing/New/${id}`;
                     });
@@ -311,71 +310,17 @@
                         window.location.href = `/Billing/New/${id}?pid=${id}`;
                     });
                     $(".bill-credit-detail").click(function (e) {
-                        self.openModalForCreditDetail(this);
+                        var id = $(this).attr("data-customerId");
+                        window.location.href = `/Sale/RecordPayment?cid=${id}`;
                     });
 
-                    $(".customer-select-2").select2({
-                        ajax: {
-                            url: "/contact/search",
-                            dataType: 'json',
-                            delay: 250,
-                            data: function (params) {
-                                return {
-                                    q: params.term,
-                                    page: params.page
-                                };
-                            },
-                            processResults: function (data, params) {
-                                var customers = [];
-                                customers.push({ id: 0, text: "clear all" });
-                                data.forEach((customer) => {
-                                    customers.push({
-                                        id: customer.Id,
-                                        text: customer.Name,
-                                        //GSTIN: customer.GSTIN,
-                                        //Address: customer.Address,
-                                        //MobileNumber: customer.MobileNumber,
-                                    });
-                                });
-
-                                return {
-                                    results: customers
-                                };
-                            },
-                            cache: true
-                        },
-                        placeholder: 'Search for a Customer',
-                        minimumInputLength: 1
-                    });
-
-
-                    $('.customer-select-2').on('select2:select',
-                        function (e) {
-                            var data = e.params.data;
-                            if (data.id == 0) {
-                                $('.customer-select-2').val(null).trigger('change');
-                            }
-                            self.customerId = data.id;
-                            self.tableReload();
-                        });
-
-                    $('.customer-select-2').on('select2:select',
-                        function (e) {
-                            var data = e.params.data;
-                            if (data.id == 0) {
-                                $('.customer-select-2').val(null).trigger('change');
-                            }
-                            self.customerId = data.id;
-                            self.tableReload();
-                        });
-
-
+                    getGridSummary(self.fromDate, self.toDate, "Sales","sale-table");
                 },
-                closeAlertMessage: function(property) {
+                closeAlertMessage: function (property) {
                     // set alert message to empty
                     this[property] = "";
                 },
-                addNewBill: function() {
+                addNewBill: function () {
                     window.location.href = "@Url.Action("New", "Billing")";
                 },
                 displayFormat: function (data) {
@@ -426,18 +371,21 @@
                         }
                     });
                 },
-                getTableData: function() {
+
+                getTableData: function () {
                     var self = this;
                     self.tableRef = $("#sale-table").DataTable({
+                        "scrollY": "180px",
+                        "paging": false,
                         bSort: false,
                         ajax: {
                             url: `/sale/GetData?fromDate=${self.fromDate}&toDate=${self.toDate}`,
                             type: "GET",
-                            dataSrc: function(json) {
+                            dataSrc: function (json) {
                                 self.footerTotal = json.footer;
                                 return json.data;
                             },
-                            error: function(xhr, error) {
+                            error: function (xhr, error) {
                                 if (xhr.status === 401) alert("Unauthorised user");
                             }
                         },
@@ -456,42 +404,45 @@
                             { data: "CustomerName" },
                             { data: "CustomerGSTIN" },
                             {
-                                data:"TotalSGSTAmount",
-                                render: function(data, type, row, meta) {
-                                    return Number(data).toLocaleString();
-                                }
-                            },
-                            {
-                                data:"TotalCGSTAmount",
-                                render: function(data, type, row, meta) {
-                                    return Number(data).toLocaleString();
-                                }
-                            },
-                            {
-                                data:"SubTotal",
-                                render: function(data, type, row, meta) {
-                                    return Number(data).toLocaleString();
-                                }
-                            },
-                            {
-                                data:"TotalAmount",
-                                render: function(data, type, row, meta) {
-                                    return Number(data).toLocaleString();
-                                }
-                            },
-                             {
+                                data: "TotalSGSTAmount",
                                 render: function (data, type, row, meta) {
-                                    return `<div class="text-center"><i class="fa fa-credit-card pointer bill-credit-detail" data-id=${row.Id}></i></div>`;
+                                    return Number(data).toLocaleString();
                                 }
                             },
                             {
-                                render: function(data, type, row, meta) {
+                                data: "TotalCGSTAmount",
+                                render: function (data, type, row, meta) {
+                                    return Number(data).toLocaleString();
+                                }
+                            },
+                            {
+                                data: "SubTotal",
+                                render: function (data, type, row, meta) {
+                                    return Number(data).toLocaleString();
+                                }
+                            },
+                            {
+                                data: "TotalAmount",
+                                render: function (data, type, row, meta) {
+                                    return Number(data).toLocaleString();
+                                }
+                            },
+                            {
+                                render: function (data, type, row, meta) {
+                                    if (row.CustomerId)
+                                        return `<div class="text-center"><i class="fa fa-credit-card pointer bill-credit-detail" data-customerId=${row.CustomerId}></i></div>`;
+                                    else
+                                        return `<div class="text-center" style="cursor:not-allowed"><i class="fa fa-credit-card pointer bill-credit-detail" style="pointer-events:none" data-id=${row.Id}></i></div>`;
+                                }
+                            },
+                            {
+                                render: function (data, type, row, meta) {
                                     return `<div class="text-center"><i class="fa fa-print pointer print-bill" data-id=${row.Id}></i></div>`;
                                 }
                             }
                         ],
                         lengthMenu: [[5, 20, 25, 30, 100], [5, 20, 25, 30, 100]],
-                        initComplete: function(settings, json) {
+                        initComplete: function (settings, json) {
                             self.bindTableClickEvents();
                         },
                         footerCallback: function () {
@@ -499,13 +450,13 @@
                                 var inrSymbol = "<i class='fa fa-inr' aria-hidden='true'></i>";
                                 var api = this.api();
                                 $(api.column(4).footer()).html(inrSymbol +
-                                    self.displayFormat(self.footerTotal.CGST) 
+                                    self.displayFormat(self.footerTotal.CGST)
                                 );
                                 $(api.column(5).footer()).html(inrSymbol +
                                     self.displayFormat(self.footerTotal.CGST)
                                 );
                                 $(api.column(6).footer()).html(inrSymbol +
-                                    self.displayFormat(self.footerTotal.SubAmount) 
+                                    self.displayFormat(self.footerTotal.SubAmount)
                                 );
                                 $(api.column(7).footer()).html(inrSymbol +
                                     self.displayFormat(self.footerTotal.Amount)
@@ -531,15 +482,15 @@
                     var tempDate = value.split("-");
                     return `${tempDate[2]}-${tempDate[1]}-${tempDate[0]}`; // DD-MM-YYYY
                 },
-                downloadReport: function() {
+                downloadReport: function () {
                     var self = this;
                     var endPoint = `/Report/Sale?fromDate=${self.fromDate}&toDate=${self.toDate}`;
                     $.get(endPoint,
-                        function(data, status) {
+                        function (data, status) {
                             window.location = endPoint;
-                        }).fail(function() {
-                        self.alertFailureMessage = "Internal server error";
-                    });
+                        }).fail(function () {
+                            self.alertFailureMessage = "Internal server error";
+                        });
                 },
             },
             mounted() {
@@ -549,12 +500,13 @@
 
                 $('.date-range').datetextentry({
                     field_order: 'DMY',
-                    on_change: function(date_str) {
+                    on_change: function (date_str) {
                         if (date_str) {
                             var value = $(this)[0].$element.attr("id");
                             if (value === "to-date") {
                                 self.toDate = self.getFormatedDate(date_str);
                                 self.tableReload();
+
                             } else {
                                 self.fromDate = self.getFormatedDate(date_str);
                                 if (self.toDate)
@@ -564,13 +516,11 @@
                     }
                 });
 
-                $('#sale-table').on( 'draw.dt', function () {
+                $('#sale-table').on('draw.dt', function () {
                     self.bindTableClickEvents();
-                } );
-
+                });
                 self.setInitialDateComponent("#from-date", self.fromDate);
                 self.setInitialDateComponent("#to-date", self.toDate);
-
             }
         });
     });

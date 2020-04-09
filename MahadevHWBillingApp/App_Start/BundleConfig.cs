@@ -20,14 +20,19 @@ namespace MahadevHWBillingApp
                 "~/Scripts/modernizr-*"));
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
-                "~/Scripts/bootstrap.js"));
+                "~/Scripts/bootstrap.bundle.min.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/validation").Include(
+                "~/Scripts/customValidation.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/custom").Include(
                 "~/Scripts/jquery.datetextentry.js",
                 "~/Scripts/vue.min.js",
                 "~/Scripts/jquery.dataTables.min.js",
                 "~/Scripts/dataTables.bootstrap4.min.js",
-                "~/Scripts/select2.min.js"));
+                "~/Scripts/select2.min.js",
+                "~/Scripts/customValidation.js",
+                 "~/Scripts/customSelect.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                 "~/Content/bootstrap.css",
@@ -37,7 +42,7 @@ namespace MahadevHWBillingApp
                 "~/Content/dataTables.bootstrap4.min.css",
                 "~/Content/select2.min.css"));
 
-            BundleTable.EnableOptimizations = true;
+           // BundleTable.EnableOptimizations = true;
         }
     }
 }

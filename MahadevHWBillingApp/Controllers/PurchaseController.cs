@@ -1,16 +1,18 @@
-﻿using MahadevHWBillingApp.Helper;
+﻿using MahadevHWBillingApp.Filters;
+using MahadevHWBillingApp.Helper;
 using MahadevHWBillingApp.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 
 namespace MahadevHWBillingApp.Controllers
 {
-    [HandleError]
+    [CustomSession]
     public class PurchaseController : BaseController
     {
         public ActionResult List()
@@ -33,30 +35,54 @@ namespace MahadevHWBillingApp.Controllers
 
         public JsonResult GetDataById(int id)
         {
-            var items = Helper.Dapper.GetById<Purchase>(Query.GetPurchaseById(id));
-            var response = Json(items, JsonRequestBehavior.AllowGet);
+            var item = Helper.Dapper.GetById<Purchase>(Query.GetPurchaseById(id));
+            var gstModelForPurchase = Helper.Dapper.Get<PurchaseGSTDetail>(Query.GetPurchaseGSTDetailsById(id)).ToList();
+            var response = Json(new PurchaseModel { Purchase = item, GSTModelData = gstModelForPurchase }, JsonRequestBehavior.AllowGet);
             return response;
         }
         [HttpPost]
-        public JsonResult Add(List<Purchase> purchases)
+        public JsonResult Add(List<PurchaseModel> purchaseModel)
         {
-            foreach (var purchase in purchases)
+            using (var transaction = _mahadevHwContext.Database.BeginTransaction())
             {
-                purchase.Date = DateTime.ParseExact(purchase.TempDate, "dd-MM-yyyy",
-                    CultureInfo.InvariantCulture);
-                _mahadevHwContext.Purchase.Add(purchase);
-            }
+                try
+                {
+                    foreach (var data in purchaseModel)
+                    {
+                        data.Purchase.Date = DateTime.ParseExact(data.Purchase.TempDate, "dd-MM-yyyy",
+                            CultureInfo.InvariantCulture);
+                        _mahadevHwContext.Purchase.Add(data.Purchase);
+                        _mahadevHwContext.SaveChanges();
 
-            _mahadevHwContext.SaveChanges();
-            return Json("Item created");
+                        foreach (var gstModel in data.GSTModelData)
+                        {
+                            gstModel.PurchaseId = data.Purchase.Id;
+                            _mahadevHwContext.PurchaseGSTDetails.Add(gstModel);
+                        }
+                    }
+                    _mahadevHwContext.SaveChanges();
+                    transaction.Commit();
+                    return Json(new { Message = "Save successfull" });
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    return Json(new { Message = "Internal Server error" });
+                }
+            }
         }
 
         [HttpPost]
-        public JsonResult Edit(Purchase purchase)
+        public JsonResult Edit(PurchaseModel model)
         {
-            purchase.Date = DateTime.ParseExact(purchase.TempDate, "dd-MM-yyyy",
+            model.Purchase.Date = DateTime.ParseExact(model.Purchase.TempDate, "dd-MM-yyyy",
                    CultureInfo.InvariantCulture);
-            _mahadevHwContext.Entry(purchase).State = EntityState.Modified;
+            model.GSTModelData.ForEach((data) =>
+            {
+                _mahadevHwContext.Entry(data).State = EntityState.Modified;
+            });
+            _mahadevHwContext.Entry(model.Purchase).State = EntityState.Modified;
             _mahadevHwContext.SaveChanges();
             return Json("Item Edited");
         }

@@ -1,4 +1,5 @@
-﻿using MahadevHWBillingApp.Helper;
+﻿using MahadevHWBillingApp.Filters;
+using MahadevHWBillingApp.Helper;
 using MahadevHWBillingApp.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Web.Mvc;
 
 namespace MahadevHWBillingApp.Controllers
 {
+    [CustomSession]
     public class ContactController : BaseController
     {
         public ActionResult List()
@@ -40,7 +42,7 @@ namespace MahadevHWBillingApp.Controllers
 
         public JsonResult Remove(int id)
         {
-            var contact = _mahadevHwContext.Contacts.Where(e => e.Id == id).First();
+            var contact = _mahadevHwContext.Contacts.ToList().Where(e => e.Id == id).First();
             contact.IsDelete = 1;
             _mahadevHwContext.SaveChanges();
             return Json("contact deleted", JsonRequestBehavior.AllowGet);
@@ -55,7 +57,7 @@ namespace MahadevHWBillingApp.Controllers
 
         public JsonResult Get(int id)
         {
-            var contact = _mahadevHwContext.Contacts.Where(e => e.Id == id).First();
+            var contact = _mahadevHwContext.Contacts.ToList().Where(e => e.Id == id).First();
             var response = Json(contact, JsonRequestBehavior.AllowGet);
             return response;
         }
