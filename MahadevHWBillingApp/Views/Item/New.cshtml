@@ -36,56 +36,13 @@
     }
 
     .custom-options {
-        cursor:pointer !important;
-        border:2px solid #aaa !important;
+        cursor: pointer !important;
+        border: 2px solid #aaa !important;
     }
-   
 </style>
-<div class="row" style="background-color: #f6f7f8 !important;">
-    <div class="col-md-12">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb" style="padding-bottom: 0px; margin-bottom: 0px; background-color: #f6f7f8 !important;">
-                <li class="breadcrumb-item"><i class="fa fa-home">&nbsp;</i><a href="#">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Billing</li>
-            </ol>
-        </nav>
-        <h4 style="padding-left: 15px;">New Bill</h4>
-    </div>
-</div>
-<div>
+<div style="padding-top:400px;">
     <div class="row">
-        <div class="col-md-4">
-            <div class="custom-select-rmb">
-                <input type="text" data-index="11" class="form-control" placeholder="Search">
-                <ul class="list-group">
-                </ul>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="custom-select-rmb">
-                <input type="text" data-index="10" class="form-control" placeholder="Search">
-                <ul class="list-group"></ul>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="custom-select-rmb">
-                <input type="text" class="form-control" placeholder="Search">
-                <ul class="list-group"></ul>
-            </div>
-        </div>
+        <a href="javascript:void(0)" id="render-link">Render the Save to Drive button</a>
+        <div id="savetodrive-div"></div>
     </div>
 </div>
-
-<script>
-    
-</script>
-<script>
-    $(document).ready(function () {
-        var obj = {
-            ele: ".custom-select-rmb", endPoint: "/item/GetDataBySearch", prop: "Name", callback: function (ele,value) {
-                confirm(ele.attr("data-index"))
-            }
-        };
-        selectSearchEvent(obj);
-    });
-</script>

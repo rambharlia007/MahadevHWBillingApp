@@ -3,10 +3,9 @@
     //such arrows keys
     $("body").keydown(function (e) {
 
-        var validKeys = ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10"];
+        var validKeys = ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "ARROWDOWN", "ArrowUp", "ArrowRight", "ArrowLeft"];
         var key = e.key.toUpperCase();
             
-        console.log(e.key);
         if (e.target.nodeName.toUpperCase() === "INPUT" || !validKeys.includes(key))
             return;
 
@@ -49,6 +48,35 @@
                 break;
             }
             case "F10": {
+                window.location.href = "/Billing/New";
+                break;
+            }
+            case "ARROWDOWN": {
+                
+                if (window.location.pathname === "/Billing/New") {
+                    if ($(".list-group.custom-select-border li.active").length === 0) {
+                        $(".list-group.custom-select-border li:first").focus();
+                        $(".list-group.custom-select-border li:first").addClass("active");
+                    }
+                    else {
+                        var currentListItem = $(".list-group.custom-select-border li.active");
+                        var nextListItem = currentListItem.next();
+                        currentListItem.removeClass("active");
+                        nextListItem.focus();
+                        nextListItem.addClass("active");
+                    }
+                }
+                break;
+            }
+            case "ArrowUp": {
+                window.location.href = "/Billing/New";
+                break;
+            }
+            case "ArrowRight": {
+                window.location.href = "/Billing/New";
+                break;
+            }
+            case "ArrowLeft": {
                 window.location.href = "/Billing/New";
                 break;
             }

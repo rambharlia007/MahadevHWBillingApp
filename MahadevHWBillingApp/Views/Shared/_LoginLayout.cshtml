@@ -28,20 +28,34 @@
         input {
             padding-left:10px !important
         }
-        /*.header-container, .body-container, .footer-container {
-            max-width: 1280px;
-            margin: 0 auto;
-        }*/
+        .blur-bg {
+            opacity: 0.5;
+        }
+
+        .hide {
+            display: none
+        }
+
+        .global-spinner {
+            right: 600px;
+            top: 250px;
+            position: absolute !important;
+            z-index: 10000;
+        }
     </style>
 </head>
 
 <body style="background-color:#eee">
+    <div class="global-spinner fa-5x" style="color:#043346 !important">
+        <i class="fa fa-spinner fa-spin fa-pulse"></i>
+    </div>
     <div class="body-content body-container">
-            @RenderBody()
-            <hr class="d-print-none" />
-            <footer class="d-print-none footer-container">
-                <p>&copy; @DateTime.Now.Year - Ram Bharlia</p>
-            </footer>
-        </div>
+        @RenderBody()
+        <script src="~/Scripts/customAjaxHandler.js"></script>
+        <hr class="d-print-none" />
+        <footer class="d-print-none footer-container">
+            <p>&copy; @DateTime.Now.Year - Ram Bharlia</p>
+        </footer>
+    </div>
 </body>
 </html>

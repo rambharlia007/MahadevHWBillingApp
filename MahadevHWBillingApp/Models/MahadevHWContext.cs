@@ -19,6 +19,7 @@ namespace MahadevHWBillingApp.Models
         public DbSet<PurchaseGSTDetail> PurchaseGSTDetails { get; set; }
         public DbSet<ShortcutKey> ShortcutKeys { get; set; }    
         public DbSet<BillingSetting> BillingSettings { get; set; }
+        public DbSet<PurchaseItem> PurchaseItems { get; set; }  
 
         public MahadevHWContext()
         {
@@ -47,6 +48,7 @@ namespace MahadevHWBillingApp.Models
             builder.Entity<EstimateItem>();
             builder.Entity<PurchaseGSTDetail>();
             builder.Entity<ShortcutKey>();
+            builder.Entity<PurchaseItem>();
             base.OnModelCreating(builder);
         }
     }

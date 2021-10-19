@@ -37,10 +37,26 @@ namespace MahadevHWBillingApp.Controllers
             {
                 try
                 {
-                    if (bill.Customer.Id == 0 && bill.Customer.IsSaveNewCustomer)
+                    //saved from ajax call directly and id is passed
+                    if (bill.Customer.Id == 0 && bill.Customer.GSTIN != null)
                     {
-                        _mahadevHwContext.Contacts.Add(bill.Customer);
-                        _mahadevHwContext.SaveChanges();
+                        var currentCustomer = _mahadevHwContext.Contacts.Where(e => e.GSTIN.ToLower() == bill.Customer.GSTIN.ToLower()).FirstOrDefault();
+                        if (currentCustomer != null)
+                        {
+                            bill.Customer.Id = currentCustomer.Id;
+                            currentCustomer.Name = bill.Customer.Name;
+                            currentCustomer.State = bill.Customer.State;
+                            currentCustomer.StateCode = bill.Customer.StateCode;
+                            currentCustomer.MobileNumber = bill.Customer.MobileNumber;
+                            _mahadevHwContext.Entry(currentCustomer).State = EntityState.Modified;
+                            _mahadevHwContext.SaveChanges();
+                        }
+                        else
+                        {
+                            bill.Customer.Type = "temp";
+                            _mahadevHwContext.Contacts.Add(bill.Customer);
+                            _mahadevHwContext.SaveChanges();
+                        }
                     }
 
                     bill.SaleDetail.CustomerId = bill.Customer.Id;
@@ -49,15 +65,15 @@ namespace MahadevHWBillingApp.Controllers
                     _mahadevHwContext.Sales.Add(bill.SaleDetail);
                     _mahadevHwContext.SaveChanges();
 
-                    var isStockCount = _profile.EnableStockCount;
+                    //var isStockCount = _profile.EnableStockCount;
                     foreach (var saleItem in bill.SaleItems)
                     {
                         saleItem.SaleId = bill.SaleDetail.Id;
                         _mahadevHwContext.SaleItems.Add(saleItem);
 
-                        if (isStockCount)
+                        var editItem = _mahadevHwContext.Items.SingleOrDefault(e => e.Id == saleItem.ItemId);
+                        if(editItem != null)
                         {
-                            var editItem = _mahadevHwContext.Items.SingleOrDefault(e => e.Id == saleItem.ItemId);
                             editItem.Quantity -= saleItem.Quantity;
                             editItem.SoldQuantity += saleItem.Quantity;
                         }
@@ -108,22 +124,35 @@ namespace MahadevHWBillingApp.Controllers
                     _mahadevHwContext.Entry(bill.SaleDetail).State = EntityState.Modified;
                     foreach (var saleItem in bill.SaleItems)
                     {
-                        var productData = _mahadevHwContext.Items.First(e => e.Id == saleItem.ItemId);
+                        var productData = _mahadevHwContext.Items.FirstOrDefault(e => e.Id == saleItem.ItemId);
                         if (trackProductIds.Contains(saleItem.ItemId))
                         {
                             var previousAddedQuantity = productQuantityTracks.First(e => e.ItemId == saleItem.ItemId).Quantity;
                             var updateQuantityCount = saleItem.Quantity - previousAddedQuantity;
-                            productData.Quantity = productData.Quantity - updateQuantityCount;
-                            productData.SoldQuantity += updateQuantityCount;
+
+                            // item not der in DB, but only sale item is edited
+                            if(productData != null)
+                            {
+                                productData.Quantity = productData.Quantity - updateQuantityCount;
+                                productData.SoldQuantity += updateQuantityCount;
+                            }
+                           
                             _mahadevHwContext.Entry(saleItem).State = EntityState.Modified;
                         }
                         // new item added to the bill
                         else
                         {
-                            saleItem.SaleId = bill.SaleDetail.Id;
-                            productData.Quantity -= saleItem.Quantity;
-                            productData.SoldQuantity += saleItem.Quantity;
-                            _mahadevHwContext.SaleItems.Add(saleItem);
+                            // Sale item exists but not der in products
+                            if(saleItem.Id < 1)
+                            {
+                                saleItem.SaleId = bill.SaleDetail.Id;
+                                if (productData != null)
+                                {
+                                    productData.Quantity -= saleItem.Quantity;
+                                    productData.SoldQuantity += saleItem.Quantity;
+                                }
+                                _mahadevHwContext.SaleItems.Add(saleItem);
+                            }
                         }
                     }
 
@@ -131,9 +160,12 @@ namespace MahadevHWBillingApp.Controllers
                     foreach(var id in deletedSaleItemIds)
                     {
                         var deleteSaleItem = _mahadevHwContext.SaleItems.ToList().Where(e => e.Id == id).First();
-                        var productUpdate = _mahadevHwContext.Items.ToList().Where(e => e.Id == deleteSaleItem.ItemId).First();
-                        productUpdate.Quantity += deleteSaleItem.Quantity;
-                        productUpdate.SoldQuantity -= deleteSaleItem.Quantity;
+                        var productUpdate = _mahadevHwContext.Items.FirstOrDefault(e => e.Id == deleteSaleItem.ItemId);
+                        if(productUpdate != null)
+                        {
+                            productUpdate.Quantity += deleteSaleItem.Quantity;
+                            productUpdate.SoldQuantity -= deleteSaleItem.Quantity;
+                        }
                         _mahadevHwContext.SaleItems.Remove(deleteSaleItem);
                     }
 

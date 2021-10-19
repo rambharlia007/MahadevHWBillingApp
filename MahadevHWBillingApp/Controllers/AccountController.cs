@@ -76,6 +76,21 @@ namespace MahadevHWBillingApp.Controllers
                     using (var accountContext = new MahadevHWContext())
                     {
                         var profile = accountContext.Profiles.FirstOrDefault();
+                        var billSettings = accountContext.BillingSettings.FirstOrDefault();
+                        if(billSettings == null)
+                        {
+                            var data = new BillingSetting()
+                            {
+                                IsDiscountRequired = true,
+                                IsGstRate = true,
+                                IsHSNRequired = true,
+                                IsPerRequired = true,
+                                BillColumn = "Price",
+                                ProductColumn = "SellPrice"
+                            };
+                            accountContext.BillingSettings.Add(data);
+                            accountContext.SaveChanges();
+                        }
                         if (profile != null)
                             Session["Profile"] = profile;
                         else
@@ -89,7 +104,9 @@ namespace MahadevHWBillingApp.Controllers
                                 GSTIN = currentUser.GSTIN,
                                 MobileNumber = currentUser.MobileNumber,
                                 Owner = currentUser.Owner,
-                                EnableStockCount = currentUser.EnableStockCount
+                                EnableStockCount = currentUser.EnableStockCount,
+                                State = currentUser.State,
+                                StateCode = currentUser.StateCode
                             };
                             Session["Profile"] = profileFromAdminUser;
                             accountContext.Profiles.Add(profileFromAdminUser);

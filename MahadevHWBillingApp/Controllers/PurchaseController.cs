@@ -33,13 +33,80 @@ namespace MahadevHWBillingApp.Controllers
             return Json(new {data = items, footer = footerSum}, JsonRequestBehavior.AllowGet);
         }
 
+        //public JsonResult GetDataById(int id)
+        //{
+        //    var item = Helper.Dapper.GetById<Purchase>(Query.GetPurchaseById(id));
+        //    var gstModelForPurchase = Helper.Dapper.Get<PurchaseGSTDetail>(Query.GetPurchaseGSTDetailsById(id)).ToList();
+        //    var response = Json(new PurchaseModel { Purchase = item, GSTModelData = gstModelForPurchase }, JsonRequestBehavior.AllowGet);
+        //    return response;
+        //}
+
         public JsonResult GetDataById(int id)
         {
             var item = Helper.Dapper.GetById<Purchase>(Query.GetPurchaseById(id));
-            var gstModelForPurchase = Helper.Dapper.Get<PurchaseGSTDetail>(Query.GetPurchaseGSTDetailsById(id)).ToList();
-            var response = Json(new PurchaseModel { Purchase = item, GSTModelData = gstModelForPurchase }, JsonRequestBehavior.AllowGet);
+            var purchaseItems = Helper.Dapper.Get<PurchaseItem>(Query.GetPurchaseItemsByPurchaseId(id)).ToList();
+            var response = Json(new PurchaseProductModel { Purchase = item, PurchaseItems = purchaseItems }, JsonRequestBehavior.AllowGet);
             return response;
         }
+
+
+        [HttpPost]
+        public JsonResult AddWithProduct(PurchaseProductModel purchaseModel)
+        {
+            using (var transaction = _mahadevHwContext.Database.BeginTransaction())
+            {
+                try
+                {
+                    purchaseModel.Purchase.Date = DateTime.ParseExact(purchaseModel.Purchase.TempDate, "dd-MM-yyyy",
+                            CultureInfo.InvariantCulture);
+                    _mahadevHwContext.Purchase.Add(purchaseModel.Purchase);
+                    _mahadevHwContext.SaveChanges();
+
+                    foreach (var item in purchaseModel.PurchaseItems)
+                    {
+                        item.PurchaseId = purchaseModel.Purchase.Id;
+
+                        if(item.IsExistingProduct)
+                        {
+                            var existingItem = _mahadevHwContext.Items.Where(e => e.Id == item.ItemId).FirstOrDefault();
+                            existingItem.Quantity += item.Quantity;
+                        }
+                        else
+                        {
+                            var newItem = new Item()
+                            {
+                                Category = item.Category,
+                                Name = item.Name,
+                                HSN = item.HSN,
+                                SellPrice = item.SellPrice,
+                                CGST = item.CGST,
+                                SGST = item.SGST,
+                                Price = item.Price,
+                                Discount = item.Discount,
+                                DiscountPrice = item.DiscountPrice,
+                                MeasuringUnit = item.MeasuringUnit,
+                                Quantity = item.Quantity,
+                                SoldQuantity = item.SoldQuantity
+                            };
+                            _mahadevHwContext.Items.Add(newItem);
+                            _mahadevHwContext.SaveChanges();
+                            item.ItemId = newItem.Id;
+                        }
+                        _mahadevHwContext.PurchaseItems.Add(item);
+                    }
+                    _mahadevHwContext.SaveChanges();
+                    transaction.Commit();
+                    return Json(new { Message = "Save successfull" });
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    return Json(new { Message = "Internal Server error" });
+                }
+            }
+        }
+
         [HttpPost]
         public JsonResult Add(List<PurchaseModel> purchaseModel)
         {

@@ -8,6 +8,13 @@
         cursor: pointer;
     }
 
+    .modal {
+        overflow-y: auto !important;
+    }
+
+    .select2-selection{
+        min-width:200px !important
+    }
     .grid-edit {
         text-decoration: underline;
         color: #158cba;
@@ -31,7 +38,13 @@
         background-color: rgb(238, 238, 238) !important;
         margin-bottom: 10px !important;
     }
+    #add-product-table td {
+        padding: 5px !important
+    }
 
+    #add-product-table th {
+        padding: 5px !important
+    }
     .text-center {
         text-align: center
     }
@@ -76,7 +89,7 @@
     @@media only screen and (min-width: 768px) {
         .table-body {
             display: block;
-            height: 400px;
+            max-height: 500px;
             overflow-y: scroll;
         }
     }
@@ -84,7 +97,7 @@
     @@media only screen and (min-width: 992px) {
         .table-body {
             display: block;
-            height: 400px;
+            max-height: 500px;
             overflow-y: scroll;
         }
     }
@@ -110,6 +123,7 @@
             <h4 style="padding-left: 15px;">Purchase</h4>
         </div>
         <div class="col-md-6">
+            <button style="margin-top: 25px; margin-left: 10px; float: right;" type="button" class="btn btn-success btn-sm" v-on:click="openModal('add-purchase-products')">Add Purchase (Products)</button>
             <button style="margin-top: 25px; margin-left: 10px; float: right;" type="button" class="btn btn-success btn-sm" v-on:click="openModalForAddPurchase()">Add Purchase</button>
             <button style="margin-top: 25px; float: right;" type="button" class="btn btn-success btn-sm" v-on:click="downloadReport()">Download Report</button>
         </div>
@@ -150,6 +164,7 @@
                                 <th>Distributor GSTIN</th>
                                 <th>SGST Amount</th>
                                 <th>CGST Amount</th>
+                                <th>Round off</th>
                                 <th>Sub Amount</th>
                                 <th>Total Amount</th>
                                 <th>Delete</th>
@@ -172,6 +187,48 @@
                 </div>
             </div>
         </div>
+
+
+
+        @*Modal for add new distributor*@
+        <div class="modal d-print-none" id="add-new-cusotmer-modal" tabindex="-1" style="z-index:2000 !important" role="dialog">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add new Distributor.</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body scroll" style="padding-left:50px;">
+                        <form>
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label">Name</label>
+                                <div class="col-sm-6">
+                                    <input v-model="distributor.Name" cv="required" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label">GSTIN</label>
+                                <div class="col-sm-6">
+                                    <input v-model="distributor.GSTIN" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label">Mobile Number</label>
+                                <div class="col-sm-6">
+                                    <input cv="phonenumber" v-model="distributor.MobileNumber" class="form-control">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success btn-sm" v-on:click="saveNewDistributorData()">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <!-- The Modal -->
         <div class="modal" id="edit-purchase-modal">
@@ -196,7 +253,9 @@
                                         <tr>
                                             <th class="text-center" style="width: 140px">Date</th>
                                             <th class="text-center" style="width: 150px;">Invoice</th>
-                                            <th class="text-center" style="width: 150px;">Distributor</th>
+                                            <th class="text-center" style="width: 220px;">
+                                                Distributor
+                                            </th>
                                             <th class="text-center" style="width: 150px;">Dist. GSTIN</th>
                                             <th class="text-center">SGST Amount</th>
                                             <th class="text-center">CGST Amount</th>
@@ -259,6 +318,109 @@
             </div>
         </div>
 
+        <div class="modal" id="add-purchase-products">
+            <div class="modal-dialog modal-dialog-centered modal-xl">
+                <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">Add Purchase</h4>
+                        <button type="button" class="close" v-on:click="closeModal('#add-purchase-products')">&times;</button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="modal-body" style="padding-top: 0px;">
+                        <div v-for="(purchase,index) in newPurchases" style="padding-bottom:10px; padding-top:5px;">
+                            <table id="purchase-product-summary-table" style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
+                                <tr>
+                                    <th class="text-center" style="width: 140px">Date</th>
+                                    <th class="text-center" style="width: 150px;">Invoice</th>
+                                    <th class="text-center" style="width: 220px;">
+                                        Distributor
+                                    </th>
+                                    <th class="text-center" style="width: 160px;">Dist. GSTIN</th>
+                                    <th class="text-center">SGST Amount</th>
+                                    <th class="text-center">CGST Amount</th>
+                                    <th class="text-center">Sub Amount</th>
+                                    <th class="text-center">Roundoff</th>
+                                    <th class="text-center">Total Amount</th>
+                                </tr>
+                                <tr>
+                                    <td style="width: 140px" v-bind:["data-id"]="index"> <input type="text" cv="date" v-model="purchase.Date" class="form-control form-control-sm purchase-date"></td>
+                                    <td style="width: 150px;"> <input type="text" cv="required" v-model="purchase.Invoice" class="form-control form-control-sm"></td>
+                                    <td style="width: 220px;">
+                                        <select v-bind:id="'dist-sel-'+index" :data-id="index" class="dist-select-22 js-example-basic-single js-states form-control"></select>
+                                        <button type="button" class="btn btn-sm btn-link" v-on:click="openModalForNewDistributor(index)">Add new Distributor?</button>
+                                    </td>
+                                    <td style="width: 160px;"> <input type="text" cv="gstin" v-model="purchase.DistributorGSTIN" class="form-control form-control-sm"></td>
+                                    <td> <input type="number" readonly v-model="purchase.TotalCGSTAmount" class="form-control form-control-sm"></td>
+                                    <td> <input type="number" readonly v-model="purchase.TotalSGSTAmount" class="form-control form-control-sm"></td>
+                                    <td> <input type="number" cv="required" v-model="purchase.SubAmount" v-on:keyup="calculateTotalAmount(index)" class="form-control form-control-sm"></td>
+                                    <td> <input type="number" readonly v-model="purchase.Roundoff" class="form-control form-control-sm"></td>
+                                    <td> <input type="number" readonly v-model="purchase.TotalAmount" class="form-control form-control-sm"></td>
+                                </tr>
+                            </table>
+                            <hr />
+                            <h5>Product Details</h5>
+                            <table class="table text-secondary" id="add-product-table" style="font-size: 14px; margin-bottom:5px;">
+                                <thead class="thead-light table-head">
+                                    <tr class="table-row">
+                                        <th style="width: 45px" scope="col">#</th>
+                                        <th scope="col">Existing Product</th>
+                                        <th style="width:250px !important" scope="col">Name</th>
+                                        <th scope="col">HSN/SAC</th>
+                                        <th scope="col">PER</th>
+                                        <th scope="col">Add Quantity</th>
+                                        <th scope="col">SGST (%)</th>
+                                        <th scope="col">CGST (%)</th>
+                                        <th scope="col">Discount %</th>
+                                        <th scope="col">Price</th>
+                                        <th scope="col">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-body">
+                                    <tr class="table-row" v-for="(item,innerIndex) in purchase.items">
+                                        <td style="width: 45px">{{innerIndex+1}}</td>
+                                        <td> <input type="checkbox" v-model="item.IsExistingProduct" v-on:change="isExistingItem(innerIndex)"> </td>
+                                        <td style="width:250px !important" v-show="item.IsExistingProduct">
+                                            <select width="100" v-bind:id="'product-sel-'+innerIndex" :data-id="innerIndex" class="product-select-2 js-example-basic-single js-states form-control"></select>
+                                        </td>
+                                        <td style="width:250px !important" v-show="!item.IsExistingProduct">
+                                            <input type="text" cv="required" v-model="item.Name" class="form-control form-control-sm">
+                                        </td>
+                                        <td> <input type="text" v-model="item.HSN" class="form-control form-control-sm"></td>
+                                        <td>
+                                            <select class="form-control form-control-sm" v-model="item.MeasuringUnit">
+                                                <option value="NOS">NOS</option>
+                                                <option value="Unit">Unit</option>
+                                                <option value="Bag">Bag</option>
+                                                <option value="Box">Box</option>
+                                                <option value="KGS">KGS</option>
+                                            </select>
+                                        </td>
+                                        <td> <input type="number" cv="required" v-model="item.Quantity" v-on:keyup="calculatePerItemTotalPrice(innerIndex)" class="form-control form-control-sm"></td>
+                                        <td> <input type="number" v-model="item.SGST" cv="required" v-on:keyup="calculatePerItemTotalPrice(innerIndex)" class="form-control form-control-sm"></td>
+                                        <td> <input type="number" v-model="item.CGST" cv="required" v-on:keyup="calculatePerItemTotalPrice(innerIndex)" class="form-control form-control-sm"></td>
+                                        <td> <input type="number" step=".01" v-model="item.Discount" v-on:keyup="calculatePerItemTotalPrice(innerIndex)" class="form-control form-control-sm"></td>
+                                        <td style="position:relative;">
+                                            <input type="number" v-model="item.Price" cv="required" class="form-control form-control-sm" v-on:keyup="calculatePerItemTotalPrice(innerIndex)">
+                                            <i class="fa fa-trash show-on-hover" v-on:click="removeNewProduct(innerIndex)" style="position:absolute; right:15px; top:15px; cursor:pointer"></i>
+                                        </td>
+                                        <td> <input type="number" readonly v-model="item.TotalAmount" class="form-control form-control-sm"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button type="button" class="btn btn-outline-primary btn-sm" style="margin-left:45px;" v-on:click="addEmptyProduct()">Add Product</button>
+                        </div>
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-success btn-sm" v-on:click="saveNewPurchaseWithProduct()">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="modal" id="add-purchase">
             <div class="modal-dialog modal-dialog-centered modal-xl">
                 <div class="modal-content">
@@ -282,20 +444,27 @@
                                             <tr>
                                                 <th class="text-center" style="width: 140px">Date</th>
                                                 <th class="text-center" style="width: 150px;">Invoice</th>
-                                                <th class="text-center" style="width: 150px;">Distributor</th>
-                                                <th class="text-center" style="width: 150px;">Dist. GSTIN</th>
+                                                <th class="text-center" style="width: 220px;">
+                                                    Distributor
+                                                </th>
+                                                <th class="text-center" style="width: 160px;">Dist. GSTIN</th>
                                                 <th class="text-center">SGST Amount</th>
                                                 <th class="text-center">CGST Amount</th>
+                                                <th class="text-center">Roundoff</th>
                                                 <th class="text-center">Sub Amount</th>
                                                 <th class="text-center">Total Amount</th>
                                             </tr>
                                             <tr>
                                                 <td style="width: 140px" v-bind:["data-id"]="index"> <input type="text" cv="date" v-model="purchase.Date" class="form-control form-control-sm purchase-date"></td>
                                                 <td style="width: 150px;"> <input type="text" cv="required" v-model="purchase.Invoice" class="form-control form-control-sm"></td>
-                                                <td style="width: 150px;"> <select v-bind:id="'dist-sel-'+index" :data-id="index" class="dist-select-2 js-example-basic-single js-states form-control"></select> </td>
-                                                <td style="width: 150px;"> <input type="text" cv="gstin" v-model="purchase.DistributorGSTIN" class="form-control form-control-sm"></td>
+                                                <td style="width: 220px;">
+                                                    <select v-bind:id="'dist-sel-'+index" :data-id="index" class="dist-select-2 js-example-basic-single js-states form-control"></select>
+                                                    <button type="button" class="btn btn-sm btn-link" v-on:click="openModalForNewDistributor(index)">Add new Distributor?</button>
+                                                </td>
+                                                <td style="width: 160px;"> <input type="text" cv="gstin" v-model="purchase.DistributorGSTIN" class="form-control form-control-sm"></td>
                                                 <td> <input type="number" readonly v-model="purchase.TotalCGSTAmount" class="form-control form-control-sm"></td>
                                                 <td> <input type="number" readonly v-model="purchase.TotalSGSTAmount" class="form-control form-control-sm"></td>
+                                                <td> <input v-model="purchase.Roundoff" v-on:keyup="calculateTotalAmount(index)" class="form-control form-control-sm"></td>
                                                 <td> <input type="number" cv="required" v-model="purchase.SubAmount" v-on:keyup="calculateTotalAmount(index)" class="form-control form-control-sm"></td>
                                                 <td> <input type="number" readonly v-model="purchase.TotalAmount" class="form-control form-control-sm"></td>
                                             </tr>
@@ -332,13 +501,13 @@
                                                 </table>
                                             </div>
                                             <div class="col-md-12">
-                                                <button type="button" class="btn btn-success btn-sm" v-on:click="addEmptyGSTModal(index)">Add new tax slab</button>
+                                                <button type="button" class="btn btn-outline-primary btn-sm" v-on:click="addEmptyGSTModal(index)">Add new tax slab</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-success btn-sm" style="margin:10px 0px 10px 0px" v-on:click="addEmptyPurchase()">Add new bill</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" style="margin:10px 0px 10px 0px" v-on:click="addEmptyPurchase()">Add new bill</button>
                         </div>
 
                         <!-- Modal footer -->
@@ -350,6 +519,7 @@
             </div>
         </div>
     </div>
+</div>
 
     <script src="~/Scripts/gridSummary.js"></script>
     <script>
@@ -368,6 +538,29 @@
             return gstModel;
         }
 
+        function addEmptyNewItems() {
+            var result = [];
+            for (var i = 0; i < 1; i++) {
+                result.push({
+                    ItemId: "",
+                    Name: "",
+                    Price: "",
+                    CGST: "",
+                    SGST: "",
+                    Discount: "",
+                    Quantity: "",
+                    MeasuringUnit: "NOS",
+                    DiscountPrice: "",
+                    SellPrice: "",
+                    HSN: "",
+                    IsExistingProduct: true,
+                    TotalAmount: 0,
+                    TotalTax: 0
+                });
+            }
+            return result;
+        }
+
         function addEmptyPurchaseObject() {
             var tempPurchase = [];
             for (var i = 0; i < 1; i++) {
@@ -378,9 +571,12 @@
                     TotalSGSTAmount: "",
                     Date: "",
                     Invoice: "",
+                    SubAmount:"",
                     DistributorGSTIN: "",
-                    DistributorName : "",
-                    GSTModelData: getPurchaseGSTModel()
+                    DistributorName: "",
+                    Roundoff:"",
+                    GSTModelData: getPurchaseGSTModel(),
+                    items: addEmptyNewItems()
                 });
             }
             return tempPurchase;
@@ -404,13 +600,127 @@
             tableRef: null,
             fromDate: GetDateRange().startDate,
             toDate: GetDateRange().endDate,
-            footerTotal: {}
+            footerTotal: {},
+            distributor: {
+                Name: "",
+                GSTIN: "",
+                MobileNumber: "",
+                Type: "Vendor"
+            },
+            indexForDistributorAdd: "",
+            isStockCountEnabled: false
         }
 
         new Vue({
             el: '#app',
             data: obj,
             methods: {
+                isExistingItem: function (index) {
+                    console.log(this.newPurchases[0].items[index].IsExistingProduct);
+                },
+                addEmptyProduct: function () {
+                    var self = this;
+                    var productList = this.newPurchases[0].items;
+                    productList.push(addEmptyNewItems()[0]);
+                    var height = 50 * productList.length;
+                    var currentTr = productList.length;
+                    setTimeout(function () {
+                        $("#add-product-table").scrollTop(height)
+                        validation[0].register();
+                        $("#add-product-table tr:eq(" + currentTr + ") input:first").focus();
+                        self.initSelect2();
+                    }, 300)
+                },
+                calculatePerItemTotalPrice: function (index) {
+                    // total item price for the individual product.
+                    var self = this;
+                    var currentItem = self.newPurchases[0].items[index];
+                    var tax = parseInt(currentItem.CGST) + parseInt(currentItem.SGST);
+                    var totalPrice = parseFloat(currentItem.Price) * currentItem.Quantity;
+                    var totalPriceWithDiscount = totalPrice - self.getPercentageValue(totalPrice, currentItem.Discount);
+                    var totalTax = self.getPercentageValue(totalPriceWithDiscount, tax);
+                    var finalTotalPrice = totalPriceWithDiscount + totalTax;
+                    currentItem.TotalAmount = this.roundOffTwoPlace(finalTotalPrice);
+                    currentItem.TotalTax = totalTax;
+                    self.calculateFinalTotalAndTax();
+                },
+                calculateFinalTotalAndTax: function () {
+                    // total price for the purchase bill. on adding the individual product.
+                    var tax = 0;
+                    var totalAmount = 0;
+                    this.newPurchases[0].items.forEach(function (val, index) {
+                        tax += val.TotalTax;
+                        totalAmount += val.TotalAmount;
+                    });
+                    var divTax = this.roundOffTwoPlace(tax / 2);
+                    this.newPurchases[0].TotalCGSTAmount = this.newPurchases[0].TotalSGSTAmount = divTax;
+                    this.newPurchases[0].SubAmount = this.roundOffTwoPlace(totalAmount - tax);
+                    var rounfOffValue = this.roundOffTwoPlace(totalAmount % 1);
+                    this.newPurchases[0].Roundoff = rounfOffValue;
+                    this.newPurchases[0].TotalAmount = rounfOffValue < 0.5 ? Math.floor(totalAmount) : Math.ceil(totalAmount);
+                },
+                getPercentageValue: function (value, discount) {
+                    var res = discount / 100 * value;
+                    return this.roundOffTwoPlace(res);
+                },
+                calculatePerItemDiscount: function (index) {
+                    var currentItem = this.newPurchases[0].items[index];
+                    this.calculateDiscount(currentItem);
+                },
+                calculateDiscount: function (currentItem) {
+                    var self = this;
+                    var tax = parseInt(currentItem.CGST) + parseInt(currentItem.SGST);
+                    var cp = parseFloat(currentItem.Price);
+                    var price = cp + ((tax / 100) * cp);
+                    if (currentItem.Discount) {
+                        tempPrice =
+                            price - ((currentItem.Discount / 100) * price);
+                        currentItem.DiscountPrice = self.roundOffTwoPlace(tempPrice);
+                    } else {
+                        currentItem.DiscountPrice = self.roundOffTwoPlace(price);
+                    }
+                },
+                roundOffTwoPlace: function (number) {
+                    return 0 || Math.round(number * 100) / 100
+                },
+                copyTax: function (index) {
+                    this.newPurchases[0].items[index].SGST = this.newPurchases[0].items[index].CGST;
+                },
+                openModalForNewDistributor: function (index) {
+                    this.indexForDistributorAdd = index;
+                    $("#add-new-cusotmer-modal").modal({ backdrop: 'static', keyboard: false, show: true });
+                },
+                saveNewDistributorData: function (index) {
+                     var self = this;
+                    var isValid = validation[0].isFormDataValid("add-new-cusotmer-modal") === 0;
+
+                    if (isValid) {
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("AddSingle", "contact")',
+                            data: JSON.stringify(self.distributor),
+                            dataType: 'json',
+                            contentType: 'application/json; charset=utf-8',
+                            success: function (res) {
+                                if (res.Id) {
+                                    $("#add-new-cusotmer-modal").modal("hide");
+                                    //settings customer select2 value
+                                    self.customerType = "isExistingCustomer";
+                                    var optionId = "-" + res.Id;
+                                    var option = new Option(self.distributor.Name, optionId);
+
+                                    var ele = $(".dist-select-2");
+                                    var curr = $(ele[self.indexForDistributorAdd]);
+                                    curr.append(option).trigger('change');
+                                    curr.val(optionId).trigger('change');
+                                    self.newPurchases[self.indexForDistributorAdd].DistributorGSTIN = self.distributor.GSTIN;
+                                    self.newPurchases[self.indexForDistributorAdd].DistributorName = self.distributor.Name;
+                                    alert("Distributor added successfully.")
+                                }
+                            }
+                        });
+                    }
+                },
                 addEmptyPurchase: function () {
                     var self = this;
                     var emptyObj = addEmptyPurchaseObject()[0]
@@ -420,7 +730,7 @@
                         $(".table-body").scrollTop(height)
                         validation[0].register();
                         self.bindAddPurchaseDateComponent();
-                        self.initSelect2();
+                        self.initDistributorSelect2(".dist-select-2");
                         validation[0].collapse();
                     }, 0)
                 },
@@ -471,7 +781,10 @@
                 commonTotalAmountCalculation: function (currentPurchaseData) {
                     var self = this;
                     var getValidateNumber = self.getValidateNumber;
-                    currentPurchaseData.TotalAmount = Math.round((getValidateNumber(currentPurchaseData.TotalSGSTAmount) + getValidateNumber(currentPurchaseData.TotalCGSTAmount) + getValidateNumber(currentPurchaseData.SubAmount))
+                    currentPurchaseData.TotalAmount = Math.round((getValidateNumber(currentPurchaseData.TotalSGSTAmount)
+                        + getValidateNumber(currentPurchaseData.TotalCGSTAmount)
+                        + getValidateNumber(currentPurchaseData.SubAmount)
+                        + getValidateNumber(currentPurchaseData.Roundoff))
                         * 100) / 100;
                 },
                 deleteItem: function(id) {
@@ -488,14 +801,21 @@
                 openModalForAddPurchase: function () {
                     var self = this;
                     self.initSelect2();
-                    $("#add-purchase").modal("show");
+                    self.initDistributorSelect2(".dist-select-2");
+                    $("#add-purchase").modal({ backdrop: 'static', keyboard: false, show: true });
+                },
+                openModal: function (id) {
+                    var self = this;
+                    $("#" + id).modal({ backdrop: 'static', keyboard: false, show: true });
+                    self.initSelect2();
+                    self.initDistributorSelect2(".dist-select-22");
                 },
                 displayFormat: function (data) {
                     return Number(data).toLocaleString(undefined, { minimumFractionDigits: 2 })
                 },
-                initSelect2: function () {
+                initDistributorSelect2: function (e) {
                     var self = this;
-                    $(".dist-select-2").select2({
+                    $(e).select2({
                         ajax: {
                             url: "/contact/search",
                             dataType: 'json',
@@ -526,11 +846,69 @@
                         minimumInputLength: 1
                     });
 
-                    $('.dist-select-2').on('select2:select',
+                    $(e).on('select2:select',
                         function (e) {
                             var index = parseInt($(this).attr('data-id'));
                             var data = e.params.data;
                             self.newPurchases[index].DistributorGSTIN = data.GSTIN;
+                            self.newPurchases[index].DistributorName = data.text;
+                        });
+                },
+                initSelect2: function () {
+                    var self = this;
+                    $(".product-select-2").select2({
+                        ajax: {
+                            url: "/item/GetDataBySearch",
+                            dataType: 'json',
+                            delay: 250,
+                            data: function (params) {
+                                return {
+                                    q: params.term,
+                                    page: params.page
+                                };
+                            },
+                            processResults: function (data, params) {
+
+                                var items = [];
+                                data.forEach((item) => {
+                                    items.push({
+                                        id: item.Id,
+                                        text: item.Name,
+                                        CGST: item.CGST,
+                                        SGST: item.SGST,
+                                        Price: item.Price,
+                                        Discount: item.Discount,
+                                        MeasuringUnit: item.MeasuringUnit,
+                                        DiscountPrice: item.DiscountPrice,
+                                        SellPrice: item.SellPrice,
+                                        HSN: item.HSN
+                                    });
+                                });
+
+                                return {
+                                    results: items
+                                };
+                            },
+                            cache: true
+                        },
+                        placeholder: 'Search for a item',
+                        minimumInputLength: 1
+                    });
+
+                    $('.product-select-2').on('select2:select',
+                        function (e) {
+                            var index = parseInt($(this).attr('data-id'));
+                            var data = e.params.data;
+                            var currentItem = self.newPurchases[0].items[index];
+                            currentItem.ItemId = data.id;
+                            currentItem.Name = data.text;
+                            currentItem.CGST = data.CGST;
+                            currentItem.SGST = data.SGST;
+                            currentItem.Discount = data.Discount;
+                            currentItem.MeasuringUnit = data.MeasuringUnit;
+                            currentItem.DiscountPrice = data.DiscountPrice;
+                            currentItem.SellPrice = data.SellPrice;
+                            currentItem.HSN = data.HSN;
                         });
                 },
                 saveNewPurchase: function() {
@@ -546,7 +924,6 @@
                     else {
                         var validData = [];
                         self.newPurchases.forEach((data) => {
-                            var validGstModelData = [];
                             validData.push({ Purchase: data, GSTModelData: data.GSTModelData });
                         });
                         $.ajax({
@@ -560,6 +937,32 @@
                                     `Purchase added succesfully.`;
                                 self.newPurchases = addEmptyPurchaseObject();
                                 self.closeModal("#add-purchase");
+                                self.tableReload();
+                            }
+                        });
+                    }
+                },
+                saveNewPurchaseWithProduct: function() {
+                    var self = this;
+                    var isNotValid = validation[0].isTableDataValid("purchase-product-summary-table") > 0 || validation[0].isTableDataValid("add-product-table");
+
+                    if (isNotValid) {
+                        return; 
+                    }
+                    else {
+                        var purchase = self.newPurchases[0];
+                        var validData = { Purchase: purchase, PurchaseItems: purchase.items };
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("AddWithProduct", "purchase")',
+                            data: JSON.stringify(validData),
+                            dataType: 'json',
+                            contentType: 'application/json; charset=utf-8',
+                            success: function () {
+                                self.alertMessage =
+                                    `Purchase added succesfully.`;
+                                self.newPurchases = addEmptyPurchaseObject();
+                                self.closeModal("#add-purchase-products");
                                 self.tableReload();
                             }
                         });
@@ -592,14 +995,28 @@
                     var self = this;
                     $.get(`/purchase/GetDataById/${id}`,
                         function (data, status) {
-                            self.purchase = data.Purchase;
-                            self.purchase.GSTModelData = data.GSTModelData;
-                            $("#edit-purchase-modal").modal("show");
+                            var purchase = data.Purchase;
+                            var currentPurchase = self.newPurchases[0];
+                            currentPurchase.BusinessName = purchase.BusinessName;
+                            currentPurchase.TotalAmount = purchase.TotalAmount;
+                            currentPurchase.TotalCGSTAmount = purchase.TotalCGSTAmount;
+                            currentPurchase.TotalSGSTAmount = purchase.TotalSGSTAmount;
+                            currentPurchase.Date = purchase.Date;
+                            currentPurchase.Invoice = purchase.Invoice;
+                            currentPurchase.SubAmount = purchase.SubAmount;
+                            currentPurchase.DistributorGSTIN = purchase.DistributorGSTIN;
+                            currentPurchase.DistributorName = purchase.DistributorName;
+                            currentPurchase.Roundoff = purchase.Roundoff;
+                            self.newPurchases[0] = data.Purchase;
+                            self.newPurchases[0].items = data.PurchaseItems;
+                            //self.purchase = data.Purchase;
+                            //self.purchase.GSTModelData = data.GSTModelData;
+                            $("#add-purchase-products").modal("show");
                             self.purchase.TempDate = data.FormatDate;
                             self.setInitialDateComponent(".purchase-edit-date", data.Purchase.FormatDate);
-                        }).fail(function() {
-                        self.alertFailureMessage = "Internal server error";
-                    });
+                        }).fail(function () {
+                            self.alertFailureMessage = "Internal server error";
+                        });
                 },
                 bindTableClickEvents: function() {
                     var self = this;
@@ -658,6 +1075,12 @@
                             },
                             {
                                 data: "TotalCGSTAmount",
+                                render: function (data, type, row, meta) {
+                                    return Number(data).toLocaleString();
+                                }
+                            },
+                            {
+                                data: "Roundoff",
                                 render: function (data, type, row, meta) {
                                     return Number(data).toLocaleString();
                                 }
@@ -775,6 +1198,7 @@
                 self.setInitialDateComponent("#from-date", self.fromDate);
                 self.setInitialDateComponent("#to-date", self.toDate);
                 validation[0].register();
+                self.isStockCountEnabled = '@Model.EnableStockCount' === 'True';
             }
         });
     });

@@ -9,7 +9,6 @@ using MahadevHWBillingApp.Models;
 
 namespace MahadevHWBillingApp.Controllers
 {
-    [CustomSession]
     public class AdminController : BaseController
     {
         public ActionResult New()
@@ -39,12 +38,20 @@ namespace MahadevHWBillingApp.Controllers
         }
         public JsonResult ChangeSystem(string system)
         {
+            var coreContext = new CoreContext();
             var value = EncryptDecryptData.Encrypt(system);
-            var profile = _mahadevHwContext.Profiles.First();
-            //profile.K1 = value;
-            _profile = profile;
-            _mahadevHwContext.SaveChanges();
+            var users = coreContext.Users;
+            foreach(var user in users)
+            {
+                user.K1 = value;
+            }
+            coreContext.SaveChanges();
             return Json("Date Changed", JsonRequestBehavior.AllowGet);
         }
+        public JsonResult SystemValue()
+        {
+            var computerName = System.Net.Dns.GetHostName();
+            return Json(computerName, JsonRequestBehavior.AllowGet);
+        }
     }
-}
+}  

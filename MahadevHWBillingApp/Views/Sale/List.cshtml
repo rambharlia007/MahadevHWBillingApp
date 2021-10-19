@@ -51,7 +51,7 @@
     }
 
     .jq-dte-year {
-        width: 35px !important;
+        width: 45px !important;
     }
 
     .jq-dte {
@@ -234,7 +234,7 @@
                             <th class="text-center">Print Bill</th>
                         </tr>
                     </thead>
-                    <tfoot>
+                    <tfoot style="font-size:0.8em !important">
                         <tr>
                             <th></th>
                             <th></th>
@@ -307,11 +307,17 @@
                     });
                     $(".print-bill").click(function (e) {
                         var id = $(this).attr("data-id");
-                        window.location.href = `/Billing/New/${id}?pid=${id}`;
+                        window.open(
+                            `/Billing/New/${id}?pid=${id}`,
+                            '_blank'
+                        );
                     });
                     $(".bill-credit-detail").click(function (e) {
                         var id = $(this).attr("data-customerId");
-                        window.location.href = `/Sale/RecordPayment?cid=${id}`;
+                        window.open(
+                            `/Sale/RecordPayment?cid=${id}`,
+                            '_blank'
+                        );
                     });
 
                     getGridSummary(self.fromDate, self.toDate, "Sales","sale-table");

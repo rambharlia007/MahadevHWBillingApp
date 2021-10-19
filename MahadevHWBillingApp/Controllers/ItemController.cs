@@ -72,6 +72,17 @@ namespace MahadevHWBillingApp.Controllers
         }
 
         [HttpPost]
+        public JsonResult EditItems(List<Item> items)
+        {
+            foreach (var item in items)
+            {
+                _mahadevHwContext.Entry(item).State = EntityState.Modified;
+            }
+            _mahadevHwContext.SaveChanges();
+            return Json("Item Edited");
+        }
+
+        [HttpPost]
         public JsonResult EditItem(Item item)
         {
             _mahadevHwContext.Entry(item).State = EntityState.Modified;

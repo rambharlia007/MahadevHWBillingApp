@@ -7,6 +7,49 @@
     }
 
     return {
+        getGSTStateCode: function () {
+            var stateCode = [
+                { Name: "Select state", Code: -1 },
+                { Name: "JAMMU AND KASHMIR", Code: 1 },
+                { Name: "HIMACHAL PRADESH", Code: 2 },
+                { Name: "PUNJAB", Code: 3 },
+                { Name: "CHANDIGARH", Code: 4 },
+                { Name: "UTTARAKHAND", Code: 5 },
+                { Name: "HARYANA", Code: 6 },
+                { Name: "DELHI", Code: 7 },
+                { Name: "RAJASTHAN", Code: 8 },
+                { Name: "UTTAR PRADESH", Code: 9 },
+                { Name: "BIHAR", Code: 10 },
+                { Name: "SIKKIM", Code: 11 },
+                { Name: "ARUNACHAL PRADESH", Code: 12 },
+                { Name: "NAGALAND", Code: 13 },
+                { Name: "MANIPUR", Code: 14 },
+                { Name: "MIZORAM", Code: 15 },
+                { Name: "TRIPURA", Code: 16 },
+                { Name: "MEGHLAYA", Code: 17 },
+                { Name: "ASSAM", Code: 18 },
+                { Name: "WEST BENGAL", Code: 19 },
+                { Name: "JHARKHAND", Code: 20 },
+                { Name: "ODISHA", Code: 21 },
+                { Name: "CHATTISGARH", Code: 22 },
+                { Name: "MADHYA PRADESH", Code: 23 },
+                { Name: "GUJARAT", Code: 24 },
+                { Name: "DAMAN AND DIU", Code: 25 },
+                { Name: "DADRA AND NAGAR HAVELI", Code: 26 },
+                { Name: "MAHARASHTRA", Code: 27 },
+                { Name: "ANDHRA PRADESH(BEFORE DIVISION)", Code: 28 },
+                { Name: "KARNATAKA", Code: 29 },
+                { Name: "GOA", Code: 30 },
+                { Name: "LAKSHWADEEP", Code: 31 },
+                { Name: "KERALA", Code: 32 },
+                { Name: "TAMIL NADU", Code: 33 },
+                { Name: "PUDUCHERRY", Code: 34 },
+                { Name: "ANDAMAN AND NICOBAR ISLANDS", Code: 35 },
+                { Name: "TELANGANA", Code: 36 },
+                { Name: "ANDHRA PRADESH(NEW)", Code: 37 }
+            ];
+            return stateCode;
+        },
         isFormDataValid: function () {
             var x;
             $("form").each(function () {

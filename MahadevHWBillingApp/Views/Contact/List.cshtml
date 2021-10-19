@@ -1,4 +1,4 @@
-﻿
+﻿@model MahadevHWBillingApp.Models.Profile
 <style>
     .pointer {
         cursor: pointer;
@@ -61,7 +61,7 @@
             <h4 style="padding-left: 15px;">Contacts</h4>
         </div>
         <div class="col-md-4">
-            <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-on:click="openModalForAddProduct()">Add New contact</button>
+            <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-on:click="openModalForAddProduct(1)">Add Customer/Vendor</button>
         </div>
     </div>
     <div style="margin-top:20px;">
@@ -88,10 +88,12 @@
                             <th style="min-width:150px">Name</th>
                             <th style="min-width:150px">Type</th>
                             <th>GSTIN</th>
+                            <th>State</th>
+                            <th>Code</th>
                             <th>Mobile Number</th>
                             <th>Address</th>
                             @*<th>Recievables</th>
-                            <th>Payables</th>*@
+        <th>Payables</th>*@
                             <th>Delete</th>
                         </tr>
                     </thead>
@@ -167,6 +169,7 @@
                                     <th scope="col">Name</th>
                                     <th scope="col">Type</th>
                                     <th scope="col">GSTIN</th>
+                                    <th scope="col">State code</th>
                                     <th scope="col">Mobile Number</th>
                                     <th scope="col">Address</th>
                                 </tr>
@@ -182,8 +185,12 @@
                                         </select>
                                     </td>
                                     <td>
-                                        <input type="text" v-if="contact.Type === '' || contact.Type === 'customer'" v-model="contact.GSTIN" class="form-control form-control-sm">
-                                        <input type="text" cv="gstin" v-if="contact.Type === 'vendor'" v-model="contact.GSTIN" class="form-control form-control-sm">
+                                        <input type="text" v-model="contact.GSTIN" class="form-control form-control-sm">
+                                    </td>
+                                    <td>
+                                        <select class="form-control form-control-sm" v-model="contact.stateObj">
+                                            <option v-for="option in validation[0].getGSTStateCode()" v-bind:value="{id:option.Code, name: option.Name}">{{ option.Name }}</option>
+                                        </select>
                                     </td>
                                     <td> <input type="number" v-model="contact.MobileNumber" class="form-control form-control-sm"></td>
                                     <td> <textarea type="number" v-model="contact.Address" class="form-control form-control-sm"></textarea></td>
@@ -214,7 +221,8 @@
                     GSTIN: "",
                     MobileNumber: "",
                     Address: "",
-                    Type:""
+                    Type: "",
+                    stateObj: { id: @Model.StateCode, name: "@Model.State" },
                 });
             }
             return result;
@@ -255,7 +263,7 @@
                         self.alertFailureMessage = "Internal server error";
                     });
                 },
-                openModalForAddProduct: function() {
+                openModalForAddProduct: function(customerType) {
                     $("#add-contact").modal("show");
                 },
                 saveNewCustomer: function() {
@@ -271,16 +279,16 @@
                             dataType: 'json',
                             contentType: 'application/json; charset=utf-8',
                             success: function() {
-                                self.alertMessage =
-                                    `${validData.length} contact Added succesfully.`;
                                 self.newCustomers = addEmptyNewCustomers();
                                 self.tableRef.ajax.reload(self.bindTableClickEvents);
+                                $("#add-contact").modal("hide");
+                                alert("Contacts added successfully.")
                             }
                         });
                     } else {
-                        self.alertFailureMessage = "20 off 20 invalid contact record were found";
+                        self.alertFailureMessage = "Internal server error, Please try again";
                     }
-                }, 
+                },
                 saveEditCustomer: function() {
                     var self = this;
                     if (self.contact) {
@@ -348,6 +356,8 @@
 
                                 }
                             },
+                            { data: "State" },
+                            { data: "StateCode" },
                             { data: "MobileNumber" },
                             { data: "Address" },
                             {

@@ -42,7 +42,7 @@ namespace MahadevHWBillingApp
                 "~/Content/dataTables.bootstrap4.min.css",
                 "~/Content/select2.min.css"));
 
-           // BundleTable.EnableOptimizations = true;
+            BundleTable.EnableOptimizations = true;
         }
     }
 }

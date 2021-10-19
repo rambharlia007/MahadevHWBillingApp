@@ -9,6 +9,9 @@
         public string Address { get; set; }
         public string Type { get; set; }
         public int IsDelete { get; set; }
+        public string State { get; set; }
+        public string Email { get; set; }
+        public int StateCode { get; set; }
         public bool IsSaveNewCustomer { get; set; }
     }
 }

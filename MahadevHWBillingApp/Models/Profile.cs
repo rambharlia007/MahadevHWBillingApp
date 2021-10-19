@@ -10,6 +10,13 @@
         public string MobileNumber { get; set; }
         public string Address { get; set; }
         public bool EnableStockCount { get; set; }
+        public string State { get; set; }
+        public int StateCode { get; set; }
+        public string Bank { get; set; }
+        public string Branch { get; set; }
+        public string AccountNumber { get; set; }
+        public string IfscCode { get; set; }
+
         public static Profile GetDummyProfile()
         {
             return new Profile()

@@ -50,6 +50,53 @@ namespace MahadevHWBillingApp.Helper
             return $"Select * From PurchaseGSTDetails Where PurchaseId = {id}";
         }
 
+        public static string GetPurchaseItemsByPurchaseId(int id)
+        {
+            return $"Select * From PurchaseItems Where PurchaseId = {id}";
+        }
+
+        public static string GetSaleExcelDownloadQuery(string fromDate, string toDate)
+        {
+            var from = fromDate.ToCustomFormat();
+            var to = toDate.ToCustomFormat();
+            return $@"
+                        SELECT DATE
+                            ,CustomerName
+                            ,Invoice
+	                        ,CustomerGSTIN
+	                        ,SubTotal
+                            ,TotalTaxSlot
+                            ,SubTotal
+                        FROM (
+	                        SELECT S.BusinessName
+		                        ,C.Name AS CustomerName
+		                        ,C.GSTIN AS CustomerGSTIN
+		                        ,S.Invoice
+		                        ,S.DATE
+		                        ,S.SubTotal
+		                        ,SUM(SI.TotalCGSTAmount) TotalCGSTAmount
+                                ,SUM(SI.TotalSGSTAmount) TotalSGSTAmount
+		                        ,SI.SGST + SI.CGST TotalTaxSlot
+	                        FROM Sales S
+	                        INNER JOIN SaleItems SI ON S.Id = SI.SaleId
+                            LEFT OUTER JOIN Contacts C on C.Id = S.CustomerId
+                        Where S.Date >= '{from}' and S.Date <= '{to}'
+	                        GROUP BY SI.SGST
+		                        ,SI.CGST
+		                        ,S.BusinessName
+		                        ,C.Name
+		                        ,C.GSTIN
+		                        ,S.Invoice
+		                        ,S.DATE
+	                        ) sourceData
+                        GROUP BY sourceData.Invoice
+	                        ,sourceData.BusinessName
+	                        ,sourceData.CustomerName
+	                        ,sourceData.CustomerGSTIN
+	                        ,sourceData.Invoice
+	                        ,sourceData.Date
+                        ORDER BY SourceData.Date";
+        }
         public static string GetSaleExcelDownloadQuery(string fromDate, string toDate, List<decimal> gstSlots)
         {
             var builder = new StringBuilder();
@@ -142,7 +189,7 @@ namespace MahadevHWBillingApp.Helper
                     SELECT SI.*, 
                            I.NAME 
                     FROM   saleitems SI 
-                           INNER JOIN items I 
+                           LEFT OUTER JOIN items I 
                                    ON SI.itemid = I.id 
                     WHERE  SI.saleid = {id}; 
 
@@ -156,7 +203,7 @@ namespace MahadevHWBillingApp.Helper
         public static string GetProductsByBill(int id)
         {
             return
-                $"Select SI.ItemId, SI.Quantity, SI.Id SaleItemId From SaleItems SI inner join Items I on SI.ItemId = I.Id Where SaleId = {id}";
+                $"Select SI.ItemId, SI.Quantity, SI.Id SaleItemId From SaleItems SI Left outer join Items I on SI.ItemId = I.Id Where SaleId = {id}";
         }
 
         public static string GetItemBySearch(string filter)

@@ -60,12 +60,16 @@ namespace MahadevHWBillingApp.Controllers
 
         public JsonResult DBUpdate()
         {
-            Helper.Dapper.Execute(@"Create Table BillingSettings(
-                                    Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-                                    ProductColumn varchar(255),
-                                    BillColumn varchar(255)
-                                    )");
-            Helper.Dapper.Execute(@"Insert into billingsettings(ProductColumn,BillColumn) values ('SellPrice', 'TotalAmount')");
+            //Helper.Dapper.Execute(@"Create Table BillingSettings(
+            //                        Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+            //                        ProductColumn varchar(255),
+            //                        BillColumn varchar(255)
+            //                        )");
+            //Helper.Dapper.Execute(@"Insert into billingsettings(ProductColumn,BillColumn) values ('SellPrice', 'TotalAmount')");
+            //Helper.Dapper.Execute(@"Alter Table Contacts Add State nvarchar(100)");
+            //Helper.Dapper.Execute(@"Alter Table Contacts Add StateCode INT");
+            //Helper.Dapper.Execute(@"Alter Table Profiles Add State nvarchar(100)");
+            //Helper.Dapper.Execute(@"Alter Table Profiles Add StateCode INT");
             return Json("Done", JsonRequestBehavior.AllowGet);
         }
         public JsonResult Sales()

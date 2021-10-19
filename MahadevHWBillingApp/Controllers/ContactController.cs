@@ -32,6 +32,19 @@ namespace MahadevHWBillingApp.Controllers
             _mahadevHwContext.SaveChanges();
             return Json("contact Added");
         }
+
+        [HttpPost]
+        public JsonResult AddSingle(Contact contact)
+        {
+            var existingContact = _mahadevHwContext.Contacts.Where(e => e.GSTIN == contact.GSTIN).FirstOrDefault();
+            if (existingContact != null)
+                return Json(new { Id = existingContact.Id });
+
+            _mahadevHwContext.Contacts.Add(contact);
+            _mahadevHwContext.SaveChanges();
+            return Json(new { Id = contact.Id });
+        }
+
         [HttpPost]
         public JsonResult Update(Contact contact)
         {

@@ -116,6 +116,20 @@
                             </div>
                         </div>
                         <div class="form-group row">
+                            <label class="col-md-4">State</label>
+                            <div class="col-md-6">
+                                <select class="form-control" v-model="stateObj">
+                                    <option v-for="option in validation[0].getGSTStateCode()" v-bind:value="{id:option.Code, name: option.Name}">{{ option.Name }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-4">State code</label>
+                            <div class="col-md-6">
+                                <input class="form-control" readonly v-model="User.StateCode">
+                            </div>
+                        </div>
+                        <div class="form-group row">
                             <label class="col-md-4">Mobile No.</label>
                             <div class="col-md-6">
                                 <input type="number" cv="phone" class="form-control" v-model="User.MobileNumber">
@@ -169,6 +183,7 @@
         var obj = {
             alertFailureMessage: "",
             alertMessage: "",
+            stateObj: { id: 29, name: "KARNATAKA"},
             User: {
                 Name: "",
                 Password: "",
@@ -179,6 +194,8 @@
                 MobileNumber: "",
                 Email: "",
                 Address: "",
+                StateCode: 29,
+                State:"",
                 EnableStockCount: false
             },
             users: []
@@ -187,8 +204,8 @@
             el: '#app',
             data: obj,
             methods: {
-                check: function (e) {
-                    this.EnableStockCount = e;
+                check: function (value) {
+                    this.User.EnableStockCount = value;
                 },
                 openModalForRegisterUser: function () {
                     $("#myModal").modal({ backdrop: 'static', keyboard: false, show: true });
@@ -200,6 +217,8 @@
                     var self = this;
                     var validate = validation[0].isFormDataValid();
                     if (validate < 1) {
+                        self.User.State = self.stateObj.name;
+                        self.User.StateCode = self.stateObj.id;
                         var endPoint = "/Account/Register";
                         $.post(endPoint,
                             self.User,

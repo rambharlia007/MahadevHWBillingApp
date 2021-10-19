@@ -7,7 +7,7 @@
         var data = $(e.target).attr("data");
         $(e.target).parent().removeClass("custom-select-scroll");
         $(e.target).parent().find("li").remove();
-        cb(inputEle, data);
+        cb(inputEle, unescape(data));
     });
 };
 var selectSearchEvent = function (config) {
@@ -36,7 +36,8 @@ var selectSearchEvent = function (config) {
                 $.get(endPoint + "?q=" + searchValue, function (res) {
                     if (res.length) {
                         for (var i = 0; i < res.length; i++) {
-                            options.push('<li class="list-group-item list-group-item-custom-select custom-options" data = ' + JSON.stringify(res[i]) + ' > ' + res[i][config.prop] + ' </li>');
+                            var item = escape(JSON.stringify(res[i]));
+                            options.push(`<li class="list-group-item list-group-item-custom-select custom-options" data = "${item}">  ${res[i][config.prop]} </li>`);
                         }
                     }
                     else { //<button type="button" class="btn btn-link">Add edit value </button> 

@@ -15,16 +15,53 @@
 
     @RenderSection("scripts", required: false)
     <style>
+        .customActive {
+            color: #fff;
+            background-color: #28a745;
+            border-color: #28a745;
+        }
         .header {
             border-bottom: 2px solid #343a405e;
         }
-
+        .blur-bg {
+            opacity: 0.5;
+        }
         .nav-bg {
-            background-color: #1f6b8a;
+            background-color: #043346;
+        }
+        .hide {
+            display: none
+        }
+        tr:hover .show-on-hover {
+            visibility: visible;
+        }
+
+        tr .show-on-hover {
+            visibility: hidden;
         }
 
         .form-control {
             border-radius: 0 !important;
+        }
+
+        /*hover datable row*/
+        .dataTable tbody tr:hover {
+            background-color: #eee;
+            cursor: pointer;
+        }
+        .dataTable tbody tr {
+            height:30px !important;
+        }
+        .dataTable tbody td {
+            padding:5px !important;
+        }
+        dataTables_scrollBody
+        .dataTables_scrollBody .dataTable thead th {
+            padding: 0px !important;
+        }
+
+        .dataTables_scrollBody .dataTable thead tr {
+            height: 0px !important;
         }
 
         .custom-options {
@@ -33,7 +70,7 @@
 
         .custom-select-scroll {
             overflow-y: scroll;
-            max-height:100px;
+            max-height:300px;
         }
         .custom-select-border{
             /*border-right: 2px solid #aaa;
@@ -48,6 +85,13 @@
             background-color: #eee;
             border:none;
             /* border: 1px solid rgba(0, 0, 0, 0.125); */
+        }
+
+        .global-spinner {
+            right: 600px;
+            top: 250px;
+            position: absolute !important;
+            z-index: 10000;
         }
 
         textarea:focus,
@@ -136,29 +180,9 @@
             padding-left: 10px !important
         }
 
-        ::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        ::-webkit-scrollbar-track {
-            -webkit-box-shadow: inset 0 0 6px #6c757d;
-            -webkit-border-radius: 10px;
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            -webkit-border-radius: 10px;
-            border-radius: 10px;
-            background: #eee;
-            -webkit-box-shadow: inset 0 0 6px #6c757d;
-        }
-
-            ::-webkit-scrollbar-thumb:window-inactive {
-                background: #6c757d;
-            }
-
         .custom-alert {
             color: red;
+            font-size:0.8em;
         }
 
         .scroll {
@@ -223,6 +247,12 @@
                 <li class="nav-item">
                     <a class="nav-link nav-link-dashboard" href=@Url.Action("New", "Dashboard")>Report</a>
                 </li>
+                <li class="nav-item" style="cursor:pointer;">
+                    <a class="nav-link" id="setting-link-li">Settings</a>
+                </li>
+                <li class="nav-item" style="cursor:pointer;">
+                    <a class="nav-link" id="backup-link-li">Backup</a>
+                </li>
             </ul>
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
@@ -242,13 +272,225 @@
     </nav>
 
     @*@Html.Partial("~/Views/Shared/ConfirmationModal.cshtml")*@
+    <div class="global-spinner fa-5x" style="color:#043346 !important">
+        <i class="fa fa-spinner fa-spin fa-pulse"></i>
+    </div>
+
     <div class="body-content body-container">
+
         @RenderBody()
         @Scripts.Render("~/bundles/validation")
+        <script src="~/Scripts/customAjaxHandler.js"></script>
         <hr class="d-print-none" />
         <footer class="d-print-none footer-container">
             <p>&copy; @DateTime.Now.Year - Product by Ram Bharlia</p>
         </footer>
     </div>
+
+    <div class="modal fade" id="backup-modal-data" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="backup-modal-data">Backup data</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="savetodrive-div"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal d-print-none" id="app-settings" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Bill Settings.</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info" role="alert">
+                        On selecting the product at the time billing, If GST is already included in the Product price
+                        then map the Product columns to the Billing total column or else if GST is to be included on the
+                        Product price then map the Product available columns to the Billing Price column
+                    </div>
+                    <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
+                        <tr>
+                            <th class="text-center" colspan="3">Product column and Bill column mappings</th>
+                        </tr>
+                        <tr>
+                            <th class="text-center">Product Columns</th>
+                            <th class="text-center" style="vertical-align:middle !important" rowspan="3">Map To</th>
+                            <th class="text-center">Bill Columns</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <select class="form-control form-control-sm" v-model="billSettings.ProductColumn">
+                                    <option value="Price">List Price</option>
+                                    <option value="DiscountPrice">Buy Price</option>
+                                    <option value="SellPrice">Sell Price</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select class="form-control form-control-sm" v-model="billSettings.BillColumn">
+                                    <option value="Price">Price </option>
+                                    <option value="TotalAmount">Total</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+                    <hr />
+                    <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
+                        <tr>
+                            <th colspan="2" class="text-center">
+                                Print bill column settings (show/hide)
+                                <i class="fa fa-info-circle fa-lg" data-toggle="tooltip" title="The column to be shown or hidden in the Bill"></i>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th class="text-center" style="width:350px; vertical-align:middle">HSN column required</th>
+                            <td class="text-center">
+                                <input type="checkbox" class="form-check-input" v-model="billSettings.IsHSNRequired">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-center" style="width:350px; vertical-align:middle">Measuring unit column required</th>
+                            <td class="text-center">
+                                <input type="checkbox" class="form-check-input" v-model="billSettings.IsPerRequired">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-center" style="width:350px; vertical-align:middle">Discount column required</th>
+                            <td class="text-center">
+                                <input type="checkbox" class="form-check-input" v-model="billSettings.IsDiscountRequired">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-center" style="width:350px; vertical-align:middle">GST rate column required</th>
+                            <td class="text-center">
+                                <input type="checkbox" class="form-check-input" v-model="billSettings.IsGstRate">
+                            </td>
+                        </tr>
+                    </table>
+                    <table style="font-size: 0.85em; color: #6c757d !important;" class="table table-bordered table-sm">
+                        <tr>
+                            <th colspan="2" class="text-center">
+                                Other settings
+                                <i class="fa fa-info-circle fa-lg" data-toggle="tooltip" title="The column to be shown or hidden in the Bill"></i>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th class="text-center" style="width:350px; vertical-align:middle">Paper size (A4/A5) </th>
+                            <td class="text-center">
+                                <select class="form-control form-control-sm" v-model="billSettings.PaperSize">
+                                    <option value="1">A4</option>
+                                    <option value="2">A5</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-center" style="width:350px; vertical-align:middle">Bill copy (Customer | Supplier | Transporter)</th>
+                            <td class="text-center">
+                                <select class="form-control form-control-sm" v-model="billSettings.CopyType">
+                                    <option value="1">Customer copy </option>
+                                    <option value="4">Supplier copy</option>
+                                    <option value="2">Customer & Supplier copy</option>
+                                    <option value="3">Customer,Supplier & Transporter copy</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" v-on:click="updateBillSettings()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://apis.google.com/js/platform.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            $("#setting-link-li").on("click", function () {
+                new Vue({
+                    el: '#app-settings',
+                    data: {
+                        billSettings: {
+                            ProductColumn: "",
+                            BillColumn: "",
+                            IsHSNRequired: true,
+                            IsPerRequired: true,
+                            IsDiscountRequired: true,
+                            IsGstRate: true,
+                            PaperSize: 1,
+                            CopyType: 1
+                        }
+                    },
+                    methods: {
+                        updateBillSettings: function () {
+                            var self = this;
+                            $.post("/Billing/UpdateBillSettings",
+                                self.billSettings,
+                                function (data) {
+                                    $("#bill-settings-modal").modal("hide");
+                                    $("#app-settings").modal("hide");
+                                    alert("settings updated succesfully");
+                                }).fail(function () {
+                                    self.alertFailureMessage = "Internal server error";
+                                });
+                        },
+                        getBillSettings: function () {
+                            var self = this;
+                            $.get("/Billing/GetBillSettings", function (res) {
+                                if (res) {
+                                    self.billSettings = res;
+                                }
+                            })
+                        },
+                    },
+                    mounted() {
+                        this.getBillSettings();
+                    }
+                });
+                $("#app-settings").modal("show");
+            });
+
+            $("#backup-link-li").on("click", function () {
+
+                $("#backup-modal-data").modal("show");
+
+                try {
+                    var d = new Date();
+                    var currentDate = d.getDate() + "-" + parseInt(d.getMonth() + 1) + "-" + d.getFullYear();
+                    var fileName = "GstBillingBackupData-" + currentDate + ".zip";
+                    var src = window.location.origin + "/Backup/" + fileName
+                    $.get("/profile/backup?fileName=" + fileName, function (response) {
+                        if (response && response.Message === "Success") {
+                            gapi.savetodrive.render('savetodrive-div', {
+                                src: src,
+                                filename: fileName,
+                                sitename: 'GST Billing app'
+                            });
+                        }
+                    });
+                }
+                catch (err) {
+
+                }
+
+            });
+        });
+
+       
+
+    </script>
 </body>
 </html>

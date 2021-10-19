@@ -28,6 +28,14 @@
         table-layout: fixed;
     }
 
+    #add-product-table td {
+        padding: 5px !important
+    }
+
+    #add-product-table th {
+        padding: 5px !important
+    }
+
     @@media only screen and (min-width: 768px) {
         .table-body {
             display: block;
@@ -67,6 +75,7 @@
         <div class="col-md-4">
             <button style="margin-top: 25px; float: right;" type="button" class="btn btn-success btn-sm" v-on:click="downloadReport()">Download</button>
             <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-on:click="openModalForAddProduct()">Add New Product</button>
+            <button style="margin-top:25px; float:right;  margin-right:10px;" type="button" class="btn btn-success btn-sm" v-on:click="openModalForBulkEditProduct()">Bulk Edit</button>
         </div>
     </div>
     <div style="margin-top:20px;">
@@ -90,7 +99,7 @@
                        class="table text-secondary" style="font-size:14px;">
                     <thead class="thead-light">
                         <tr>
-                            <th style="min-width:150px">Name</th>
+                            <th style="width:300px">Name</th>
                             <th>HSN/SAC</th>
                             <th>PER</th>
                             <th>Quantity Available</th>
@@ -206,6 +215,101 @@
             </div>
         </div>
 
+        
+
+        <!-- bulk edit profuct modal -->
+        <div class="modal" id="bulk-edit-product">
+            <div class="modal-dialog modal-dialog-centered modal-xl">
+                <div class="modal-content">
+
+                    @*Product search list view modal*@
+                    <div class="card" v-show="isSearchItemVisible" style="position:absolute; width:400px; z-index:2000; top:20px; left:860px; background-color:#eee">
+                        <div class="card-header">
+                            Items
+                            <span style="background-color:#28a745; float:right; cursor:pointer; color:white; padding:0px 15px 0px 15px;" v-on:click="hideSearchItemPanel()">
+                                Hide
+                            </span>
+                        </div>
+                        <div class="card-body" style="height:350px; overflow-y:scroll">
+                            <ul class="list-group custom-select-border" style="cursor:pointer">
+                                <li class="list-group-item list-group-item-light" v-on:click="onClickSearchItem(index)" style="font-size:0.9em;" v-for="(item,index) in searchItems">
+                                    {{item.Name}}
+                                    <span style="background-color: rgb(36, 169, 188);color: white; font-size:0.85em; padding:2px;">{{item.Quantity}}</span>
+                                    <span style="background-color: rgb(36, 169, 188);color: white; font-size:0.85em; padding:2px;">LP {{item.Price}}</span>
+                                    <span style="background-color: rgb(36, 169, 188);color: white; font-size:0.85em; padding:2px;">BP {{item.DiscountPrice}}</span>
+                                    <span style="background-color: rgb(36, 169, 188);color: white; font-size:0.85em; padding:2px;">SP {{item.SellPrice}}</span>
+                                </li>
+                                <li v-show="searchItems.length === 0">
+                                    <strong>No Items found</strong>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">Bulk edit products</h4>
+                        <button type="button" class="close" v-on:click="closeModal('#bulk-edit-product')">&times;</button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <table class="table text-secondary" id="bulk-edit-product-table" style="font-size: 14px; margin-bottom:5px;">
+                            <thead class="thead-light table-head">
+                                <tr class="table-row">
+                                    <th style="width: 45px" scope="col">#</th>
+                                    <th style="width:250px !important" scope="col">Name</th>
+                                    <th scope="col">HSN/SAC</th>
+                                    <th scope="col">PER</th>
+                                    <th scope="col" v-if="isStockCountEnabled">Quantity Available</th>
+                                    <th scope="col">SGST (%)</th>
+                                    <th scope="col">CGST (%)</th>
+                                    <th scope="col">Discount %</th>
+                                    <th scope="col">List Price</th>
+                                    <th scope="col">Buy Price</th>
+                                    <th scope="col">Sell Price</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-body">
+                                <tr class="table-row" v-for="(item,index) in newItems">
+                                    <td style="width: 45px">{{index+1}}</td>
+                                    <td style="width:250px !important"> <input type="text" cv="required" placeholder="Search product" v-on:keyup="searchItemFn(index)" v-model="item.Name" class="form-control form-control-sm"></td>
+                                    <td> <input type="text" v-model="item.HSN" class="form-control form-control-sm"></td>
+                                    <td>
+                                        <select class="form-control form-control-sm" v-model="item.MeasuringUnit">
+                                            <option value="NOS">NOS</option>
+                                            <option value="Unit">Unit</option>
+                                            <option value="Bag">Bag</option>
+                                            <option value="Box">Box</option>
+                                            <option value="KGS">KGS</option>
+                                        </select>
+                                    </td>
+                                    <td v-if="isStockCountEnabled"> <input type="number" cv="required" v-model="item.Quantity" class="form-control form-control-sm"></td>
+                                    <td> <input type="number" v-model="item.SGST" cv="required" v-on:keyup="copyTax(index)" class="form-control form-control-sm"></td>
+                                    <td> <input type="number" v-model="item.CGST" readonly cv="required"  class="form-control form-control-sm"></td>
+                                    <td> <input type="number" step=".01" v-model="item.Discount" v-on:keyup="calculatePerItemDiscount(index)" class="form-control form-control-sm"></td>
+                                    <td> <input type="number" v-model="item.Price" cv="required" v-on:keyup="calculatePerItemDiscount(index)" class="form-control form-control-sm"></td>
+                                    <td> <input type="number" readonly v-model="item.DiscountPrice" class="form-control form-control-sm"></td>
+                                    <td style="position:relative;">
+                                        <input type="number" v-model="item.SellPrice" class="form-control form-control-sm">
+                                        <i class="fa fa-trash show-on-hover" v-on:click="removeNewProduct(index)" style="position:absolute; right:15px; top:15px; cursor:pointer"></i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button type="button" class="btn btn-success btn-sm" style="margin-left:45px;" v-on:click="addEmptyProduct()">Add</button>
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success btn-sm" v-on:click="saveBulkEditProduct()">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
         <div class="modal" id="add-product">
             <div class="modal-dialog modal-dialog-centered modal-xl">
                 <div class="modal-content">
@@ -223,7 +327,7 @@
                             <thead class="thead-light table-head">
                                 <tr class="table-row">
                                     <th style="width: 45px" scope="col">#</th>
-                                    <th style="width:150px !important" scope="col">Name</th>
+                                    <th style="width:250px !important" scope="col">Name</th>
                                     <th scope="col">HSN/SAC</th>
                                     <th scope="col">PER</th>
                                     <th scope="col" v-if="isStockCountEnabled">Quantity Available</th>
@@ -238,7 +342,7 @@
                             <tbody class="table-body">
                                 <tr class="table-row" v-for="(item,index) in newItems">
                                     <td style="width: 45px">{{index+1}}</td>
-                                    <td style="width:150px !important"> <input type="text" cv="required" v-model="item.Name" class="form-control form-control-sm"></td>
+                                    <td style="width:250px !important"> <input type="text" cv="required" v-model="item.Name" class="form-control form-control-sm"></td>
                                     <td> <input type="text" v-model="item.HSN" class="form-control form-control-sm"></td>
                                     <td>
                                         <select class="form-control form-control-sm" v-model="item.MeasuringUnit">
@@ -250,13 +354,14 @@
                                         </select>
                                     </td>
                                     <td v-if="isStockCountEnabled"> <input type="number" cv="required" v-model="item.Quantity" class="form-control form-control-sm"></td>
-                                    <td> <input type="number" v-model="item.SGST" cv="required" class="form-control form-control-sm"></td>
-                                    <td> <input type="number" v-model="item.CGST" cv="required" v-on:keyup="copyTax(index)" class="form-control form-control-sm"></td>
+                                    <td> <input type="number" v-model="item.SGST" cv="required" v-on:keyup="copyTax(index)" class="form-control form-control-sm"></td>
+                                    <td> <input type="number" readonly v-model="item.CGST" cv="required"  class="form-control form-control-sm"></td>
                                     <td> <input type="number" step=".01" v-model="item.Discount" v-on:keyup="calculatePerItemDiscount(index)" class="form-control form-control-sm"></td>
                                     <td> <input type="number" v-model="item.Price" cv="required" v-on:keyup="calculatePerItemDiscount(index)" class="form-control form-control-sm"></td>
                                     <td> <input type="number" readonly v-model="item.DiscountPrice" class="form-control form-control-sm"></td>
-                                    <td style="display:inline-flex"> <input type="number" v-model="item.SellPrice" class="form-control form-control-sm">
-                                         <button type="button" style="padding:0px 0px 0px 5px; color:red" class="btn btn-link" v-on:click="removeNewProduct(index)">X</button>
+                                    <td style="position:relative;">
+                                        <input type="number" v-model="item.SellPrice" class="form-control form-control-sm">
+                                        <i class="fa fa-trash show-on-hover" v-on:click="removeNewProduct(index)" style="position:absolute; right:15px; top:15px; cursor:pointer"></i>
                                     </td>
                                 </tr>
                             </tbody>
@@ -304,13 +409,47 @@
             alertMessage: "",
             newItems: addEmptyNewItems(),
             tableRef: null,
-            isStockCountEnabled: false
+            isStockCountEnabled: false,
+            searchItems: [],
+            isSearchItemVisible: false
         }
 
         new Vue({
             el: '#app',
             data: obj,
             methods: {
+                hideSearchItemPanel: function () {
+                    this.isSearchItemVisible = false;
+                },
+                searchItemFn: function (index) {
+                    var self = this;
+                    self.isSearchItemVisible = true;
+                    self.currentSearchItemIndex = index;
+                    var searchValue = self.newItems[index].Name;
+                    $.get("/item/GetDataBySearch" + "?q=" + searchValue, function (res) {
+                        self.searchItems = res;
+                    });
+                },
+                onClickSearchItem: function (itemIndex) {
+                    var self = this;
+                    var index = self.currentSearchItemIndex;
+                    var data = self.searchItems[itemIndex];
+
+                    self.newItems[index].ItemId = data.Id;
+                    self.newItems[index].Name = data.Name;
+                    self.newItems[index].Price = data.Price;
+                    self.newItems[index].GST = data.CGST + data.SGST;
+                    self.newItems[index].CGST = data.CGST;
+                    self.newItems[index].SGST = data.SGST;
+                    self.newItems[index].Quantity = data.Quantity;
+                    self.newItems[index].Discount = data.Discount || 0;
+                    self.newItems[index].DiscountPrice = data.DiscountPrice;
+                    self.newItems[index].HSN = data.HSN;
+                    self.newItems[index].Id = data.Id;
+                    self.newItems[index].MeasuringUnit = data.MeasuringUnit;
+                    self.newItems[index].SellPrice = data.SellPrice;
+                    self.isSearchItemVisible = false;
+                },
                 addEmptyProduct: function () {
                     this.newItems.push(addEmptyNewItems()[0]);
                     var height = 50 * this.newItems.length;
@@ -319,6 +458,7 @@
                         $(".table-body").scrollTop(height)
                         validation[0].register();
                         $("#add-product-table tr:eq(" + currentTr + ") input:first").focus();
+                        $("#bulk-edit-product-table tr:eq(" + currentTr + ") input:first").focus();
                     }, 300)
                 },
                 removeNewProduct: function (index) {
@@ -327,9 +467,15 @@
                             this.newItems.splice(index, 1);
                         }
                     }
+                    else {
+                        if (confirm("Are you sure you want to clear the entry of the Product")) {
+                            this.newItems = addEmptyNewItems();
+                        }
+                    }
                 },
                 copyTax: function (index) {
                     this.newItems[index].CGST = this.newItems[index].SGST;
+                    this.calculatePerItemDiscount(index);
                 },
                 calculatePerItemDiscount: function(index) {
                     var currentItem = this.newItems[index];
@@ -357,13 +503,17 @@
                     $.get("/item/RemoveItem?id=" + id,
                         function() {
                             self.alertMessage = "Item deleted succesfully";
-                            self.tableRef.ajax.reload(self.bindTableClickEvents);
+                            self.tableRef.ajax.reload();
                         }).fail(function() {
                         self.alertFailureMessage = "Internal server error";
                     });
                 },
                 openModalForAddProduct: function() {
                     $("#add-product").modal("show");
+                    this.focusInput(0);
+                },
+                openModalForBulkEditProduct: function () {
+                    $("#bulk-edit-product").modal("show");
                     this.focusInput(0);
                 },
                 focusInput: function (index) {
@@ -394,7 +544,27 @@
                                 self.closeModal("#add-product");
                                 self.alertMessage = "Product Added succesfully.";
                                 self.newItems = addEmptyNewItems();
-                                self.tableRef.ajax.reload(self.bindTableClickEvents);
+                                self.tableRef.ajax.reload();
+                            }
+                        });
+                    }
+                },
+                saveBulkEditProduct: function () {
+                    validation[0].register();
+                    var isValid = validation[0].isTableDataValid("bulk-edit-product-table");
+                    if (isValid === 0) {
+                        var self = this;
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("EditItems", "Item")',
+                            data: JSON.stringify(self.newItems),
+                            dataType: 'json',
+                            contentType: 'application/json; charset=utf-8',
+                            success: function () {
+                                self.closeModal("#bulk-edit-product");
+                                alert("Changes made succesfully");
+                                self.newItems = addEmptyNewItems();
+                                self.tableRef.ajax.reload();
                             }
                         });
                     }
@@ -466,15 +636,15 @@
                 getTableData: function() {
                     var self = this;
                     self.tableRef = $("#product-table").DataTable({
-                        "scrollY": "180px",
-                        "paging": false,
+                        "lengthChange": false,
+                        "scrollY": "250px",
                         ajax: {
                             url: "/item/GetData",
                             type: "GET",
-                            dataSrc: function(json) {
+                            dataSrc: function (json) {
                                 return json;
                             },
-                            error: function(xhr, error) {
+                            error: function (xhr, error) {
                                 if (xhr.status === 401) alert("Unauthorised user");
                             }
                         },
@@ -482,6 +652,8 @@
                             header: true,
                             footer: true
                         },
+                        columnDefs: [
+                            { "width": "300px", "targets": 0 }],
                         columns: [
                             { data: "Name" },
                             {
@@ -506,8 +678,8 @@
                                 }
                             }
                         ],
-                        lengthMenu: [[5, 20, 25, 30, 100], [5, 20, 25, 30, 100]],
-                        initComplete: function(settings, json) {
+                        lengthMenu: [[50], [50]],
+                        initComplete: function (settings, json) {
                             //self.bindTableClickEvents();
                             self.hideStockCountColumns();
                         }

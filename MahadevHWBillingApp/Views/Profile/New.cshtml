@@ -74,6 +74,30 @@
                             </div>
                         </div>
                         <div class="form-group row">
+                            <label class="col-md-4">Bank</label>
+                            <div class="col-md-7">
+                                <input placeholder="SBI,HDFC etc" class="form-control" v-model="Bank">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-4">Account Number</label>
+                            <div class="col-md-7">
+                                <input type="email" class="form-control" v-model="AccountNumber">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-4">IFSC code</label>
+                            <div class="col-md-7">
+                                <input type="email" class="form-control" v-model="IfscCode">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-4">Branch</label>
+                            <div class="col-md-7">
+                                <input type="email" class="form-control" v-model="Branch">
+                            </div>
+                        </div>
+                        <div class="form-group row">
                             <label class="col-md-4">Address</label>
                             <div class="col-md-7">
                                 <textarea class="form-control" v-model="Address"></textarea>
@@ -103,7 +127,11 @@
             MobileNumber: "",
             Email: "",
             Address: "",
-            Id: 0
+            Id: 0,
+            Branch: "",
+            IfscCode: "",
+            Bank: "",
+            AccountNumber:""
         }
         new Vue({
             el: '#app',
@@ -119,7 +147,11 @@
                         MobileNumber: this.MobileNumber,
                         Email: this.Email,
                         Address: this.Address,
-                        Id: this.Id
+                        Id: this.Id,
+                        AccountNumber: this.AccountNumber,
+                        Bank: this.Bank,
+                        Branch: this.Branch,
+                        IfscCode: this.IfscCode
                     }
                     $.post(endPoint,
                         formData,
@@ -153,6 +185,10 @@
                             self.Email = res.Email;
                             self.Address = res.Address;
                             self.Id = res.Id;
+                            self.IfscCode = res.IfscCode;
+                            self.Bank = res.Bank;
+                            self.Branch = res.Branch;
+                            self.AccountNumber = res.AccountNumber;
                         }
                     }).fail(function () {
                         self.alertFailureMessage = "Internal server error";
